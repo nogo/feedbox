@@ -1,0 +1,27 @@
+{
+    "name": "slim/slim-skeleton",
+    "description": "A Slim Framework skeleton application for rapid development",
+    "keywords": ["microframework","rest","router"],
+    "homepage": "http://github.com/codeguy/Slim-Skeleton",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Josh Lockhart",
+            "email": "info@joshlockhart.com",
+            "homepage": "http://www.joshlockhart.com/"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "slim/slim": "2.*",
+        "slim/extras": "2.*",
+        "aura/sql": "1.*",
+        "symfony/yaml": "2.2.*",
+        "zendframework/zend-feed": "2.1.*",
+        "htmlawed/htmlawed": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {"": "src/"},
+        "files": ["vendor/htmlawed/htmlawed/htmLawed.php"]
+    }
+}

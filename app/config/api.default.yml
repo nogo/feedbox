@@ -1,0 +1,10 @@
+contentType: 'application/json'
+
+controller:
+  - 'Nogo\Feed\Controller\Sources'
+  - 'Nogo\Feed\Controller\Items'
+
+database_adapter: "sqlite"
+database_dsn: "%data_dir%/database.sdb"
+database_username: ""
+database_password: ""
