@@ -48,7 +48,15 @@ class Items extends AbstractRestController
     public function listAction()
     {
         $params = $this->getParameter($this->allowed_params);
+
+        $result = $this->getRepository()->fetchAllWithFilter($params, true);
+        $this->app->response()->header('X-Items-Total', $result[0]['count(*)']);
         $result = $this->getRepository()->fetchAllWithFilter($params);
-        $this->renderJson($result);
+
+        if (!empty($result)) {
+            $this->renderJson($result);
+        } else {
+            $this->renderJson(array('error' => 'No items.'), 400);
+        }
     }
 }

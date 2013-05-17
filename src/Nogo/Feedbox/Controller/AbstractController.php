@@ -58,10 +58,10 @@ abstract class AbstractController
      *
      * @param array $data
      */
-    protected function renderJson(array $data)
+    protected function renderJson(array $data, $status = 200)
     {
         $json = json_encode($data);
-        $this->render($json);
+        $this->render($json, $status);
     }
 
     /**
