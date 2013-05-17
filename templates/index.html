@@ -17,7 +17,7 @@
     <div class="row-fluid">
         <section id="sidebar" class="span2">
             <div class="nav-sidebar">
-                <div class="logo"><a href="#"><img src="img/box128.png" width="128" alt="FeedBox"> Feed Box</a></div>
+                <div class="logo"><a href="#"><img src="img/box128.png" width="128" alt="FeedBox"> <span class="nowrap">Feed Box</span></a></div>
                 <ul class="nav nav-list">
                     <li><a class="menu-item" href="#unread"><i class="icon-inbox"></i> Unread</a></li>
                     <li><a class="menu-item" href="#read"><i class="icon-inbox"></i> Read</a></li>
@@ -35,8 +35,8 @@
             </div>
             <div class="clearfix"></div>
         </section>
-        <section class="span10">
-            <div id="content"></div>
+        <section id="content" class="span10">
+            <div id="item-list" class="scrollable"></div>
         </section>
     </div>
 </div>
@@ -55,7 +55,15 @@
 
 <script type="text/template" id="tpl-item">
     <header class="entry-header foldable row-fluid">
-        <div class="entry-source span2" title="<%- model.get('source').get('name') %>"><i class="icon-star-empty"></i> <%- model.get('source').get('name') %></div>
+        <div class="entry-source span2" title="<%- model.get('source').get('name') %>">
+
+            <% if (model.get('starred') == 1) { %>
+            <button class="btn btn-mini starred"><i class="icon-star"></i></button>
+            <% } else { %>
+            <button class="btn btn-mini starred"><i class="icon-star-empty"></i></button>
+            <% } %>
+            <%- model.get('source').get('name') %>
+        </div>
         <div class="entry-title span7"><%= model.get('title') %></div>
         <div class="entry-date span2"><%- model.timeHumanize() %></div>
         <div class="entry-link span1"><button class="btn btn-mini btn-link open-entry-link"><i class="icon-external-link"></i></button></div>
@@ -66,9 +74,9 @@
     </div>
     <footer class="entry-controls">
         <% if (model.get('read')) { %>
-        <a class="read" href="#"><i class="icon-eye-open"></i> mark as unread</a>
+        <button class="btn btn-link read"><i class="icon-eye-open"></i> mark as unread</button>
         <% } else { %>
-        <a class="read" href="#"><i class="icon-eye-close"></i> mark as read</a>
+        <button class="btn btn-link read"><i class="icon-eye-close"></i> mark as read</button>
         <% } %>
         <button class="btn btn-link open-entry-link"><i class="icon-external-link"></i> open</button>
         <span><i class="icon-time"></i> <%- model.timeHumanize() %></span>
@@ -130,6 +138,8 @@
 
 <!-- Javascript -->
 <script src="js/vendor/jquery.min.js"></script>
+<script src="js/vendor/waypoints.min.js"></script>
+<script src="js/vendor/waypoints-infinite.min.js"></script>
 <script src="js/vendor/underscore.min.js"></script>
 <script src="js/vendor/backbone.min.js"></script>
 <script src="js/vendor/moment.min.js"></script>

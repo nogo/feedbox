@@ -28,21 +28,47 @@ App.router.route('unread', function() {
 });
 
 App.router.route('read', function() {
+    var items = App.Session.get('item-collection');
+
     App.switchView('content-view', 'item-list', function() {
         return new App.Module.Item.Views.List({
-            el: '#content'
+            collection: items
         });
     });
 
-    var items = App.Session.get('item-collection');
     if (items) {
+        var data = {
+            'unread': false,
+            'limit': 50,
+            'page': 1
+        };
+        App.Session.set('item-collection-data', data);
         items.fetch({
             reset: true,
-            data: {
-                'unread': false,
-                'limit': 50,
-                'page': 1
-            }
+            data: data
+        });
+    }
+});
+
+App.router.route('starred', function() {
+    var items = App.Session.get('item-collection');
+
+    App.switchView('content-view', 'item-list', function() {
+        return new App.Module.Item.Views.List({
+            collection: items
+        });
+    });
+
+    if (items) {
+        var data = {
+            'starred': true,
+            'limit': 50,
+            'page': 1
+        };
+        App.Session.set('item-collection-data', data);
+        items.fetch({
+            reset: true,
+            data: data
         });
     }
 });

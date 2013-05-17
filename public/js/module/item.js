@@ -29,7 +29,8 @@ App.Module.Item = {
             events: {
                 'click .foldable': 'showDetails',
                 'click .read': 'itemRead',
-                'click .open-entry-link': 'openLink'
+                'click .open-entry-link': 'openLink',
+                'click .starred': 'itemStarred'
             },
             render: function() {
                 // Call parent contructor
@@ -86,6 +87,18 @@ App.Module.Item = {
                     this.model.save({ 'read': null });
                 } else {
                     this.model.save({ 'read': moment().format('YYYY-MM-DD HH:mm:ss') });
+                }
+            },
+            itemStarred: function (e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                if (this.model.get('starred') == 1) {
+                    this.model.save({ 'starred': 0 });
+                } else {
+                    this.model.save({ 'starred': 1 });
                 }
             },
             openLink: function(e) {

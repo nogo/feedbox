@@ -21,6 +21,10 @@ html,body {
     font-style: normal;
 }
 
+.nowrap {
+    white-space: nowrap;
+}
+
 .toggable, .foldable {
     cursor: pointer;
 }
