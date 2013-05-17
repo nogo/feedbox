@@ -1,14 +1,14 @@
 {
-    "name": "slim/slim-skeleton",
-    "description": "A Slim Framework skeleton application for rapid development",
-    "keywords": ["microframework","rest","router"],
-    "homepage": "http://github.com/codeguy/Slim-Skeleton",
+    "name": "nogo/feedbox",
+    "description": "A feed reader like google reader",
+    "keywords": ["feed reader", "atom", "rss", "reader"],
+    "homepage": "http://github.com/nogo/feedbox",
     "license": "MIT",
     "authors": [
         {
-            "name": "Josh Lockhart",
-            "email": "info@joshlockhart.com",
-            "homepage": "http://www.joshlockhart.com/"
+            "name": "Danilo Kühn",
+            "email": "dk@nogo-software.de",
+            "homepage": "http://nogo-software.de"
         }
     ],
     "require": {
