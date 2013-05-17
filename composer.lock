@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "35fada9829a72b1800dae2d7f04e7769",
+    "hash": "5118607cf5b8d08b25b246ebf3ee3d1a",
     "packages": [
         {
             "name": "aura/installer-default",
@@ -48,16 +48,16 @@
         },
         {
             "name": "aura/sql",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/auraphp/Aura.Sql",
-                "reference": "1.0.0"
+                "url": "https://github.com/auraphp/Aura.Sql.git",
+                "reference": "1.1.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/auraphp/Aura.Sql/archive/1.0.0.zip",
-                "reference": "1.0.0",
+                "url": "https://api.github.com/repos/auraphp/Aura.Sql/zipball/1.1.0",
+                "reference": "1.1.0",
                 "shasum": ""
             },
             "require": {
@@ -87,6 +87,14 @@
                 {
                     "name": "Roy Gu",
                     "email": "cnwggu@gmail.com"
+                },
+                {
+                    "name": "Pascal Borrelli",
+                    "email": "pascal@borreli.com"
+                },
+                {
+                    "name": "Ramiro Varandas Jr",
+                    "email": "ramirovjnr@gmail.com"
                 }
             ],
             "description": "The Aura Sql package is a wrapper around PDO that provides connection adapters and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.",
@@ -100,7 +108,7 @@
                 "sql server",
                 "sqlite"
             ],
-            "time": "2012-11-29 00:00:00"
+            "time": "2013-05-09 00:00:00"
         },
         {
             "name": "htmlawed/htmlawed",

@@ -27,7 +27,7 @@ $db = $connection_factory->newInstance(
 // Load Controller
 foreach($app->config('controller') as $class) {
     $ref = new ReflectionClass($class);
-    if ($ref->isSubclassOf('Nogo\Feed\Controller\AbstractController')) {
+    if ($ref->isSubclassOf('Nogo\Feedbox\Controller\AbstractController')) {
         $controller = new $class($app, $db);
         $controller->enable();
     }

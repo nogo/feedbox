@@ -23,10 +23,10 @@ $connection = $connection_factory->newInstance(
     $app->config('database_password')
 );
 
-$sourceRepository = new \Nogo\Feed\Repository\Source($connection);
-$itemRepository = new \Nogo\Feed\Repository\Item($connection);
+$sourceRepository = new \Nogo\Feedbox\Repository\Source($connection);
+$itemRepository = new \Nogo\Feedbox\Repository\Item($connection);
 
-$feedRunner = new \Nogo\Feed\Helper\FeedLoader();
+$feedRunner = new \Nogo\Feedbox\Helper\FeedLoader();
 $feedRunner->setCacheDir($app->config('cache_dir'));
 $feedRunner->setSourceRepository($sourceRepository);
 $feedRunner->setItemRepository($itemRepository);

@@ -60,8 +60,8 @@ $app->get('/', function() use ($db, $app) {
     if ($app->getMode() === 'dev') {
         //loadSql($db, APP_DIR . '/sql/fixtures.sql');
 
-        $opml = new \Nogo\Feed\Helper\OpmlLoader();
-        $opml->setSourceRepository(new \Nogo\Feed\Repository\Source($db));
+        $opml = new \Nogo\Feedbox\Helper\OpmlLoader();
+        $opml->setSourceRepository(new \Nogo\Feedbox\Repository\Source($db));
         $opml->setContent(file_get_contents($app->config('data_dir') . '/subscriptions.xml'));
         $opml->run();
     }

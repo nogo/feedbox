@@ -7,7 +7,7 @@ define('VENDOR_DIR', ROOT_DIR . '/vendor');
 require ROOT_DIR . '/vendor/autoload.php';
 
 use Slim\Slim;
-use Nogo\Feed\Helper\ConfigLoader;
+use Nogo\Feedbox\Helper\ConfigLoader;
 use Symfony\Component\Yaml\Yaml;
 
 // load config
@@ -19,5 +19,3 @@ try {
 
 }
 $app = new Slim($configLoader->getConfig());
-
-// Middleware
