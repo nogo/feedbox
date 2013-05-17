@@ -4,7 +4,7 @@ namespace Nogo\Feedbox\Repository;
 class Item extends AbstractRepository
 {
     protected $table = 'items';
-    protected $fields = ['source_id', 'read', 'title', 'content', 'uid', 'uri'];
+    protected $fields = ['source_id', 'read', 'starred', 'title', 'content', 'uid', 'uri'];
 
     public function getFields()
     {
@@ -16,24 +16,46 @@ class Item extends AbstractRepository
         return $this->table;
     }
 
-    public function fetchAllWithFilter(array $filter = array())
+    public function fetchAllWithFilter(array $filter = array(), $count = false)
     {
         /**
          * @var $select \Aura\Sql\Query\Select
          */
         $select = $this->connection->newSelect();
-        $select->cols(['*'])
-            ->from($this->getTable())
-            ->orderBy(['updated_at DESC', 'id ASC'])
-            ->setPaging(50)
-            ->page(1);
+
+        $select->from($this->getTable())
+            ->orderBy(['updated_at DESC', 'id ASC']);
+
+        if ($count) {
+            $select->cols(['count(*)']);
+        } else {
+            $select->cols(['*']);
+        }
+
+        if (!$count) {
+            if (isset($filter['page']) && isset($filter['limit'])) {
+                $select->setPaging(intval($filter['limit']));
+                $select->page(intval($filter['page']));
+            }
+        }
 
 
         $bind = [];
         foreach ($filter as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+
             switch ($key) {
-                case 'unread':
+                case 'starred':
                     if ($value) {
+                        $select->where('starred = 1');
+                    } else {
+                        $select->where('starred = 0');
+                    }
+                    break;
+                case 'unread':
+                    if ($value == 'true' || $value == 1) {
                         $select->where('read IS NULL');
                     } else {
                         $select->where('read IS NOT NULL');
@@ -42,7 +64,8 @@ class Item extends AbstractRepository
             }
         }
 
-        return $this->connection->fetchAll($select);
+        return $this->connection->fetchAll($select, $bind);
+    }
     }
 
     public function countUnread(array $sourceIds = array())

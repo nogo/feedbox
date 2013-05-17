@@ -39,6 +39,20 @@ abstract class AbstractController
      */
     abstract public function enable();
 
+    protected function getParameter(array $filter = array())
+    {
+        if (empty($filter)) {
+            $params = $this->app->request()->get();
+        } else {
+            $params = array();
+            foreach ($filter as $name) {
+                $params[$name] = $this->app->request()->get($name);
+            }
+        }
+
+        return $params;
+    }
+
     /**
      * Render array data as json with json_decode
      *

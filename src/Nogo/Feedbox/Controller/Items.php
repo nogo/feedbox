@@ -16,6 +16,8 @@ class Items extends AbstractRestController
      */
     protected $repository;
 
+    protected $allowed_params = ['page', 'limit', 'unread', 'starred', 'source'];
+
     public function enable()
     {
         $this->app->get('/items', array($this, 'listAction'));
@@ -45,7 +47,8 @@ class Items extends AbstractRestController
 
     public function listAction()
     {
-        $result = $this->getRepository()->fetchAllWithFilter(['unread' => true]);
+        $params = $this->getParameter($this->allowed_params);
+        $result = $this->getRepository()->fetchAllWithFilter($params);
         $this->renderJson($result);
     }
 }
