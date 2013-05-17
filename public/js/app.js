@@ -119,13 +119,19 @@ var App = {
         return undefined;
     },
     router: new Backbone.Router(),
-    switchView: function(name, view) {
-        if (name && view) {
-            if (App.Session.has(name)) {
-                App.Session.get(name).remove();
+    switchView: function(section, name, callback) {
+        if (section && name && callback) {
+            var currentName = App.Session.get(section + '-name');
+
+            if (!currentName || currentName !== name) {
+                if (App.Session.has(section)) {
+                    App.Session.get(section).remove();
+                }
+                var view = callback();
+                view.render();
+                App.Session.set(section, view);
+                App.Session.set(section + '-name', name);
             }
-            view.render();
-            App.Session.set(name, view);
             this.notifier.show('#content');
         }
     }
