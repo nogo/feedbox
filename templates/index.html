@@ -2,44 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>NoGo feed</title>
+    <title>FeedBox</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <!-- Le styles -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/box64.ico" type="image/x-icon" />
 </head>
 <body>
-<header class="page-header">
-    <h1>NoGo feed</h1>
-</header>
-<div class="container">
-    <div class="row">
-        <section id="content" class="span9"></section>
-        <section id="sidebar" class="span3">
-            <ul class="nav nav-list nav-sidebar">
-                <li>
-                    <ul class="nav nav-list tree">
-                        <li><a href="#unread">Ungelesen</a></li>
-                        <li><a href="#newest">Neueste</a></li>
-                        <li><a href="#read">Gelesenen</a></li>
-                    </ul>
-                </li>
-                <li class="nav-header">
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        <section id="sidebar" class="span2">
+            <div class="nav-sidebar">
+                <div class="logo"><a href="#"><img src="img/box128.png" width="128" alt="FeedBox"> Feed Box</a></div>
+                <ul class="nav nav-list">
+                    <li><a class="menu-item" href="#unread"><i class="icon-inbox"></i> Unread</a></li>
+                    <li><a class="menu-item" href="#read"><i class="icon-inbox"></i> Read</a></li>
+                    <li><a class="menu-item" href="#starred"><i class="icon-star"></i> Starred</a></li>
+                </ul>
+                <header class="nav-header">
                     <div class="btn-group pull-right">
                         <a class="btn btn-mini" href="#sources/add" title="Hinzufügen"><i class="icon-plus"></i></a>
                         <a class="btn btn-mini" href="#sources/update" title="Aktualisieren"><i class="icon-refresh"></i></a>
                         <a class="btn btn-mini" href="#sources" title="Verwalten"><i class="icon-wrench"></i></a>
                     </div>
-                    <span class=" toggable" data-toggle="#sources"><i class="icon-inbox"></i> Sources</span>
-                </li>
-                <li id="sources" class="hide"></li>
-
-            </ul>
+                    <span class="toggable" data-target="#sources">Sources</span>
+                </header>
+                <div id="sources" class="hide scrollable"></div>
+            </div>
+            <div class="clearfix"></div>
         </section>
-
+        <section class="span10">
+            <div id="content"></div>
+        </section>
     </div>
 </div>
 
@@ -48,7 +46,7 @@
 </script>
 
 <script type="text/template" id="tpl-sidebar-source-item">
-    <a href="#sources/<%- model.id %>"><%- model.get('name') %> <span class="badge"><%- model.get('unread') %></span></a>
+    <a href="#sources/<%- model.id %>"><span class="source-name"><%- model.get('name') %></span><span class="source-unread"><%- model.get('unread') %></span></a>
 </script>
 
 <script type="text/template" id="tpl-item-source">
@@ -57,24 +55,28 @@
 
 <script type="text/template" id="tpl-item">
     <header class="entry-header foldable row-fluid">
-        <div class="entry-source span2"><%= App.render('#tpl-item-source', { model: model.get('source') }) %></div>
+        <div class="entry-source span2" title="<%- model.get('source').get('name') %>"><i class="icon-star-empty"></i> <%- model.get('source').get('name') %></div>
         <div class="entry-title span7"><%= model.get('title') %></div>
         <div class="entry-date span2"><%- model.timeHumanize() %></div>
-        <div class="entry-link span1"><button class="btn btn-mini btn-link open-entry-link"><i class="icon-share-alt"></i></button></div>
+        <div class="entry-link span1"><button class="btn btn-mini btn-link open-entry-link"><i class="icon-external-link"></i></button></div>
     </header>
     <div class="entry-details foldable">
         <h4><%= model.get('title') %></h4>
         <%= model.get('content') %>
     </div>
     <footer class="entry-controls">
-        <% if (model.get('read')) { %>
-        <a class="read" href="#"><i class="icon-eye-open"></i> als ungelesen markieren</a>
-        <% } else { %>
-        <a class="read" href="#"><i class="icon-eye-close"></i> als gelesen markieren</a>
-        <% } %>
-        <button class="btn btn-link open-entry-link"><i class="icon-share-alt"></i> öffnen</button>
-        <i class="icon-time"></i> <%- model.timeHumanize() %>
-        <i class="icon-inbox"></i> <%- model.get('source').get('name') %>
+        <div class="pull-right">
+            <span><i class="icon-rss"></i> <%- model.get('source').get('name') %></span>
+            <span><i class="icon-time"></i> <%- model.timeHumanize() %></span>
+        </div>
+        <div>
+            <% if (model.get('read')) { %>
+            <a class="read" href="#"><i class="icon-eye-open"></i> als ungelesen markieren</a>
+            <% } else { %>
+            <a class="read" href="#"><i class="icon-eye-close"></i> als gelesen markieren</a>
+            <% } %>
+            <button class="btn btn-link open-entry-link"><i class="icon-share-alt"></i> öffnen</button>
+        </div>
     </footer>
 </script>
 

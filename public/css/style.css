@@ -1,32 +1,99 @@
-@font-face {
-    font-family: 'SearsTowerRegular';
-    src: url('Sears_Tower-webfont.eot');
-    src: url('Sears_Tower-webfont.eot?#iefix') format('embedded-opentype'),
-    url('Sears_Tower-webfont.woff') format('woff'),
-    url('Sears_Tower-webfont.ttf') format('truetype'),
-    url('Sears_Tower-webfont.svg#SearsTowerRegular') format('svg');
-    font-weight: normal;
-    font-style: normal;
+/* boostrap tweak */
+
+a:hover, a:focus,
+.btn-link:hover, .btn-link:focus {
+    text-decoration: none;
 }
 
-.page-header h1 {
+/* custom */
+html,body {
+    background-color: #424242;
+}
+
+@font-face {
     font-family: 'SearsTowerRegular';
-    text-align: center;
+    src: url('../font/Sears_Tower-webfont.eot');
+    src: url('../font/Sears_Tower-webfont.eot?#iefix') format('embedded-opentype'),
+    url('../font/Sears_Tower-webfont.woff') format('woff'),
+    url('../font/Sears_Tower-webfont.ttf') format('truetype'),
+    url('../font/Sears_Tower-webfont.svg#SearsTowerRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 
 .toggable, .foldable {
     cursor: pointer;
 }
 
-/* sidebar nav */
+.scrollable {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.container-fluid {
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+/* sidebar */
+@media (min-width: 979px) {
+    .nav-sidebar {
+        position:fixed;
+        top: 20px;
+        left: 20px;
+        bottom: 20px;
+        width: 14.893617021276595%;
+    }
+}
+
 .nav-sidebar {
-    background-color: #F5F5F5;
-    border: 1px solid #E3E3E3;
-    border-radius: 3px 3px 3px 3px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
-    margin-bottom: 20px;
-    min-height: 20px;
-    padding: 9px;
+    overflow: hidden;
+}
+
+.nav-header {
+    text-shadow: none;
+}
+
+.nav-list > li > a,
+.nav-list .nav-header {
+    color: #ccc;
+    text-shadow: none;
+}
+
+.nav-list > li > a:hover,
+.nav-list > li > a:focus {
+    background: #5E5E5E;
+}
+
+.logo {
+    color: #1a1a1a;
+    font-family: 'SearsTowerRegular';
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.logo a {
+    color: #1a1a1a;
+}
+.logo a:hover,
+.logo a:focus {
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+.source-name {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 85%;
+}
+
+.source-unread {
+    display: inline-block;
+    padding-left: 4px;
+    vertical-align: top;
+    width: 10%;
 }
 
 /* entry layout */
@@ -55,6 +122,7 @@
     font-size: 11px;
     overflow: hidden;
     padding-left: 10px;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -135,4 +203,10 @@
 }
 .box.muted small {
     display: none;
+}
+
+.badge-iconic {
+    margin-right: 5px;
+    text-align: center;
+    width: 35px;
 }
