@@ -19,15 +19,20 @@
             <div class="nav-sidebar">
                 <div class="logo"><a href="#"><img src="img/box128.png" width="128" alt="FeedBox"> <span class="nowrap">Feed Box</span></a></div>
                 <ul class="nav nav-list">
-                    <li><a class="menu-item" href="#unread"><i class="icon-inbox"></i> Unread</a></li>
+                    <li>
+                        <div class="btn-group pull-right">
+                            <button class="btn btn-mini mark-as-read" title="Mark all as read"><i class="icon-eye-close"></i></button>
+                        </div>
+                        <a class="menu-item" href="#unread"><i class="icon-inbox"></i> Unread</a>
+                    </li>
                     <li><a class="menu-item" href="#read"><i class="icon-inbox"></i> Read</a></li>
                     <li><a class="menu-item" href="#starred"><i class="icon-star"></i> Starred</a></li>
                 </ul>
                 <header class="nav-header">
                     <div class="btn-group pull-right">
-                        <a class="btn btn-mini" href="#sources/add" title="Hinzufügen"><i class="icon-plus"></i></a>
-                        <a class="btn btn-mini" href="#sources/update" title="Aktualisieren"><i class="icon-refresh"></i></a>
-                        <a class="btn btn-mini" href="#sources" title="Verwalten"><i class="icon-wrench"></i></a>
+                        <a class="btn btn-mini" href="#sources/add" title="Add"><i class="icon-plus"></i></a>
+                        <a class="btn btn-mini" href="#sources/update" title="Refresh"><i class="icon-refresh"></i></a>
+                        <a class="btn btn-mini" href="#sources" title="Manage"><i class="icon-wrench"></i></a>
                     </div>
                     <span class="toggable" data-target="#sources">Sources</span>
                 </header>
@@ -138,8 +143,6 @@
 
 <!-- Javascript -->
 <script src="js/vendor/jquery.min.js"></script>
-<script src="js/vendor/waypoints.min.js"></script>
-<script src="js/vendor/waypoints-infinite.min.js"></script>
 <script src="js/vendor/underscore.min.js"></script>
 <script src="js/vendor/backbone.min.js"></script>
 <script src="js/vendor/moment.min.js"></script>

@@ -167,6 +167,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
         }
         if(options && options.xhr && options.xhr.getResponseHeader('X-Items-Total')) {
             this.itemTotal = options.xhr.getResponseHeader('X-Items-Total');
+            collection.total(this.itemTotal);
         }
     },
     addMore: function(e) {
@@ -199,6 +200,14 @@ App.Module.Item.Views.List = App.Views.List.extend({
 
 App.Module.Item.Collection = Backbone.Collection.extend({
     model: App.Module.Item.Model,
-    url: 'api.php/items'
+    url: 'api.php/items',
+    total: function(total) {
+        if (total !== undefined) {
+            this.totalCount = total;
+        }
+
+        return this.totalCount || 0;
+    }
+
 });
 App.Module.Item.initialize(App);

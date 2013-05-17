@@ -5,11 +5,16 @@ App.Module.Sidebar = {
         Main: Backbone.View.extend({
             el: '#sidebar',
             events: {
-                'click .toggable': 'toggable'
+                'click .toggable': 'toggable',
+                'click .mark-as-read': 'markAsRead'
             },
             initialize: function() {
                 this.sources = App.Session.get('source-collection');
-                this.sources.fetch({ async: false });
+                this.items = App.Session.get('item-collection');
+
+                if (this.sources) {
+                    this.sources.fetch({ async: false });
+                }
             },
             render: function() {
                 // Source view
@@ -44,6 +49,17 @@ App.Module.Sidebar = {
                         height = $(window).height() - position.top - 40;
                     target.height(height);
                 }
+            },
+            markAsRead: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                this.items.each(function(model) {
+                    if (!model.get('read')) {
+                        model.save({ 'read': moment().format('YYYY-MM-DD HH:mm:ss') });
+                    }
+                });
             }
         })
     },
