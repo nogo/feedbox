@@ -180,7 +180,7 @@ html,body {
 .box {
     background-color: #fff;
     border: 1px solid #CCC;
-    padding:  10px;
+    padding: 10px 20px;
 }
 .box.has-errors {
     border-color: red;
@@ -209,4 +209,12 @@ html,body {
     margin-right: 5px;
     text-align: center;
     width: 35px;
+}
+
+form.well {
+    background-color: #fff;
+}
+
+form.well .form-actions {
+    margin-bottom: 0px;
 }

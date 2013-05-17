@@ -62,21 +62,17 @@
     </header>
     <div class="entry-details foldable">
         <h4><%= model.get('title') %></h4>
-        <%= model.get('content') %>
+        <div class="entry-content"><%= model.get('content') %></div>
     </div>
     <footer class="entry-controls">
-        <div class="pull-right">
-            <span><i class="icon-rss"></i> <%- model.get('source').get('name') %></span>
-            <span><i class="icon-time"></i> <%- model.timeHumanize() %></span>
-        </div>
-        <div>
-            <% if (model.get('read')) { %>
-            <a class="read" href="#"><i class="icon-eye-open"></i> als ungelesen markieren</a>
-            <% } else { %>
-            <a class="read" href="#"><i class="icon-eye-close"></i> als gelesen markieren</a>
-            <% } %>
-            <button class="btn btn-link open-entry-link"><i class="icon-share-alt"></i> öffnen</button>
-        </div>
+        <% if (model.get('read')) { %>
+        <a class="read" href="#"><i class="icon-eye-open"></i> mark as unread</a>
+        <% } else { %>
+        <a class="read" href="#"><i class="icon-eye-close"></i> mark as read</a>
+        <% } %>
+        <button class="btn btn-link open-entry-link"><i class="icon-external-link"></i> open</button>
+        <span><i class="icon-time"></i> <%- model.timeHumanize() %></span>
+        <span><i class="icon-rss"></i> <%- model.get('source').get('name') %></span>
     </footer>
 </script>
 
@@ -95,11 +91,11 @@
 </script>
 
 <script type="text/template" id="tpl-source-form">
-    <form class="form-horizontal">
+    <form class="form-horizontal well">
         <fieldset>
-            <legend>Quelle bearbeiten</legend>
+            <legend>Edit source</legend>
             <div class="control-group">
-                <label class="control-label" for="source-active">Aktiv</label>
+                <label class="control-label" for="source-active">Active?</label>
                 <div class="controls">
                     <input type="checkbox" id="source-active" name="active" class="input-block-level" checked>
                 </div>
@@ -124,8 +120,8 @@
             </div>
             <div class="form-actions">
                 <div class="pull-right">
-                    <button type="submit" class="btn btn-primary save">Speichern</button>
-                    <button class="btn cancel">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary save">Save</button>
+                    <button class="btn cancel">Cancel</button>
                 </div>
             </div>
         </fieldset>
