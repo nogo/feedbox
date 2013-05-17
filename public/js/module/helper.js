@@ -61,7 +61,7 @@ App.Views.List = Backbone.View.extend({
             this.setElement(this.options.templateEl);
         }
 
-        if (this.collection) {
+        if (this.collection && this.collection.length > 0) {
             this.addAll();
         }
 
