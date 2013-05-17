@@ -108,32 +108,78 @@ App.Module.Item = {
     }
 };
 
-App.Module.Item.Views.List = Backbone.View.extend({
-    initialize: function () {
-        this.items = App.Session.get('item-collection');
-        this.items.fetch();
+App.Module.Item.Views.List = App.Views.List.extend({
+    el: '#item-list',
+    options: {
+        prefix: 'item-',
+        item: {
+            attributes: {
+                'class': 'entry'
+            },
+            tagName: 'article',
+            template: '#tpl-item',
+            View: App.Module.Item.Views.Item
+        }
     },
-    render: function () {
-        this.itemList = new App.Views.List({
-            el: '#content',
-            prefix: 'item-',
-            collection: this.items,
-            item: {
-                attributes: {
-                    'class': 'entry'
-                },
-                tagName: 'article',
-                template: '#tpl-item',
-                View: App.Module.Item.Views.Item
-            }
-        });
-        this.itemList.render();
+    events: {
+        'scroll': 'addMore'
+    },
+    initialize: function() {
+        // Call parent contructor
+        App.Views.List.prototype.initialize.call(this);
+
+        this.itemTotal = 0;
+
+        if (this.collection) {
+            this.collection.on('sync', this.retrieveItemCount, this);
+        }
+    },
+    render: function() {
+        // Call parent contructor
+        App.Views.List.prototype.render.call(this);
+
+        var position = this.$el.position(),
+            height = $(window).height() - position.top - 20;
+        this.$el.height(height);
+
+        this.isLoading = false;
 
         return this;
     },
-    remove: function () {
-        if (this.itemList) {
-            this.itemList.remove();
+    retrieveItemCount: function(collection, xhr, options) {
+        if(options && options.hasOwnProperty('getResponseHeader')) {
+            options = {
+                xhr: options
+            };
+        }
+        if(options && options.xhr && options.xhr.getResponseHeader('X-Items-Total')) {
+            this.itemTotal = options.xhr.getResponseHeader('X-Items-Total');
+        }
+    },
+    addMore: function(e) {
+        var triggerPoint = 100; // 100px from the bottom
+        if (!this.isLoading) {
+            if(this.el.scrollTop + this.el.clientHeight + triggerPoint > this.el.scrollHeight) {
+                this.isLoading = true;
+                if (this.collection.length < this.itemTotal) {
+                    var that = this,
+                        data =  App.Session.get('item-collection-data');
+
+                    data.page += 1;
+                    this.collection.fetch({
+                        remove: false,
+                        async: false,
+                        data: data,
+                        success: function(models, textStatus, jqXHR) {
+                            App.Session.set('item-collection-data', data);
+                            that.isLoading = false;
+                        },
+                        error: function() {
+
+                        }
+                    });
+                }
+            }
         }
     }
 });
