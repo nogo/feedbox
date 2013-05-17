@@ -18,7 +18,7 @@ App.Module.Sidebar = {
                     tagName: 'ul',
                     collection: this.sources,
                     attributes: {
-                        'class': 'nav nav-list tree'
+                        'class': 'nav nav-list'
                     },
                     item: {
                         tagName: 'li',
@@ -28,21 +28,21 @@ App.Module.Sidebar = {
                 });
                 this.$('#sources').html(sourceList.render().el);
 
-                //App.router.route('')
-
                 return this;
             },
             toggable: function(e) {
                 if (e) {
-                    console.log(e.currentTarget);
                     e.preventDefault();
                 }
 
                 var component = $(e.currentTarget),
-                    toggle = component.data('toggle');
+                    target = this.$(component.data('target'));
 
-                if (toggle) {
-                    this.$(toggle).toggle();
+                if (target) {
+                    target.toggle();
+                    var position = target.position(),
+                        height = $(window).height() - position.top - 40;
+                    target.height(height);
                 }
             }
         })
