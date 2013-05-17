@@ -1,5 +1,5 @@
 <?php
-namespace Nogo\Feed\Helper;
+namespace Nogo\Feedbox\Helper;
 
 use Aura\Sql\Exception;
 use Symfony\Component\Yaml\Yaml;

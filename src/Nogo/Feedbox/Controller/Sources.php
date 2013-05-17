@@ -1,11 +1,11 @@
 <?php
-namespace Nogo\Feed\Controller;
+namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
-use Nogo\Feed\Helper\FeedLoader;
-use Nogo\Feed\Repository\Repository;
-use Nogo\Feed\Repository\Source as SourceRepository;
-use Nogo\Feed\Repository\Item as ItemRepository;
+use Nogo\Feedbox\Helper\FeedLoader;
+use Nogo\Feedbox\Repository\Repository;
+use Nogo\Feedbox\Repository\Source as SourceRepository;
+use Nogo\Feedbox\Repository\Item as ItemRepository;
 
 class Sources extends AbstractRestController
 {

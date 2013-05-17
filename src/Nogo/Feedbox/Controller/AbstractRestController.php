@@ -1,13 +1,13 @@
 <?php
-namespace Nogo\Feed\Controller;
+namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
-use Nogo\Feed\Repository\Repository;
+use Nogo\Feedbox\Repository\Repository;
 
 /**
  * Class AbstractRestController
  *
- * @package Nogo\Feed\Controller
+ * @package Nogo\Feedbox\Controller
  */
 abstract class AbstractRestController extends AbstractController
 {

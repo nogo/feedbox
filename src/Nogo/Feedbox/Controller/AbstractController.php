@@ -1,5 +1,5 @@
 <?php
-namespace Nogo\Feed\Controller;
+namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
 use Slim\Slim;
@@ -7,7 +7,7 @@ use Slim\Slim;
 /**
  * Class AbstractController
  *
- * @package Nogo\Feed\Controller
+ * @package Nogo\Feedbox\Controller
  */
 abstract class AbstractController
 {

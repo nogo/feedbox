@@ -1,8 +1,8 @@
 <?php
-namespace Nogo\Feed\Helper;
+namespace Nogo\Feedbox\Helper;
 
-use Nogo\Feed\Repository\Item as ItemRepository;
-use Nogo\Feed\Repository\Source as SourceRepository;
+use Nogo\Feedbox\Repository\Item as ItemRepository;
+use Nogo\Feedbox\Repository\Source as SourceRepository;
 use Slim\Slim;
 
 class FeedLoader

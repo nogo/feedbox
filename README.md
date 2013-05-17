@@ -1,4 +1,4 @@
-# Feed reader (Working-Title: NoGo Feed)
+# FeedBox
 
 Feed reader inspired by Google Reader and Selfoss.
 
@@ -17,3 +17,5 @@ Feed reader inspired by Google Reader and Selfoss.
 * Bootstap: http://twitter.github.io/bootstrap/index.html
 
 * Selfoss: http://selfoss.aditu.de/
+
+* Box-Graphics: http://www.graphicsfuel.com/2012/01/cardboard-box-icon-psd/

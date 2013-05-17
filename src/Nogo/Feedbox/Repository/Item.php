@@ -1,5 +1,5 @@
 <?php
-namespace Nogo\Feed\Repository;
+namespace Nogo\Feedbox\Repository;
 
 class Item extends AbstractRepository
 {

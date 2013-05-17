@@ -1,6 +1,6 @@
 <?php
 
-namespace Nogo\Feed\Repository;
+namespace Nogo\Feedbox\Repository;
 
 use Aura\Sql\Connection\AbstractConnection;
 
