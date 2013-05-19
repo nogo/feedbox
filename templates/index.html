@@ -59,19 +59,35 @@
 </script>
 
 <script type="text/template" id="tpl-item">
-    <header class="entry-header foldable row-fluid">
-        <div class="entry-source span2" title="<%- model.get('source').get('name') %>">
-
-            <% if (model.get('starred') == 1) { %>
-            <button class="btn btn-mini starred"><i class="icon-star"></i></button>
-            <% } else { %>
-            <button class="btn btn-mini starred"><i class="icon-star-empty"></i></button>
-            <% } %>
-            <%- model.get('source').get('name') %>
+    <header class="entry-header foldable">
+        <div class="visible-phone">
+            <div class="entry-source">
+                <div class="btn-group pull-right">
+                <% if (model.get('starred') == 1) { %>
+                <button class="btn btn-mini starred"><i class="icon-star"></i></button>
+                <% } else { %>
+                <button class="btn btn-mini starred"><i class="icon-star-empty"></i></button>
+                <% } %>
+                <button class="btn btn-mini open-entry-link"><i class="icon-external-link"></i></button>
+                </div>
+                <%- model.get('source').get('name') %>
+                - <%- model.timeHumanize() %>
+            </div>
+            <div class="entry-title"><%= model.get('title') %></div>
         </div>
-        <div class="entry-title span7"><%= model.get('title') %></div>
-        <div class="entry-date span2"><%- model.timeHumanize() %></div>
-        <div class="entry-link span1"><button class="btn btn-mini btn-link open-entry-link"><i class="icon-external-link"></i></button></div>
+        <div class="hidden-phone row-fluid">
+            <div class="entry-source span2" title="<%- model.get('source').get('name') %>">
+                <% if (model.get('starred') == 1) { %>
+                <button class="btn btn-mini starred"><i class="icon-star"></i></button>
+                <% } else { %>
+                <button class="btn btn-mini starred"><i class="icon-star-empty"></i></button>
+                <% } %>
+                <%- model.get('source').get('name') %>
+            </div>
+            <div class="entry-title span7"><%= model.get('title') %></div>
+            <div class="entry-date span2"><%- model.timeHumanize() %></div>
+            <div class="entry-link span1"><button class="btn btn-mini open-entry-link"><i class="icon-external-link"></i></button></div>
+        </div>
     </header>
     <div class="entry-details foldable">
         <h4><%= model.get('title') %></h4>

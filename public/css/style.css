@@ -101,6 +101,7 @@ html,body {
 }
 
 /* entry layout */
+
 .entry {
     background: #FFF;
     border: 1px solid #CCC;
@@ -119,7 +120,7 @@ html,body {
 }
 
 .entry-read .entry-header {
-    color: #CCC;
+    background-color: #EEE;
 }
 
 .entry-source {
@@ -133,6 +134,7 @@ html,body {
 .entry-title {
     font-weight: bold;
     overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -178,6 +180,17 @@ html,body {
 .entry-unfolded .entry-details,
 .entry-unfolded .entry-controls {
     display: block;
+}
+
+@media (max-width: 767px) {
+    .entry-source {
+        padding: 0 10px;
+    }
+
+    .entry-title {
+        padding: 0 10px;
+        white-space: normal;
+    }
 }
 
 /* box layout */
