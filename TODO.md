@@ -1,12 +1,11 @@
 # TODO
 
-* Testing
-* Menu structure
-* FavIcons
 * Better mobile layout
-* Pagination
-* Filter read / unread
 * Filter Item Source
+* Mark menu items
+
+* Testing
+* FavIcons
 * Import OPML via Frontend
 
 # Features
