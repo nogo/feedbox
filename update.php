@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../app/bootstrap.php';
+require_once dirname(__FILE__) . '/app/bootstrap.php';
 
 // load API config
 $configLoader->mergeLoad(APP_DIR . '/config/api.default.yml');
