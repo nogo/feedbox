@@ -1,8 +1,7 @@
 # TODO
 
+* Unread counter
 * Better mobile layout
-* Filter Item Source
-* Mark menu items
 
 * Testing
 * FavIcons

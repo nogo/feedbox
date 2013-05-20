@@ -134,5 +134,34 @@ var App = {
             }
             this.notifier.show('#content');
         }
+    },
+    selectMenuItem: function(item) {
+        var items = App.Session.get('selected-menu-items', function() { return [] });
+
+        if (item) {
+            if (_.isString(item)) {
+                items.push(item);
+            } else if (_.isArray(item)) {
+                items = $.merge(items, item);
+            }
+        }
+
+        $('.menu-item').removeClass('active').each(function(idx, el) {
+           $(el).parent('li').removeClass('active');
+        });
+
+
+        for (var i=0; i<items.length; i++) {
+            var $item = $(items[i]),
+                parent = $item.parent('li');
+
+            if (parent) {
+                parent.addClass('active');
+            } else {
+                $item.addClass('active');
+            }
+        }
+
+        App.Session.set('selected-menu-items', items);
     }
 };

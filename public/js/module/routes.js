@@ -24,6 +24,8 @@ App.router.route('unread', function() {
             reset: true,
             data: data
         });
+        App.Session.set('selected-menu-items', ['.menu-item-unread']);
+        App.selectMenuItem();
     }
 });
 
@@ -47,6 +49,8 @@ App.router.route('read', function() {
             reset: true,
             data: data
         });
+        App.Session.set('selected-menu-items', ['.menu-item-read']);
+        App.selectMenuItem();
     }
 });
 
@@ -70,6 +74,9 @@ App.router.route('starred', function() {
             reset: true,
             data: data
         });
+
+        App.Session.set('selected-menu-items', ['.menu-item-starred']);
+        App.selectMenuItem();
     }
 });
 
@@ -81,6 +88,45 @@ App.router.route('sources', function() {
             el: '#content'
         });
     });
+});
+
+App.router.route('sources/:id', function(id) {
+    var items = App.Session.get('item-collection');
+
+    App.switchView('content-view', 'item-list', function() {
+        return new App.Module.Item.Views.List({
+            collection: items
+        });
+    });
+
+    if (items) {
+        var data = App.Session.get('item-collection-data', function() {
+            return {
+                unread: true
+            };
+        }),
+        selectedMenuItem = ['.menu-item-source-' + id];
+
+        if (data.unread) {
+            selectedMenuItem.push('.menu-item-unread');
+        } else if (!data.unread) {
+            selectedMenuItem.push('.menu-item-read');
+        } else if (data.starred) {
+            selectedMenuItem.push('.menu-item-starred');
+        }
+
+        data.limit = 50;
+        data.page = 1;
+        data.source = id;
+
+        App.Session.set('item-collection-data', data);
+        items.fetch({
+            reset: true,
+            data: data
+        });
+        App.Session.set('selected-menu-items', selectedMenuItem);
+        App.selectMenuItem();
+    }
 });
 
 App.router.route('sources/add', function(id) {

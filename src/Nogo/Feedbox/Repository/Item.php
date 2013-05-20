@@ -47,6 +47,13 @@ class Item extends AbstractRepository
             }
 
             switch ($key) {
+                case 'source':
+                    $value = intval($value);
+                    if ($value) {
+                        $bind['source'] = $value;
+                        $select->where('source_id = :source');
+                    }
+                    break;
                 case 'starred':
                     if ($value) {
                         $select->where('starred = 1');

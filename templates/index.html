@@ -20,13 +20,13 @@
                 <div class="logo text-center"><a href="#"><img src="img/box128-1.png" width="128" alt="FeedBox"></a></div>
                 <ul class="nav nav-list">
                     <li>
-                        <div class="btn-group pull-right">
+                        <div class="btn-group pull-right" style="margin-top: 2px;">
                             <button class="btn btn-mini mark-as-read" title="Mark all as read"><i class="icon-eye-close"></i></button>
                         </div>
-                        <a class="menu-item" href="#unread"><i class="icon-inbox"></i> Unread</a>
+                        <a class="menu-item menu-item-unread" href="#unread"><i class="icon-inbox"></i> Unread</a>
                     </li>
-                    <li><a class="menu-item" href="#read"><i class="icon-inbox"></i> Read</a></li>
-                    <li><a class="menu-item" href="#starred"><i class="icon-star"></i> Starred</a></li>
+                    <li><a class="menu-item menu-item-read" href="#read"><i class="icon-inbox"></i> Read</a></li>
+                    <li><a class="menu-item menu-item-starred" href="#starred"><i class="icon-star"></i> Starred</a></li>
                 </ul>
                 <header class="nav-header">
                     <div class="btn-group pull-right">
@@ -51,7 +51,7 @@
 </script>
 
 <script type="text/template" id="tpl-sidebar-source-item">
-    <a href="#sources/<%- model.id %>"><span class="source-name"><%- model.get('name') %></span><span class="source-unread"><%- model.get('unread') %></span></a>
+    <a class="menu-item menu-item-source-<%- model.id %>" href="#sources/<%- model.id %>"><span class="source-name"><%- model.get('name') %></span><span class="source-unread"><%- model.get('unread') %></span></a>
 </script>
 
 <script type="text/template" id="tpl-item-source">

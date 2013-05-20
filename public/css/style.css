@@ -64,6 +64,9 @@ html,body {
     text-shadow: none;
 }
 
+.nav-list > li.active > a,
+.nav-list > li.active > a:hover,
+.nav-list > li.active > a:focus,
 .nav-list > li > a:hover,
 .nav-list > li > a:focus {
     background: #5E5E5E;

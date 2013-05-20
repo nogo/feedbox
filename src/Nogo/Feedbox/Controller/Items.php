@@ -53,10 +53,6 @@ class Items extends AbstractRestController
         $this->app->response()->header('X-Items-Total', $result[0]['count(*)']);
         $result = $this->getRepository()->fetchAllWithFilter($params);
 
-        if (!empty($result)) {
-            $this->renderJson($result);
-        } else {
-            $this->renderJson(array('error' => 'No items.'), 400);
-        }
+        $this->renderJson($result);
     }
 }
