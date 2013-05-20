@@ -5,6 +5,20 @@ a:hover, a:focus,
     text-decoration: none;
 }
 
+.nav-list > li > a,
+.nav-list .nav-header {
+    color: #ccc;
+    text-shadow: none;
+}
+
+.nav-list > li.active > a,
+.nav-list > li.active > a:hover,
+.nav-list > li.active > a:focus,
+.nav-list > li > a:hover,
+.nav-list > li > a:focus {
+    background: #5E5E5E;
+}
+
 /* custom */
 html,body {
     background-color: #424242;
@@ -35,7 +49,6 @@ html,body {
 }
 
 .container-fluid {
-    padding-bottom: 20px;
     padding-top: 20px;
 }
 
@@ -56,20 +69,6 @@ html,body {
 
 .nav-header {
     text-shadow: none;
-}
-
-.nav-list > li > a,
-.nav-list .nav-header {
-    color: #ccc;
-    text-shadow: none;
-}
-
-.nav-list > li.active > a,
-.nav-list > li.active > a:hover,
-.nav-list > li.active > a:focus,
-.nav-list > li > a:hover,
-.nav-list > li > a:focus {
-    background: #5E5E5E;
 }
 
 .logo {

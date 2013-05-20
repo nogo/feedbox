@@ -125,6 +125,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
     el: '#item-list',
     options: {
         prefix: 'item-',
+        bottom: 20,
         item: {
             attributes: {
                 'class': 'entry'
@@ -152,7 +153,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
         App.Views.List.prototype.render.call(this);
 
         var position = this.$el.position(),
-            height = $(window).height() - position.top - 20;
+            height = $(window).height() - position.top - this.options.bottom;
         this.$el.height(height);
 
         this.isLoading = false;
