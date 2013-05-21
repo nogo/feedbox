@@ -139,7 +139,7 @@ App.router.route('sources/add', function(id) {
 
     App.switchView('content-view', 'source-add', function() {
         return new App.Module.Source.Views.Form({
-            el: '#content',
+            el: '#content-list',
             model: model,
             collection: sources
         });
@@ -153,7 +153,7 @@ App.router.route('sources/:id/edit', function(id) {
     if (model) {
         App.switchView('content-view', 'source-edit', function() {
             return new App.Module.Source.Views.Form({
-                el: '#content',
+                el: '#content-list',
                 model: model,
                 collection: sources
             });

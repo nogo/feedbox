@@ -5,6 +5,7 @@
 * Pull updates via timer
 * Testing
 * FavIcons
+* Inline-Editing
 
 # Features
 
