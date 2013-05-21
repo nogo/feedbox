@@ -40,7 +40,9 @@ $app->post(
 
         // Write to config
         $config = array(
-            'installed' => 'true',
+            'installed' => true,
+            'mode' => 'prod',
+            'debug' => false,
             'database_adapter' => $request->post('database_adapter'),
             'database_dsn' => $request->post('database_dsn'),
             'database_username' => $request->post('database_username'),
@@ -55,6 +57,7 @@ $app->post(
             );
         }
         file_put_contents($app->config('data_dir') . '/config.yml', Yaml::dump($config));
+        chmod($app->config('data_dir') . '/config.yml', 0666);
         file_put_contents($app->config('data_dir') . '/.htaccess', "AllowOverride None\nOrder deny,allow\ndeny from all\n");
 
         // load new config file
