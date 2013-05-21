@@ -1,82 +1,148 @@
 <?php
 namespace Nogo\Feedbox\Helper;
 
-use Nogo\Feedbox\Repository\Item as ItemRepository;
-use Nogo\Feedbox\Repository\Source as SourceRepository;
-use Slim\Slim;
+use Zend\Validator\Uri;
+use Zend\Feed\Reader\Reader;
+use Zend\Feed\Reader\Feed\AbstractFeed;
+use Zend\Feed\Reader\Entry\EntryInterface;
+use Zend\Feed\Reader\Exception\InvalidArgumentException;
+use Zend\Feed\Reader\Exception\RuntimeException;
+use Zend\Feed\Reader\Extension\Syndication\Feed as Syndication;
 
+/**
+ * Class FeedLoader
+ * @package Nogo\Feedbox\Helper
+ */
 class FeedLoader
 {
-    protected $cacheDir;
     /**
-     * @var ItemRepository
+     * @var string
      */
-    protected $itemRepository;
+    protected $uri;
+
     /**
-     * @var array
+     * @var string
      */
-    protected $source;
+    protected $update_interval;
+
     /**
-     * @var SourceRepository
+     * @var string
      */
-    protected $sourceRepository;
+    protected $errors;
 
-    public function setCacheDir($path)
+
+    /**
+     * @var int
+     */
+    protected $timeout = 10;
+
+    /**
+     * @param string $update_interval
+     *
+     * @return $this
+     */
+    public function setUpdateInterval($update_interval)
     {
-        $this->cacheDir = $path;
+        $this->update_interval = $update_interval;
+
+        return $this;
     }
 
-    public function setItemRepository(ItemRepository $repository)
+    /**
+     * @return string
+     */
+    public function getUpdateInterval()
     {
-        $this->itemRepository = $repository;
+        return $this->update_interval;
     }
 
-    public function getSource()
+    /**
+     * Set uri
+     *
+     * @param string $uri
+     *
+     * @return $this
+     */
+    public function setUri($uri)
     {
-        return $this->source;
+        $this->uri = $uri;
+
+        return $this;
     }
 
-    public function setSource(array $source)
+    /**
+     * @return string
+     */
+    public function getUri()
     {
-        $this->source = $source;
+        return $this->uri;
     }
 
-    public function setSourceRepository(SourceRepository $repository)
+    /**
+     * @param string $errors
+     */
+    public function setErrors($errors)
     {
-        $this->sourceRepository = $repository;
+        $this->errors = $errors;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout()
+    {
+        return $this->timeout;
     }
 
     public function run()
     {
-        if (!empty($this->source)) {
-            $data = trim($this->readUrl($this->source['uri']));
+        $result = array();
+
+        if (!empty($this->uri)) {
+            $data = trim($this->readUrl($this->uri));
             if ($data != null && !empty($data)) {
                 try {
-                    \Zend\Feed\Reader\Reader::registerExtension('Syndication');
-                    $feed = \Zend\Feed\Reader\Reader::importString($data);
-                    $this->source['errors'] = '';
-                } catch (\Zend\Feed\Reader\Exception\InvalidArgumentException $ex) {
-                    $this->source['errors'] = $ex->getMessage();
+                    Reader::registerExtension('Syndication');
+                    $feed = Reader::importString($data);
+                    $this->errors = '';
+                } catch (InvalidArgumentException $ex) {
+                    $this->errors = $ex->getMessage();
                     $feed = null;
-                } catch (\Zend\Feed\Reader\Exception\RuntimeException $ex) {
-                    $this->source['errors'] = $ex->getMessage();
+                } catch (RuntimeException $ex) {
+                    $this->errors = $ex->getMessage();
                     $feed = null;
                 }
 
                 /**
-                 * @var $entry \Zend\Feed\Reader\Entry\EntryInterface
+                 * @var $feed  AbstractFeed
+                 * @var $entry EntryInterface
                  */
                 if ($feed != null) {
 
-                    $linkValidator = new \Zend\Validator\Uri();
+                    $linkValidator = new Uri();
 
                     foreach ($feed as $entry) {
                         $uid = md5($entry->getId());
-                        $dbItem = $this->itemRepository->fetchOneBy('uid', $uid);
-                        if (!empty($dbItem)) {
-                            // TODO UPDATE ?
-                            continue;
-                        }
 
                         $title = htmlspecialchars_decode($entry->getTitle());
                         $title = htmLawed($title, array("deny_attribute" => "*", "elements" => "-*"));
@@ -89,20 +155,21 @@ class FeedLoader
                             $link = htmLawed($entry->getLink(), array("deny_attribute" => "*", "elements" => "-*"));
                         }
 
-                        $entity = array(
+                        $content = htmLawed(
+                            htmlspecialchars_decode($entry->getContent()),
+                            array(
+                                "safe" => 1,
+                                "deny_attribute" => '* -alt -title -src -href',
+                                "keep_bad" => 0,
+                                "comment" => 1,
+                                "cdata" => 1,
+                                "elements" => 'div,p,ul,li,a,dl,dt,h1,h2,h3,h4,h5,h6,ol,br,table,tr,td,blockquote,pre,ins,del,th,thead,tbody,b,i,strong,em,tt'
+                            )
+                        );
+
+                        $result[] = array(
                             'title' => $title,
-                            'content' => htmLawed(
-                                htmlspecialchars_decode($entry->getContent()),
-                                array(
-                                    "safe" => 1,
-                                    "deny_attribute" => '* -alt -title -src -href',
-                                    "keep_bad" => 0,
-                                    "comment" => 1,
-                                    "cdata" => 1,
-                                    "elements" => 'div,p,ul,li,a,img,dl,dt,h1,h2,h3,h4,h5,h6,ol,br,table,tr,td,blockquote,pre,ins,del,th,thead,tbody,b,i,strong,em,tt'
-                                )
-                            ),
-                            'source_id' => $this->source['id'],
+                            'content' => $content,
                             'uid' => $uid,
                             'uri' => $link,
                             'pubdate' => $this->formatDate($entry->getDateModified()),
@@ -110,20 +177,19 @@ class FeedLoader
                             'updated_at' => $this->formatDate($entry->getDateModified())
                         );
 
-                        $this->itemRepository->persist($entity);
                     }
 
+                    /**
+                     * @var $syndication Syndication
+                     */
                     $syndication = $feed->getExtension('Syndication');
-                    $this->source['period'] = $syndication->getUpdatePeriod();
+                    $this->update_interval = $syndication->getUpdatePeriod();
 
                     unset($feed);
                 }
-
-                $this->source['last_update'] = date('Y-m-d H:i:s');
-                $this->source['unread'] = $this->itemRepository->countUnread([$this->source['id']]);
-                $this->sourceRepository->persist($this->source);
             }
         }
+        return $result;
     }
 
     protected function readUrl($url)
@@ -134,6 +200,7 @@ class FeedLoader
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_HEADER, false);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
             $result = $this->curl_exec_follow($ch);
             curl_close($ch);
         } else {
@@ -160,6 +227,7 @@ class FeedLoader
                 curl_setopt($rch, CURLOPT_NOBODY, true);
                 curl_setopt($rch, CURLOPT_FORBID_REUSE, false);
                 curl_setopt($rch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($rch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
                 do {
                     curl_setopt($rch, CURLOPT_URL, $newurl);
                     $header = curl_exec($rch);

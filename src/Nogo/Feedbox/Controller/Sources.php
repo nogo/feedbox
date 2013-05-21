@@ -43,41 +43,73 @@ class Sources extends AbstractRestController
 
     public function updateAllAction()
     {
-        $result = $this->getRepository()->fetchAll();
+        $sources = $this->getRepository()->fetchAllActive();
 
         $feedRunner = new FeedLoader();
-        $feedRunner->setCacheDir($this->app->config('cache_dir'));
-        $feedRunner->setSourceRepository($this->getRepository());
-        $feedRunner->setItemRepository(new ItemRepository($this->connection));
 
-        foreach($result as $source) {
+        $result = array();
+        foreach($sources as $source) {
             if(isset($source['uri'])) {
-                $feedRunner->setSource($source);
-                $feedRunner->run();
+                $result[] = $this->fetchSource($source, $feedRunner);
             }
         }
 
-        $this->render('OK');
+        // output updated sources
+        $this->renderJson($result);
     }
 
     public function updateAction($id)
     {
         $id = intval($id);
 
-        $result = $this->getRepository()->fetchOneById($id);
+        $source = $this->getRepository()->fetchOneById($id);
 
-        if ($result === false) {
+        if ($source === false) {
             $this->render('Not found', 404);
             return;
         }
 
-        $feedRunner = new FeedLoader();
-        $feedRunner->setCacheDir($this->app->config('cache_dir'));
-        $feedRunner->setSourceRepository($this->getRepository());
-        $feedRunner->setItemRepository(new ItemRepository($this->connection));
-        $feedRunner->setSource($result);
-        $feedRunner->run();
-//
-//        $this->render('OK');
+        if (empty($source['uri'])) {
+            $this->render('Source has no URL to fetch.', 404);
+            return;
+        }
+
+        // fetch source
+        $this->fetchSource($source);
+
+        // output updated source
+        $this->renderJson($source);
+    }
+
+    protected function fetchSource($source, FeedLoader $runner = null)
+    {
+        if ($runner == null) {
+            $runner = new FeedLoader();
+        }
+
+        $runner->setUri($source['uri']);
+        $items = $runner->run();
+
+        $itemRepository = new ItemRepository($this->connection);
+        foreach($items as $item) {
+            if (isset($item['uid'])) {
+                $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
+                // TODO UPDATE ?
+                if (!empty($dbItem)) {
+                    continue;
+                }
+            }
+
+            $item['source_id'] = $source['id'];
+            $itemRepository->persist($item);
+        }
+
+        $source['last_update'] = date('Y-m-d H:i:s');
+        $source['period'] = $runner->getUpdateInterval();
+        $source['errors'] = $runner->getErrors();
+        $source['unread'] = $itemRepository->countUnread([$source['id']]);
+        $this->getRepository()->persist($source);
+
+        return $source;
     }
 }

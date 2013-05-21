@@ -2,8 +2,6 @@
 
 namespace Nogo\Feedbox\Repository;
 
-use Aura\Sql\Connection\AbstractConnection;
-
 class Source extends AbstractRepository
 {
     protected $table = 'sources';
@@ -19,4 +17,8 @@ class Source extends AbstractRepository
         return $this->fields;
     }
 
+    public function fetchAllActiveWithUri()
+    {
+        return $this->connection->fetchAll('SELECT * FROM ' . $this->getTable() . ' WHERE active = 1 AND uri IS NOT NULL');
+    }
 }

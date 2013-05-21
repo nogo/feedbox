@@ -3,6 +3,7 @@ mode: "dev"
 templates.path: "%root_dir%/templates"
 data_dir: "%root_dir%/data"
 cache_dir: "%data_dir%/cache"
+update_timeout: 10
 
 # Datebase
 database_adapter:  "sqlite"

@@ -1,5 +1,10 @@
 <?php
+
 use Nogo\Feedbox\Helper\ConfigLoader;
+use Nogo\Feedbox\Helper\FeedLoader;
+use Nogo\Feedbox\Helper\DatabaseConnector;
+use Nogo\Feedbox\Repository\Item;
+use Nogo\Feedbox\Repository\Source;
 
 define('ROOT_DIR', dirname(__FILE__));
 
@@ -14,33 +19,29 @@ $configLoader = new ConfigLoader(
 $config = $configLoader->getConfig();
 
 // database connection with pdo
-$connection_factory = new Aura\Sql\ConnectionFactory();
-
-/**
- * @var \Aura\Sql\Connection\Sqlite $connection
- */
-$connection = $connection_factory->newInstance(
-    $config['api']['database_adapter'],
-    $config['api']['database_dsn'],
-    $config['api']['database_username'],
-    $config['api']['databases_password']
+$connector = new DatabaseConnector(
+    $config['database_adapter'],
+    $config['database_dsn'],
+    $config['database_username'],
+    $config['database_password']
 );
+$connection = $connector->getInstance();
 
-$sourceRepository = new \Nogo\Feedbox\Repository\Source($connection);
-$itemRepository = new \Nogo\Feedbox\Repository\Item($connection);
+// create repositories
+$sourceRepository = new Source($connection);
+$itemRepository = new Item($connection);
 
-$feedRunner = new \Nogo\Feedbox\Helper\FeedLoader();
-$feedRunner->setCacheDir($config['cache_dir']);
-$feedRunner->setSourceRepository($sourceRepository);
-$feedRunner->setItemRepository($itemRepository);
+// fetch active sources with uri
+$sources = $sourceRepository->fetchAllActiveWithUri();
 
-$sources = $sourceRepository->fetchAll();
+// get the feed runner
+$feedRunner = new FeedLoader();
+$feedRunner->setTimeout($config['update_timeout']);
 
 $now = new \DateTime();
 foreach ($sources as $source) {
-    if (isset($source['uri'])) {
-
-        // update periodly
+    if (!empty($source['uri'])) {
+        // periodic update
         if ($source['last_update'] != null) {
             $last_update = new \DateTime($source['last_update']);
             $interval = $last_update->diff($now, true);
@@ -74,8 +75,35 @@ foreach ($sources as $source) {
             }
         }
 
+        // set uri
+        if ($config['debug']) {
+            echo sprintf("Read source [%s]: ", $source['name']);
+        }
+        $feedRunner->setUri($source['uri']);
+        $items = $feedRunner->run();
 
-        $feedRunner->setSource($source);
-        $feedRunner->run();
+        foreach($items as $item) {
+            if (isset($item['uid'])) {
+                $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
+                // TODO UPDATE ?
+                if (!empty($dbItem)) {
+                    continue;
+                }
+            }
+
+            $item['source_id'] = $source['id'];
+            $itemRepository->persist($item);
+        }
+
+        $source['last_update'] = date('Y-m-d H:i:s');
+        $source['period'] = $feedRunner->getUpdateInterval();
+        $source['errors'] = $feedRunner->getErrors();
+        $count = $source['unread'];
+        $source['unread'] = $itemRepository->countUnread([$source['id']]);
+        $sourceRepository->persist($source);
+
+        if ($config['debug']) {
+            echo sprintf("%d new items.\n", $source['unread'] - $count);
+        }
     }
 }
