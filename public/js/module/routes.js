@@ -83,11 +83,15 @@ App.router.route('starred', function() {
 /* Sources */
 
 App.router.route('sources', function() {
+    var sources = App.Session.get('source-collection');
     App.switchView('content-view', 'source-list', function() {
         return new App.Module.Source.Views.List({
-            el: '#content'
+            collection: sources
         });
     });
+
+    App.Session.set('selected-menu-items', ['.menu-item-sources']);
+    App.selectMenuItem();
 });
 
 App.router.route('sources/:id', function(id) {

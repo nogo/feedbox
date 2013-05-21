@@ -1,18 +1,18 @@
 debug: true
-mode: "dev"
+mode:  "dev"
 templates.path: "%root_dir%/templates"
 data_dir:  "%root_dir%/data"
 cache_dir: "%data_dir%/cache"
 
-# Feed runner
-runner.timeout: 10
-runner.default_worker: "Nogo\Feedbox\Feed\Worker\Rss"
-
-# Datebase
+# Database (PDO)
 database_adapter:  "sqlite"
 database_dsn:      "%data_dir%/database.sdb"
 database_username: ""
 database_password: ""
+
+# Feed runner
+runner.timeout: 10
+runner.default_worker: "Nogo\Feedbox\Feed\Worker\Rss"
 
 # API
 api.content_type: "application/json"

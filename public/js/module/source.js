@@ -48,6 +48,10 @@ App.Module.Source = {
                     this.$el.html(html);
                 }
 
+                if (this.model && this.model.isNew()) {
+                    this.$('legend').text('Add source')
+                }
+
                 App.Module.Form.Bind(this.$el, this.model.toJSON(), this.ignore);
 
                 return this;
@@ -103,32 +107,34 @@ App.Module.Source = {
     }
 };
 
-App.Module.Source.Views.List = Backbone.View.extend({
-    initialize: function () {
-        this.sources = App.Session.get('source-collection');
+App.Module.Source.Views.List = App.Views.List.extend({
+    el: '#content-list',
+    options: {
+        prefix: 'source-',
+        bottom: 20,
+        emptyTemplate: '#tpl-empty',
+        item: {
+            attributes: {
+                'class': 'box'
+            },
+            tagName: 'div',
+            template: '#tpl-source',
+            View: App.Module.Source.Views.Item
+        }
     },
-    render: function () {
-        this.itemList = new App.Views.List({
-            el: '#content',
-            prefix: 'item-',
-            collection: this.sources,
-            item: {
-                attributes: {
-                    'class': 'box'
-                },
-                tagName: 'div',
-                template: '#tpl-source',
-                View: App.Module.Source.Views.Item
-            }
-        });
-        this.itemList.render();
+    render: function() {
+        // Call parent contructor
+        App.Views.List.prototype.render.call(this);
+
+        var position = this.$el.position(),
+            height = $(window).height() - this.options.bottom;
+
+        if (position) {
+            height -= position.top;
+        }
+        this.$el.height(height);
 
         return this;
-    },
-    remove: function () {
-        if (this.itemList) {
-            this.itemList.remove();
-        }
     }
 });
 

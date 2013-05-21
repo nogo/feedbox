@@ -122,10 +122,11 @@ App.Module.Item = {
 };
 
 App.Module.Item.Views.List = App.Views.List.extend({
-    el: '#item-list',
+    el: '#content-list',
     options: {
         prefix: 'item-',
         bottom: 20,
+        emptyTemplate: '#tpl-empty',
         item: {
             attributes: {
                 'class': 'entry'
@@ -153,7 +154,11 @@ App.Module.Item.Views.List = App.Views.List.extend({
         App.Views.List.prototype.render.call(this);
 
         var position = this.$el.position(),
-            height = $(window).height() - position.top - this.options.bottom;
+            height = $(window).height() - this.options.bottom;
+
+        if (position) {
+            height -= position.top;
+        }
         this.$el.height(height);
 
         this.isLoading = false;

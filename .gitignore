@@ -1,4 +1,5 @@
 .idea
 bin
+config/config.yml
 data
 vendor

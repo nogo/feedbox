@@ -27,21 +27,23 @@
                     </li>
                     <li><a class="menu-item menu-item-read" href="#read"><i class="icon-inbox"></i> Read</a></li>
                     <li><a class="menu-item menu-item-starred" href="#starred"><i class="icon-star"></i> Starred</a></li>
+                    <li>
+                        <div class="btn-group pull-right" style="margin-top: 2px;">
+                            <a class="btn btn-mini" href="#sources/add" title="Add"><i class="icon-plus"></i></a>
+                            <a class="btn btn-mini" href="#sources/update" title="Refresh"><i class="icon-refresh"></i></a>
+                            <button class="btn btn-mini toggable" data-target="#sources"><span class="caret"></span></button>
+                        </div>
+                        <a class="menu-item menu-item-sources" href="#sources"><i class="icon-wrench"></i> Sources</a>
+                    </li>
                 </ul>
-                <header class="nav-header">
-                    <div class="btn-group pull-right">
-                        <a class="btn btn-mini" href="#sources/add" title="Add"><i class="icon-plus"></i></a>
-                        <a class="btn btn-mini" href="#sources/update" title="Refresh"><i class="icon-refresh"></i></a>
-                        <a class="btn btn-mini" href="#sources" title="Manage"><i class="icon-wrench"></i></a>
-                    </div>
-                    <span class="toggable" data-target="#sources">Sources</span>
-                </header>
                 <div id="sources" class="hide scrollable"></div>
             </div>
             <div class="clearfix"></div>
         </section>
         <section id="content" class="span10">
-            <div id="item-list" class="scrollable"></div>
+            <header id="content-header"></header>
+            <div id="content-list" class="scrollable"></div>
+            <footer id="content-footer"></footer>
         </section>
     </div>
 </div>
@@ -56,6 +58,10 @@
 
 <script type="text/template" id="tpl-item-source">
     <%- model.get('name') %>
+</script>
+
+<script type="text/template" id="tpl-empty">
+    <div class="alert alert-info">List is empty.</div>
 </script>
 
 <script type="text/template" id="tpl-item">
