@@ -1,40 +1,47 @@
 <?php
-namespace Nogo\Feedbox\Helper;
+namespace Nogo\Feedbox\Feed;
 
-use Zend\Validator\Uri;
-use Zend\Feed\Reader\Reader;
-use Zend\Feed\Reader\Feed\AbstractFeed;
-use Zend\Feed\Reader\Entry\EntryInterface;
 use Zend\Feed\Reader\Exception\InvalidArgumentException;
 use Zend\Feed\Reader\Exception\RuntimeException;
 use Zend\Feed\Reader\Extension\Syndication\Feed as Syndication;
+use Zend\Feed\Reader\Feed\AbstractFeed;
+use Zend\Feed\Reader\Reader;
+use Zend\Validator\Uri;
 
 /**
- * Class FeedLoader
+ * Class Runner
  * @package Nogo\Feedbox\Helper
  */
-class FeedLoader
+class Runner
 {
     /**
      * @var string
      */
     protected $uri;
-
     /**
      * @var string
      */
     protected $update_interval;
-
     /**
      * @var string
      */
     protected $errors;
-
-
     /**
      * @var int
      */
     protected $timeout = 10;
+    /**
+     * @var Worker
+     */
+    protected $worker = null;
+
+    /**
+     * @return string
+     */
+    public function getUpdateInterval()
+    {
+        return $this->update_interval;
+    }
 
     /**
      * @param string $update_interval
@@ -51,9 +58,9 @@ class FeedLoader
     /**
      * @return string
      */
-    public function getUpdateInterval()
+    public function getUri()
     {
-        return $this->update_interval;
+        return $this->uri;
     }
 
     /**
@@ -73,35 +80,18 @@ class FeedLoader
     /**
      * @return string
      */
-    public function getUri()
-    {
-        return $this->uri;
-    }
-
-    /**
-     * @param string $errors
-     */
-    public function setErrors($errors)
-    {
-        $this->errors = $errors;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getErrors()
     {
         return $this->errors;
     }
 
     /**
-     * @param int $timeout
+     * @param string $errors
+     * @return $this
      */
-    public function setTimeout($timeout)
+    public function setErrors($errors)
     {
-        $this->timeout = $timeout;
+        $this->errors = $errors;
 
         return $this;
     }
@@ -114,13 +104,63 @@ class FeedLoader
         return $this->timeout;
     }
 
+    /**
+     * @param int $timeout
+     * @return $this
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+
+        return $this;
+    }
+
+    /**
+     * @return Worker
+     */
+    public function getWorker()
+    {
+        return $this->worker;
+    }
+
+    /**
+     * @param Worker $worker
+     * @return $this
+     */
+    public function setWorker(Worker $worker)
+    {
+        $this->worker = $worker;
+
+        return $this;
+    }
+
+    /**
+     * Execute runner
+     *
+     * @return array|null
+     * @throws \Exception
+     */
     public function run()
     {
-        $result = array();
+        if ($this->worker == null) {
+            throw new \Exception("Runner has no worker.");
+        }
 
-        if (!empty($this->uri)) {
-            $data = trim($this->readUrl($this->uri));
-            if ($data != null && !empty($data)) {
+        if (!isset($this->uri) || empty($this->uri)) {
+            throw new \Exception("Runner has no uri to process.");
+        }
+
+        $result = null;
+
+        // fetch data from uri
+        $data = $this->readUrl($this->uri);
+        if ($data == null) {
+            $this->errors = 'Connection timeout.';
+        } else {
+            $data = trim($data);
+            if (empty($data)) {
+                $this->errors = 'Source content is empty.';
+            } else {
                 try {
                     Reader::registerExtension('Syndication');
                     $feed = Reader::importString($data);
@@ -135,60 +175,22 @@ class FeedLoader
 
                 /**
                  * @var $feed  AbstractFeed
-                 * @var $entry EntryInterface
                  */
                 if ($feed != null) {
-
-                    $linkValidator = new Uri();
-
-                    foreach ($feed as $entry) {
-                        $uid = md5($entry->getId());
-
-                        $title = htmlspecialchars_decode($entry->getTitle());
-                        $title = htmLawed($title, array("deny_attribute" => "*", "elements" => "-*"));
-                        if (strlen(trim($title)) == 0) {
-                            $title = "[ no title ]";
-                        }
-
-                        $link = null;
-                        if ($linkValidator->isValid($entry->getLink())) {
-                            $link = htmLawed($entry->getLink(), array("deny_attribute" => "*", "elements" => "-*"));
-                        }
-
-                        $content = htmLawed(
-                            htmlspecialchars_decode($entry->getContent()),
-                            array(
-                                "safe" => 1,
-                                "deny_attribute" => '* -alt -title -src -href',
-                                "keep_bad" => 0,
-                                "comment" => 1,
-                                "cdata" => 1,
-                                "elements" => 'div,p,ul,li,a,dl,dt,h1,h2,h3,h4,h5,h6,ol,br,table,tr,td,blockquote,pre,ins,del,th,thead,tbody,b,i,strong,em,tt'
-                            )
-                        );
-
-                        $result[] = array(
-                            'title' => $title,
-                            'content' => $content,
-                            'uid' => $uid,
-                            'uri' => $link,
-                            'pubdate' => $this->formatDate($entry->getDateModified()),
-                            'created_at' => $this->formatDate($entry->getDateCreated()),
-                            'updated_at' => $this->formatDate($entry->getDateModified())
-                        );
-
-                    }
-
                     /**
                      * @var $syndication Syndication
                      */
                     $syndication = $feed->getExtension('Syndication');
                     $this->update_interval = $syndication->getUpdatePeriod();
 
+                    $this->worker->setFeed($feed);
+                    $result = $this->worker->execute();
+
                     unset($feed);
                 }
             }
         }
+
         return $result;
     }
 
@@ -202,7 +204,11 @@ class FeedLoader
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
             $result = $this->curl_exec_follow($ch);
+            $error = curl_errno($ch);
             curl_close($ch);
+            if ($error > 0) {
+                $result = null;
+            }
         } else {
             $result = file_get_contents($url);
         }
@@ -259,18 +265,5 @@ class FeedLoader
             }
         }
         return curl_exec($ch);
-    }
-
-    protected function formatDate($date)
-    {
-        if ($date instanceof \DateTime) {
-            return $date->format("Y-m-d H:i:s");
-        }
-
-        if ($date == null) {
-            $date = date('Y-m-d H:i:s');
-        }
-
-        return $date;
     }
 }

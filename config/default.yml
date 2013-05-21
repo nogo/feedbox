@@ -1,9 +1,12 @@
 debug: true
 mode: "dev"
 templates.path: "%root_dir%/templates"
-data_dir: "%root_dir%/data"
+data_dir:  "%root_dir%/data"
 cache_dir: "%data_dir%/cache"
-update_timeout: 10
+
+# Feed runner
+runner.timeout: 10
+runner.default_worker: "Nogo\Feedbox\Feed\Worker\Rss"
 
 # Datebase
 database_adapter:  "sqlite"
@@ -12,9 +15,9 @@ database_username: ""
 database_password: ""
 
 # API
-api.content_type: 'application/json'
+api.content_type: "application/json"
 api.controller:
-    - 'Nogo\Feedbox\Controller\Sources'
-    - 'Nogo\Feedbox\Controller\Items'
+    - "Nogo\Feedbox\Controller\Sources"
+    - "Nogo\Feedbox\Controller\Items"
 
 

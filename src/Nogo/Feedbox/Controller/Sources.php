@@ -2,7 +2,7 @@
 namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
-use Nogo\Feedbox\Helper\FeedLoader;
+use Nogo\Feedbox\Feed\Runner;
 use Nogo\Feedbox\Repository\Repository;
 use Nogo\Feedbox\Repository\Source as SourceRepository;
 use Nogo\Feedbox\Repository\Item as ItemRepository;
@@ -45,12 +45,15 @@ class Sources extends AbstractRestController
     {
         $sources = $this->getRepository()->fetchAllActive();
 
-        $feedRunner = new FeedLoader();
+        $defaultWorkerClass = $this->app->config('runner.default_worker');
+
+        $runner = new Runner();
+        $runner->setWorker(new $defaultWorkerClass());
 
         $result = array();
         foreach($sources as $source) {
             if(isset($source['uri'])) {
-                $result[] = $this->fetchSource($source, $feedRunner);
+                $result[] = $this->fetchSource($source, $runner);
             }
         }
 
@@ -81,12 +84,16 @@ class Sources extends AbstractRestController
         $this->renderJson($source);
     }
 
-    protected function fetchSource($source, FeedLoader $runner = null)
+    protected function fetchSource($source, Runner $runner = null)
     {
         if ($runner == null) {
-            $runner = new FeedLoader();
+            $defaultWorkerClass = $this->app->config('runner.default_worker');
+
+            $runner = new Runner();
+            $runner->setWorker(new $defaultWorkerClass());
         }
 
+        $runner->setTimeout($this->app->config('runner.timeout'));
         $runner->setUri($source['uri']);
         $items = $runner->run();
 

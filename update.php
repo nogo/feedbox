@@ -1,7 +1,7 @@
 <?php
 
+use Nogo\Feedbox\Feed\Runner;
 use Nogo\Feedbox\Helper\ConfigLoader;
-use Nogo\Feedbox\Helper\FeedLoader;
 use Nogo\Feedbox\Helper\DatabaseConnector;
 use Nogo\Feedbox\Repository\Item;
 use Nogo\Feedbox\Repository\Source;
@@ -35,8 +35,11 @@ $itemRepository = new Item($connection);
 $sources = $sourceRepository->fetchAllActiveWithUri();
 
 // get the feed runner
-$feedRunner = new FeedLoader();
-$feedRunner->setTimeout($config['update_timeout']);
+$defaultWorkerClass = $config['runner.default_worker'];
+
+$feedRunner = new Runner();
+$feedRunner->setWorker(new $defaultWorkerClass());
+$feedRunner->setTimeout($config['runner.timeout']);
 
 $now = new \DateTime();
 foreach ($sources as $source) {
@@ -82,28 +85,32 @@ foreach ($sources as $source) {
         $feedRunner->setUri($source['uri']);
         $items = $feedRunner->run();
 
-        foreach($items as $item) {
-            if (isset($item['uid'])) {
-                $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
-                // TODO UPDATE ?
-                if (!empty($dbItem)) {
-                    continue;
+        if ($items != null) {
+            foreach($items as $item) {
+                if (isset($item['uid'])) {
+                    $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
+                    // TODO UPDATE ?
+                    if (!empty($dbItem)) {
+                        continue;
+                    }
                 }
+
+                $item['source_id'] = $source['id'];
+                $itemRepository->persist($item);
             }
 
-            $item['source_id'] = $source['id'];
-            $itemRepository->persist($item);
-        }
+            $source['last_update'] = date('Y-m-d H:i:s');
+            $source['period'] = $feedRunner->getUpdateInterval();
+            $source['errors'] = $feedRunner->getErrors();
+            $count = $source['unread'];
+            $source['unread'] = $itemRepository->countUnread([$source['id']]);
+            $sourceRepository->persist($source);
 
-        $source['last_update'] = date('Y-m-d H:i:s');
-        $source['period'] = $feedRunner->getUpdateInterval();
-        $source['errors'] = $feedRunner->getErrors();
-        $count = $source['unread'];
-        $source['unread'] = $itemRepository->countUnread([$source['id']]);
-        $sourceRepository->persist($source);
-
-        if ($config['debug']) {
-            echo sprintf("%d new items.\n", $source['unread'] - $count);
+            if ($config['debug']) {
+                echo sprintf("%d new items.\n", $source['unread'] - $count);
+            }
+        } else if ($config['debug']) {
+            echo sprintf("%s\n", $feedRunner->getErrors());
         }
     }
 }

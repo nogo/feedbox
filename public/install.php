@@ -30,7 +30,7 @@ $app->get('/', function() use ($db, $app) {
             break;
     }
 
-    DatabaseConnector::loadSqlFile($db, ROOT_DIR . '/config/sql' . $app->config('database_adapter') . '.sql');
+    DatabaseConnector::loadSqlFile($db, ROOT_DIR . '/config/sql/' . $app->config('database_adapter') . '.sql');
 
     if ($app->request()->get('with_fixtures')) {
         //loadSql($db, APP_DIR . '/sql/fixtures.sql');
