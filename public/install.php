@@ -55,6 +55,7 @@ $app->post(
             );
         }
         file_put_contents($app->config('data_dir') . '/config.yml', Yaml::dump($config));
+        file_put_contents($app->config('data_dir') . '/.htaccess', "AllowOverride None\nOrder deny,allow\ndeny from all\n");
 
         // load new config file
         $configLoader->load($app->config('data_dir') . '/config.yml');
