@@ -4,6 +4,13 @@ templates.path: "%root_dir%/templates"
 data_dir:  "%root_dir%/data"
 cache_dir: "%data_dir%/cache"
 
+# Login
+login.enabled:     false
+login.realm:       "Feedbox - Protected Area"
+login.algorithm:   "plaintext"
+login.credentials:
+  #admin: "feedbox"
+
 # Database (PDO)
 database_adapter:  "sqlite"
 database_dsn:      "%data_dir%/database.sdb"

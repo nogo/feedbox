@@ -1,6 +1,14 @@
 <?php
 require_once dirname(__FILE__) . '/../bootstrap.php';
 
+if ($app->config('login.enabled')) {
+    $app->add(new \Nogo\Feedbox\Middleware\HttpBasicAuth(
+            $app->config('login.credentials'),
+            $app->config('login.realm'),
+            $app->config('login.algorithm')
+    ));
+}
+
 $connector = new \Nogo\Feedbox\Helper\DatabaseConnector(
     $app->config('database_adapter'),
     $app->config('database_dsn'),

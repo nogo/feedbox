@@ -1,3 +1,8 @@
 debug:   false
 mode:    "prod"
-install: true
+
+# login
+login.enabled:     true
+login.algorithm:   "md5"
+login.credentials:
+  admin: d52192175a38a7844a776f22c6aaafcd
