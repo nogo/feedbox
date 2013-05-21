@@ -1,10 +1,11 @@
 <?php
 namespace Nogo\Feedbox\Helper;
 
-use Nogo\Feedbox\Repository\Item as ItemRepository;
-use Nogo\Feedbox\Repository\Source as SourceRepository;
-use Slim\Slim;
-
+/**
+ * Class OpmlLoader
+ *
+ * @package Nogo\Feedbox\Helper
+ */
 class OpmlLoader
 {
     /**
@@ -13,43 +14,54 @@ class OpmlLoader
     protected $xml;
 
     /**
-     * @var SourceRepository
+     * @return \SimpleXMLElement
      */
-    protected $sourceRepository;
+    public function getXml()
+    {
+        return $this->xml;
+    }
 
+    /**
+     * @param \SimpleXMLElement $xml
+     */
     public function setXml(\SimpleXMLElement $xml)
     {
         $this->xml = $xml;
+
+        return $this;
     }
 
     public function setContent($content)
     {
         $this->xml = new \SimpleXMLElement($content);
+
+        return $this;
     }
 
-    public function setSourceRepository(SourceRepository $repository)
-    {
-        $this->sourceRepository = $repository;
-    }
-
+    /**
+     * Process the xml content into a array of source
+     *
+     * @return array
+     */
     public function run()
     {
+        $result = array();
         if (!empty($this->xml)) {
             $outlines = $this->xml->xpath("//outline[@type='rss']");
 
             /**
              * @var $outline \SimpleXMLElement
              */
-            foreach($outlines as $outline) {
+            foreach ($outlines as $outline) {
                 $attr = $outline->attributes();
-                $source = [
+                $result[] = array(
                     'name' => $attr['title'],
                     'uri' => $attr['xmlUrl'],
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
-                ];
-                $this->sourceRepository->persist($source);
+                );
             }
         }
+        return $result;
     }
 }
