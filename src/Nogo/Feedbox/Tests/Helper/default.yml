@@ -1,0 +1,5 @@
+root_dir: "."
+
+mode: "dev"
+
+data_dir: "%root_dir%/data"

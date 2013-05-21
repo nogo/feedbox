@@ -20,8 +20,14 @@
         "zendframework/zend-feed": "2.1.*",
         "htmlawed/htmlawed": "dev-master"
     },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
     "autoload": {
         "psr-0": {"": "src/"},
         "files": ["vendor/htmlawed/htmlawed/htmLawed.php"]
+    },
+    "config": {
+        "bin-dir": "bin"
     }
 }

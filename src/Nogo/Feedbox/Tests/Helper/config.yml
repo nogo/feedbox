@@ -1,0 +1,5 @@
+root_dir: "."
+
+mode: "prod"
+
+data_dir: "%root_dir%/data_test"
