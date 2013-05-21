@@ -1,35 +1,16 @@
 <?php
 
+use Nogo\Feedbox\Helper\DatabaseConnector;
 
 require_once dirname(__FILE__) . '/../bootstrap.php';
 
-}
-
-// database connection with pdo
-$connection_factory = new Aura\Sql\ConnectionFactory();
-
-/**
- * @var \Aura\Sql\Connection\Sqlite $db
- */
-$db = $connection_factory->newInstance(
+$connector = new DatabaseConnector(
     $app->config('database_adapter'),
     $app->config('database_dsn'),
     $app->config('database_username'),
     $app->config('database_password')
 );
-
-function loadSql($db, $file) {
-    if (file_exists($file)) {
-        $sql = file_get_contents($file);
-
-        if (!empty($sql)) {
-            $queries = explode(';', $sql);
-            foreach ($queries as $q) {
-                $db->query(trim($q) . ";");
-            }
-        }
-    }
-}
+$db = $connector->getInstance();
 
 $app->get('/', function() use ($db, $app) {
     if (!file_exists($app->config('data_dir'))) {
@@ -49,15 +30,21 @@ $app->get('/', function() use ($db, $app) {
             break;
     }
 
-    loadSql($db, APP_DIR . '/sql/' . $app->config('database_adapter') . '.sql');
+    DatabaseConnector::loadSqlFile($db, ROOT_DIR . '/config/sql' . $app->config('database_adapter') . '.sql');
 
-    if ($app->getMode() === 'dev') {
+    if ($app->request()->get('with_fixtures')) {
         //loadSql($db, APP_DIR . '/sql/fixtures.sql');
 
         $opml = new \Nogo\Feedbox\Helper\OpmlLoader();
-        $opml->setSourceRepository(new \Nogo\Feedbox\Repository\Source($db));
         $opml->setContent(file_get_contents($app->config('data_dir') . '/subscriptions.xml'));
-        $opml->run();
+        $sources = $opml->run();
+
+        if (!empty($sources)) {
+            $sourceRepository = new \Nogo\Feedbox\Repository\Source($db);
+            foreach ($sources as $source) {
+                $sourceRepository->persist($source);
+            }
+        }
     }
 });
 
