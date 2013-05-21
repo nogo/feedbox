@@ -1,0 +1,19 @@
+debug: true
+mode: "dev"
+templates.path: "%root_dir%/templates"
+data_dir: "%root_dir%/data"
+cache_dir: "%data_dir%/cache"
+
+# Datebase
+database_adapter:  "sqlite"
+database_dsn:      "%data_dir%/database.sdb"
+database_username: ""
+database_password: ""
+
+# API
+api.content_type: 'application/json'
+api.controller:
+    - 'Nogo\Feedbox\Controller\Sources'
+    - 'Nogo\Feedbox\Controller\Items'
+
+

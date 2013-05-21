@@ -1,15 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../app/bootstrap.php';
-
-// load API config
-$configLoader->mergeLoad(APP_DIR . '/config/api.default.yml');
-try {
-    $configLoader->mergeLoad(APP_DIR . '/config/api.config.yml', true);
-} catch (Exception $ex) {
-
-}
-$app->config($configLoader->getConfig());
-$app->contentType($app->config('contentType'));
+require_once dirname(__FILE__) . '/../bootstrap.php';
 
 // database connection with pdo
 $connection_factory = new Aura\Sql\ConnectionFactory();
@@ -24,8 +14,11 @@ $db = $connection_factory->newInstance(
     $app->config('database_password')
 );
 
-// Load Controller
-foreach($app->config('controller') as $class) {
+// set default route
+$app->get('/', function() use ($db, $app) {});
+
+// load api controller
+foreach($app->config('api.controller') as $class) {
     $ref = new ReflectionClass($class);
     if ($ref->isSubclassOf('Nogo\Feedbox\Controller\AbstractController')) {
         $controller = new $class($app, $db);

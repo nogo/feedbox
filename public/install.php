@@ -1,15 +1,9 @@
 <?php
 
-require_once dirname(__FILE__) . '/../app/bootstrap.php';
 
-// load API config
-$configLoader->mergeLoad(APP_DIR . '/config/api.default.yml');
-try {
-    $configLoader->mergeLoad(APP_DIR . '/config/api.config.yml', true);
-} catch (Exception $ex) {
+require_once dirname(__FILE__) . '/../bootstrap.php';
 
 }
-$app->config($configLoader->getConfig());
 
 // database connection with pdo
 $connection_factory = new Aura\Sql\ConnectionFactory();

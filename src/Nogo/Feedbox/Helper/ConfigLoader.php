@@ -1,35 +1,63 @@
 <?php
 namespace Nogo\Feedbox\Helper;
 
-use Aura\Sql\Exception;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-
+/**
+ * Class ConfigLoader
+ *
+ * @package Nogo\Feedbox\Helper
+ */
 class ConfigLoader implements \ArrayAccess
 {
+    /**
+     * @var array
+     */
+    protected $configFiles = array();
+    /**
+     * @var array
+     */
     protected $config = array();
 
-    public function __construct($file)
+    /**
+     * Constructor
+     *
+     * @param *args files to load
+     */
+    public function __construct()
     {
-        $this->load($file);
-    }
-
-    public function load($file)
-    {
-        if (file_exists($file)) {
-            $this->config =  Yaml::parse($file);
-            $this->pathConvert($this->config);
-        } else {
-            throw new Exception('File [' . $file . '] not found.');
+        if (func_num_args() > 0) {
+            foreach (func_get_args() as $file) {
+                try {
+                    $this->load($file);
+                } catch (\Exception $e) {
+                }
+            }
         }
     }
 
-    public function mergeLoad($file, $first = false)
+    /**
+     * Load file into config
+     *
+     * @param $file
+     * @throws \Exception
+     */
+    public function load($file)
     {
         if (file_exists($file)) {
-            $this->merge(Yaml::parse($file), $first);
+            $hash = md5($file);
+            if (!isset($this->configFiles[$hash])) {
+                $this->configFiles[$hash] = $file;
+
+                try {
+                    $values = Yaml::parse($file);
+                    $this->merge($values);
+                } catch (ParseException $e) {
+                }
+            }
         } else {
-            throw new Exception('File [' . $file . '] not found.');
+            throw new \Exception('File [' . $file . '] not found.');
         }
     }
 
@@ -39,16 +67,34 @@ class ConfigLoader implements \ArrayAccess
      * @param array $config array to merge
      * @param bool $first true, this config will be first, parameter array will be second
      */
-    public function merge(array $config, $first = false)
+    public function merge(array $config)
     {
-        if ($first) {
-            $this->config = array_merge($this->config, $config);
-        } else {
-            $this->config = array_merge($config, $this->config);
-        }
-        $this->pathConvert($this->config);
+        $this->config = array_merge($this->config, $config);
+        $this->pathConvert();
     }
 
+    /**
+     * Convert "%.*_dir%" into real path
+     */
+    protected function pathConvert()
+    {
+        array_walk_recursive(
+            $this->config,
+            function (&$item, $key) {
+                if (preg_match('/%(.*_dir)%/', $item, $matches)) {
+                    $constName = strtoupper($matches[1]);
+                    if (defined($constName)) {
+                        $value = constant($constName);
+                        $item = str_replace('%' . $matches[1] . '%', $value, $item);
+                    } else {
+                        if (array_key_exists($matches[1], $this->config)) {
+                            $item = str_replace('%' . $matches[1] . '%', $this->config[$matches[1]], $item);
+                        }
+                    }
+                }
+            }
+        );
+    }
 
     public function getConfig()
     {
@@ -73,20 +119,5 @@ class ConfigLoader implements \ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->config[$offset]);
-    }
-
-    protected function pathConvert()
-    {
-        array_walk_recursive($this->config, function(&$item, $key) {
-            if (preg_match('/%(.*_dir)%/', $item, $matches)) {
-                $constName = strtoupper($matches[1]);
-                if (defined($constName)) {
-                    $value = constant($constName);
-                    $item = str_replace('%' . $matches[1] . '%',$value, $item);
-                } else if (array_key_exists($matches[1], $this->config)) {
-                    $item = str_replace('%' . $matches[1] . '%', $this->config[$matches[1]], $item);
-                }
-            }
-        });
     }
 }

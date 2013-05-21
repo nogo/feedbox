@@ -1,7 +1,0 @@
-debug: true
-mode: "dev"
-templates.path: "%root_dir%/templates"
-
-data_dir: "%root_dir%/data"
-cache_dir: "%data_dir%/cache"
-
