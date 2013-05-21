@@ -11,11 +11,6 @@ class Item extends AbstractRepository
         return $this->fields;
     }
 
-    public function getTable()
-    {
-        return $this->table;
-    }
-
     public function fetchAllWithFilter(array $filter = array(), $count = false)
     {
         /**
@@ -38,7 +33,6 @@ class Item extends AbstractRepository
                 $select->page(intval($filter['page']));
             }
         }
-
 
         $bind = [];
         foreach ($filter as $key => $value) {
@@ -73,6 +67,10 @@ class Item extends AbstractRepository
 
         return $this->connection->fetchAll($select, $bind);
     }
+
+    public function getTable()
+    {
+        return $this->table;
     }
 
     public function countUnread(array $sourceIds = array())

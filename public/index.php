@@ -14,6 +14,10 @@ if ($app->config('login.enabled')) {
 
 $app->get('/',
     function () use ($app) {
+        if (!$app->config('installed')) {
+            $app->redirect('install.php');
+        }
+
         $app->render('index.html');
     }
 );

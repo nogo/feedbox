@@ -12,8 +12,8 @@ require ROOT_DIR . '/vendor/autoload.php';
 
 // load API config
 $configLoader = new ConfigLoader(
-    ROOT_DIR . '/config/default.yml',
-    ROOT_DIR . '/config/config.yml'
+    ROOT_DIR . '/src/Nogo/Feedbox/Resources/config/default.yml',
+    ROOT_DIR . '/data/config.yml'
 );
 
 $config = $configLoader->getConfig();

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>FeedBox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/box64.ico" type="image/x-icon"/>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="page-header">
+        <img src="img/box128-1.png" alt="FeedBox"/> Install
+    </h1>
+
+    <form method="post" class="form-horizontal well">
+        <fieldset>
+            <legend>Database</legend>
+            <div class="control-group">
+                <label class="control-label" for="database_adapter">Adapter</label>
+
+                <div class="controls">
+                    <select id="database_adapter" name="database_adapter" class="input-block-level">
+                        <option value="sqlite">SQLite</option>
+                        <option value="mysql">MySQL</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="database_dsn">DSN</label>
+
+                <div class="controls">
+                    <input type="text" id="database_dsn" name="database_dsn" class="input-block-level" placeholder=""
+                           value="%data_dir%/database.sdb" required>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="database_username">Username</label>
+
+                <div class="controls">
+                    <input type="text" id="database_username" name="database_username" class="input-block-level" value="">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="database_password">Password</label>
+
+                <div class="controls">
+                    <input type="text" id="database_password" name="database_password" class="input-block-level" value="">
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Login</legend>
+            <div class="control-group">
+                <label class="control-label" for="login_enabled">Enabled?</label>
+
+                <div class="controls">
+                    <input type="checkbox" id="login_enabled" name="login_enabled" class="input-block-level" value="true">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="login_algorithm">Algorithm</label>
+
+                <div class="controls">
+                    <select id="login_algorithm" name="login_algorithm" class="input-block-level">
+                        <option value="sha256">SHA256</option>
+                        <option value="md5">MD5</option>
+                        <option value="sha1">SHA1</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="login_username">Username</label>
+
+                <div class="controls">
+                    <input type="text" id="login_username" name="login_username" class="input-block-level" value="">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="login_password">Password</label>
+
+                <div class="controls">
+                    <input type="password" id="login_password" name="login_password" class="input-block-level" value="">
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Import</legend>
+            <div class="control-group">
+                <label class="control-label" for="opml">OPML</label>
+
+                <div class="controls">
+                    <textarea id="opml" name="opml" class="input-block-level"></textarea>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="form-actions">
+            <div class="pull-right">
+                <button type="submit" class="btn btn-primary">Install</button>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+</body>
+</html>

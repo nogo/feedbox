@@ -4,6 +4,9 @@ templates.path: "%root_dir%/templates"
 data_dir:  "%root_dir%/data"
 cache_dir: "%data_dir%/cache"
 
+log.enabled: true
+log_dir:     "%data_dir%/log"
+
 # Login
 login.enabled:     false
 login.realm:       "Feedbox - Protected Area"

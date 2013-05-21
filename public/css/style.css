@@ -19,6 +19,13 @@ a:hover, a:focus,
     background: #5E5E5E;
 }
 
+.page-header {
+    border-bottom: none;
+    color: #1a1a1a;
+    font-family: 'SearsTowerRegular';
+    padding-bottom: 0;
+}
+
 /* custom */
 html,body {
     background-color: #424242;
