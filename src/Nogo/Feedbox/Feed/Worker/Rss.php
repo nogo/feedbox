@@ -45,8 +45,6 @@ class Rss implements Worker
 
         $result = array();
 
-        $linkValidator = new Uri();
-
         /**
          * @var $entry EntryInterface
          */
@@ -59,10 +57,7 @@ class Rss implements Worker
                 $title = "[ no title ]";
             }
 
-            $link = null;
-            if ($linkValidator->isValid($entry->getLink())) {
-                $link = htmLawed($entry->getLink(), array("deny_attribute" => "*", "elements" => "-*"));
-            }
+            $link = htmLawed($entry->getLink(), array("deny_attribute" => "*", "elements" => "-*"));
 
             $content = htmLawed(
                 htmlspecialchars_decode($entry->getContent()),
