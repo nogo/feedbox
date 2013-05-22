@@ -17,7 +17,8 @@ App.router.route('unread', function() {
         var data = {
             'unread': true,
             'limit': 50,
-            'page': 1
+            'page': 1,
+            'sortby': 'oldest'
         };
         App.Session.set('item-collection-data', data);
         items.fetch({
@@ -42,7 +43,8 @@ App.router.route('read', function() {
         var data = {
             'unread': false,
             'limit': 50,
-            'page': 1
+            'page': 1,
+            'sortby': 'newest'
         };
         App.Session.set('item-collection-data', data);
         items.fetch({
@@ -67,7 +69,8 @@ App.router.route('starred', function() {
         var data = {
             'starred': true,
             'limit': 50,
-            'page': 1
+            'page': 1,
+            'sortby': 'newest'
         };
         App.Session.set('item-collection-data', data);
         items.fetch({

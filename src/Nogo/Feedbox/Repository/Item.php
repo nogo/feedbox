@@ -19,8 +19,7 @@ class Item extends AbstractRepository
         $select = $this->connection->newSelect();
 
         $select
-            ->from($this->getTable())
-            ->orderBy(['updated_at DESC', 'id DESC']);
+            ->from($this->getTable());
 
         if ($count) {
             $select->cols(['count(*)']);
@@ -42,6 +41,16 @@ class Item extends AbstractRepository
             }
 
             switch ($key) {
+                case 'sortby':
+                    switch ($value) {
+                        case 'oldest':
+                            $select->orderBy(['updated_at ASC', 'id ASC']);
+                            break;
+                        case 'newest':
+                            $select->orderBy(['updated_at DESC', 'id DESC']);
+                            break;
+                    }
+                    break;
                 case 'source':
                     $value = intval($value);
                     if ($value) {

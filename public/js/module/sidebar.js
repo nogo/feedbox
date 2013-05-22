@@ -55,11 +55,29 @@ App.Module.Sidebar = {
                     e.preventDefault();
                 }
 
+                var marked = []
                 this.items.each(function(model) {
                     if (!model.get('read')) {
                         model.save({ 'read': moment().format('YYYY-MM-DD HH:mm:ss') });
+                        marked.push(model);
                     }
                 });
+
+                var data =  App.Session.get('item-collection-data');
+                data.page = 1;
+                this.items.fetch({
+                    remove: false,
+                    async: false,
+                    data: data,
+                    success: function(models, textStatus, jqXHR) {
+                        App.Session.set('item-collection-data', data);
+                    },
+                    error: function() {
+
+                    }
+                });
+
+                this.items.remove(marked);
             }
         }),
         Top: Backbone.View.extend({

@@ -69,9 +69,10 @@ App.Module.Source = {
                             App.notifier.show('#content');
                         },
                         error: function(xhr, status, errors) {
-                            console.log(xhr);
                             App.notifier.add(that.model.get('name') + " - Source update failed.", "error");
-                            that.model.set(jQuery.parseJSON(xhr.responseText));
+                            if (xhr.responseText) {
+                                that.model.set(jQuery.parseJSON(xhr.responseText));
+                            }
                             App.notifier.show('#content');
                         }
                     });
