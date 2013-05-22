@@ -55,8 +55,11 @@ html,body {
     overflow-y: auto;
 }
 
-.container-fluid {
-    padding-top: 20px;
+
+@media (min-width: 979px) {
+    .container-fluid {
+        padding-top: 20px;
+    }
 }
 
 /* sidebar */
@@ -70,8 +73,31 @@ html,body {
     }
 }
 
+@media (max-width: 767px) {
+    #sidebar {
+        display: none;
+    }
+}
+
 .nav-sidebar {
     overflow: hidden;
+}
+
+.nav-sidebar-top {
+    padding: 3px 0;
+}
+
+.nav-sidebar-top .btn-navbar {
+    background: #424242;
+    border-color: #5E5E5E;
+    margin-top: 5px;
+}
+
+.nav-sidebar-top .btn-navbar .icon-bar {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background-color: #848484;
 }
 
 .nav-header {

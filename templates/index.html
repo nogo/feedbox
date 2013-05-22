@@ -13,11 +13,22 @@
 </head>
 <body>
 
+<div id="sidebar-top" class="nav-sidebar-top visible-phone">
+    <div class="pull-right">
+        <a class="btn btn-navbar toggable" data-target="#sidebar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </a>
+    </div>
+    <a class="brand logo" href="#"><img src="img/box32.png" alt="FeedBox"> FeedBox</a>
+</div>
+
 <div class="container-fluid">
     <div class="row-fluid">
         <section id="sidebar" class="span2">
             <div class="nav-sidebar">
-                <div class="logo text-center"><a href="#"><img src="img/box128-1.png" width="128" alt="FeedBox"></a></div>
+                <div class="logo text-center hidden-phone"><a href="#"><img src="img/box128-1.png" width="128" alt="FeedBox"></a></div>
                 <ul class="nav nav-list">
                     <li>
                         <div class="btn-group pull-right" style="margin-top: 2px;">
@@ -38,7 +49,6 @@
                 </ul>
                 <div id="sources" class="hide scrollable"></div>
             </div>
-            <div class="clearfix"></div>
         </section>
         <section id="content" class="span10">
             <header id="content-header"></header>

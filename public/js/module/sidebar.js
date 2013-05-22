@@ -61,12 +61,37 @@ App.Module.Sidebar = {
                     }
                 });
             }
+        }),
+        Top: Backbone.View.extend({
+            el: '#sidebar-top',
+            events: {
+                'click .toggable': 'toggable'
+            },
+            render: function() {
+                return this;
+            },
+            toggable: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                var component = $(e.currentTarget),
+                    target = $(component.data('target'));
+
+                if (target) {
+                    target.toggle();
+                }
+            }
         })
     },
     initialize: function(App) {
         var main = new this.Views.Main();
         main.render();
         App.Session.set('sidebar', main);
+
+        var top = new this.Views.Top();
+        top.render();
+        App.Session.set('sidebar-top', top);
 
     }
 };
