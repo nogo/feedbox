@@ -6,7 +6,8 @@ App.Module.Sidebar = {
             el: '#sidebar',
             events: {
                 'click .toggable': 'toggable',
-                'click .mark-as-read': 'markAsRead'
+                'click .mark-as-read': 'markAsRead',
+                'click .reload': 'reload'
             },
             initialize: function() {
                 this.sources = App.Session.get('source-collection');
@@ -78,6 +79,27 @@ App.Module.Sidebar = {
                 });
 
                 this.items.remove(marked);
+            },
+            reload: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                var data =  App.Session.get('item-collection-data');
+                data.page = 1;
+                this.items.fetch({
+                    remove: true,
+                    async: false,
+                    data: data,
+                    success: function(models, textStatus, jqXHR) {
+                        App.Session.set('item-collection-data', data);
+                        var view = App.Session.get('content-view');
+                        view.el.scrollTop = 0;
+                    },
+                    error: function() {
+
+                    }
+                });
             }
         }),
         Top: Backbone.View.extend({
