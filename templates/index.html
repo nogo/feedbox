@@ -123,9 +123,10 @@
 
 <script type="text/template" id="tpl-source">
     <div class="btn-group pull-right">
-        <a class="btn" href="#sources/<%- model.id %>/update"><i class="icon-refresh"></i></a>
+        <button class="btn activate"><i class="icon-off"></i></button>
         <a class="btn" href="#sources/<%- model.id %>/edit"><i class="icon-pencil"></i></a>
-        <a class="btn" href="#sources/<%- model.id %>/delete"><i class="icon-trash"></i></a>
+        <button class="btn update"><i class="icon-refresh"></i></button>
+        <button class="btn delete"><i class="icon-trash"></i></button>
     </div>
     <div class="box-title"><%- model.get('name') %><% if (model.hasErrors()) { %> <small><%- model.get('errors') %></small><% } %></div>
     <small>
@@ -142,7 +143,7 @@
             <div class="control-group">
                 <label class="control-label" for="source-active">Active?</label>
                 <div class="controls">
-                    <input type="checkbox" id="source-active" name="active" class="input-block-level" checked>
+                    <input type="checkbox" id="source-active" name="active" class="input-block-level" checked value="1">
                 </div>
             </div>
             <div class="control-group">
@@ -158,9 +159,15 @@
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="source-tags">Tags</label>
+                <label class="control-label" for="source-period">Period</label>
                 <div class="controls">
-                    <input type="text" id="source-tags" name="tags" class="input-block-level">
+                    <select id="source-period" name="period" class="input-block-level">
+                        <option value="everytime">everytime</option>
+                        <option value="hourly">hourly</option>
+                        <option value="daily">daily</option>
+                        <option value="weekly">weekly</option>
+                        <option value="yearly">yearly</option>
+                    </select>
                 </div>
             </div>
             <div class="form-actions">

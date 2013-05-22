@@ -5,7 +5,7 @@ namespace Nogo\Feedbox\Repository;
 class Source extends AbstractRepository
 {
     protected $table = 'sources';
-    protected $fields = ['name', 'uri', 'active'];
+    protected $fields = ['name', 'uri', 'active', 'period'];
 
     public function getTable()
     {

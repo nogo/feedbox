@@ -9,6 +9,11 @@ App.Module.Source = {
     }),
     Views: {
         Item: App.Views.ListItem.extend({
+            events: {
+                'click .activate': 'activateItem',
+                'click .update': 'updateItem',
+                'click .delete': 'deleteItem'
+            },
             render: function() {
                 // Call parent contructor
                 App.Views.ListItem.prototype.render.call(this);
@@ -24,12 +29,62 @@ App.Module.Source = {
                     var active = this.model.get('active');
                     if (active) {
                         this.$el.removeClass('muted');
+                        this.$('.activate').addClass('active');
                     } else {
                         this.$el.addClass('muted');
+                        this.$('.activate').removeClass('active');
                     }
                 }
 
                 return this;
+            },
+            activateItem: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                if (this.model) {
+                    var value = this.model.get('active');
+
+                    if (value == 0) {
+                        this.model.save({ active: 1 });
+                    } else {
+                        this.model.save({ active: 0 });
+                    }
+                }
+            },
+            updateItem: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                if (this.model) {
+                    var that = this;
+                    $.ajax('api.php/update/' + this.model.id, {
+                        cache: false,
+                        dataType: 'json',
+                        success: function(data, status, xhr) {
+                            App.notifier.add(that.model.get('name') + " - Source update successfull.", "success");
+                            that.model.set(data);
+                            App.notifier.show('#content');
+                        },
+                        error: function(xhr, status, errors) {
+                            console.log(xhr);
+                            App.notifier.add(that.model.get('name') + " - Source update failed.", "error");
+                            that.model.set(jQuery.parseJSON(xhr.responseText));
+                            App.notifier.show('#content');
+                        }
+                    });
+                }
+            },
+            deleteItem: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                if (this.model) {
+                    this.model.destroy();
+                }
             }
         }),
         Form: Backbone.View.extend({

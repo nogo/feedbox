@@ -18,8 +18,9 @@ class Item extends AbstractRepository
          */
         $select = $this->connection->newSelect();
 
-        $select->from($this->getTable())
-            ->orderBy(['updated_at DESC', 'id ASC']);
+        $select
+            ->from($this->getTable())
+            ->orderBy(['updated_at DESC', 'id DESC']);
 
         if ($count) {
             $select->cols(['count(*)']);

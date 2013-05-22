@@ -43,7 +43,7 @@ class Sources extends AbstractRestController
 
     public function updateAllAction()
     {
-        $sources = $this->getRepository()->fetchAllActive();
+        $sources = $this->getRepository()->fetchAllActiveWithUri();
 
         $defaultWorkerClass = $this->app->config('runner.default_worker');
 
@@ -78,10 +78,15 @@ class Sources extends AbstractRestController
         }
 
         // fetch source
-        $this->fetchSource($source);
+        $source = $this->fetchSource($source);
+
+        $status = 200;
+        if (!empty($source['errors'])) {
+            $status = 502;  // Bad Gateway
+        }
 
         // output updated source
-        $this->renderJson($source);
+        $this->renderJson($source, $status);
     }
 
     protected function fetchSource($source, Runner $runner = null)
@@ -98,21 +103,25 @@ class Sources extends AbstractRestController
         $items = $runner->run();
 
         $itemRepository = new ItemRepository($this->connection);
-        foreach($items as $item) {
-            if (isset($item['uid'])) {
-                $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
-                // TODO UPDATE ?
-                if (!empty($dbItem)) {
-                    continue;
+        if ($items != null) {
+            foreach($items as $item) {
+                if (isset($item['uid'])) {
+                    $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
+                    // TODO UPDATE ?
+                    if (!empty($dbItem)) {
+                        continue;
+                    }
                 }
-            }
 
-            $item['source_id'] = $source['id'];
-            $itemRepository->persist($item);
+                $item['source_id'] = $source['id'];
+                $itemRepository->persist($item);
+            }
         }
 
         $source['last_update'] = date('Y-m-d H:i:s');
-        $source['period'] = $runner->getUpdateInterval();
+        if (empty($source['period'])) {
+            $source['period'] = $runner->getUpdateInterval();
+        }
         $source['errors'] = $runner->getErrors();
         $source['unread'] = $itemRepository->countUnread([$source['id']]);
         $this->getRepository()->persist($source);
