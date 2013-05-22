@@ -68,11 +68,11 @@ foreach ($sources as $source) {
                         $period = 0;
                         break;
                     default:
-                        $format = '%a';
+                        $format = false;
                         $period = 0;
                 }
 
-                if ($interval->format($format) <= $period) {
+                if ($format && $interval->format($format) <= $period) {
                     continue;
                 }
             }
@@ -89,9 +89,15 @@ foreach ($sources as $source) {
             foreach($items as $item) {
                 if (isset($item['uid'])) {
                     $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
-                    // TODO UPDATE ?
                     if (!empty($dbItem)) {
-                        continue;
+                        if ($item['content'] !== $dbItem['content']
+                            || $item['title'] !== $dbItem['title']) {
+                            $item['id'] = $dbItem['id'];
+                            $item['starred'] = $dbItem['starred'];
+                            $item['created_at']= $dbItem['created_at'];
+                        } else {
+                            continue;
+                        }
                     }
                 }
 
@@ -100,7 +106,9 @@ foreach ($sources as $source) {
             }
 
             $source['last_update'] = date('Y-m-d H:i:s');
-            $source['period'] = $feedRunner->getUpdateInterval();
+            if (empty($source['period'])) {
+                $source['period'] = $feedRunner->getUpdateInterval();
+            }
             $source['errors'] = $feedRunner->getErrors();
             $count = $source['unread'];
             $source['unread'] = $itemRepository->countUnread([$source['id']]);

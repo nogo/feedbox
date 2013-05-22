@@ -107,9 +107,15 @@ class Sources extends AbstractRestController
             foreach($items as $item) {
                 if (isset($item['uid'])) {
                     $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
-                    // TODO UPDATE ?
                     if (!empty($dbItem)) {
-                        continue;
+                        if ($item['content'] !== $dbItem['content']
+                            || $item['title'] !== $dbItem['title']) {
+                            $item['id'] = $dbItem['id'];
+                            $item['starred'] = $dbItem['starred'];
+                            $item['created_at']= $dbItem['created_at'];
+                        } else {
+                            continue;
+                        }
                     }
                 }
 
