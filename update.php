@@ -52,23 +52,23 @@ foreach ($sources as $source) {
             if ($interval !== false) {
                 switch ($source['period']) {
                     case 'hourly':
-                        $format = 'h';
+                        $format = '%h';
                         $period = 0;
                         break;
                     case 'daily':
-                        $format = 'a';
+                        $format = '%a';
                         $period = 0;
                         break;
                     case 'weekly':
-                        $format = 'a';
+                        $format = '%a';
                         $period = 5;
                         break;
                     case 'yearly':
-                        $format = 'y';
+                        $format = '%y';
                         $period = 0;
                         break;
                     default:
-                        $format = 'a';
+                        $format = '%a';
                         $period = 0;
                 }
 
@@ -109,8 +109,14 @@ foreach ($sources as $source) {
             if ($config['debug']) {
                 echo sprintf("%d new items.\n", $source['unread'] - $count);
             }
-        } else if ($config['debug']) {
-            echo sprintf("%s\n", $feedRunner->getErrors());
+        } else {
+            $source['errors'] = $feedRunner->getErrors();
+            $source['unread'] = $itemRepository->countUnread([$source['id']]);
+            $sourceRepository->persist($source);
+
+            if ($config['debug']) {
+                echo sprintf("%s\n", $feedRunner->getErrors());
+            }
         }
     }
 }
