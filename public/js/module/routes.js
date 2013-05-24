@@ -93,6 +93,7 @@ App.router.route('sources', function() {
         });
     });
 
+    App.Session.get('content-footer-view').hide();
     App.Session.set('selected-menu-items', ['.menu-item-sources']);
     App.selectMenuItem();
 });
@@ -147,6 +148,7 @@ App.router.route('sources/add', function(id) {
             collection: sources
         });
     });
+    App.Session.get('content-footer-view').hide();
 });
 
 App.router.route('sources/:id/edit', function(id) {
@@ -161,6 +163,7 @@ App.router.route('sources/:id/edit', function(id) {
                 collection: sources
             });
         });
+        App.Session.get('content-footer-view').hide();
     } else {
         App.notifier.add("Source not found", "error");
         App.router.navigate('sources', { trigger: true });

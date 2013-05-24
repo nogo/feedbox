@@ -57,6 +57,8 @@
     </div>
 </div>
 
+<!-- templates -->
+
 <script type="text/template" id="tpl-application-notification">
     <div class="alert<%- type %>"><button type="button" class="close" data-dismiss="alert">×</button><%- message %></div>
 </script>
@@ -68,6 +70,13 @@
 <script type="text/template" id="tpl-item-source">
     <%- model.get('name') %>
 </script>
+
+<script type="text/template" id="tpl-content-footer">
+    <div class="text-right">
+        <span class="badge"><i class="icon-rss"></i> <%- total %></span>
+    </div>
+</script>
+
 
 <script type="text/template" id="tpl-empty">
     <div class="alert alert-warning">Dude, there is nothing in this list.</div>
@@ -189,6 +198,7 @@
 <script src="js/module/item.js"></script>
 <script src="js/module/source.js"></script>
 <script src="js/module/sidebar.js"></script>
+<script src="js/module/content.js"></script>
 <script src="js/module/routes.js"></script>
 <script src="js/init.js"></script>
 
