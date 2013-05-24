@@ -44,10 +44,10 @@ class Item extends AbstractRepository
                 case 'sortby':
                     switch ($value) {
                         case 'oldest':
-                            $select->orderBy(['updated_at ASC', 'id ASC']);
+                            $select->orderBy(['pubdate ASC', 'id ASC']);
                             break;
                         case 'newest':
-                            $select->orderBy(['updated_at DESC', 'id DESC']);
+                            $select->orderBy(['pubdate DESC', 'id DESC']);
                             break;
                     }
                     break;
