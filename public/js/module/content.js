@@ -26,11 +26,9 @@ App.Module.Content = {
                 }
 
                 var html = App.render(this.options.template, {total: this.itemTotal});
-                console.log(this.options.template);
                 if (html) {
                     this.$el.html(html);
                 }
-
                 return this;
             },
             remove: function() {
