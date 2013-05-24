@@ -20,7 +20,7 @@ App.Module.Item = {
             if (date.isSame(moment(), 'day')) {
                 return date.format('HH:mm:ss');
             } else {
-                return date.format('YYYY-MM-DD');
+                return date.format('YYYY-MM-DD HH:mm');
             }
         }
     }),

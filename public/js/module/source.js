@@ -129,7 +129,7 @@ App.Module.Source = {
                     this.model.save(data, {
                         wait: true,
                         success: function(model) {
-                            App.notifier.add("Nice, all data are saved properly.", "success");
+                            App.notifier.add(that.model.get('name') + " - All data are saved properly.", "success");
                             if (isNew) {
                                 that.collection.add(model);
                             }

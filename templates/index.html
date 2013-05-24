@@ -15,11 +15,9 @@
 
 <div id="sidebar-top" class="nav-sidebar-top visible-phone">
     <div class="pull-right">
-        <a class="btn btn-navbar toggable" data-target="#sidebar">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </a>
+        <button class="btn btn-navbar btn-mini reload"><i class="icon-refresh"></i></button>
+        <button class="btn btn-navbar btn-mini mark-as-read"><i class="icon-eye-close"></i></button>
+        <button class="btn btn-navbar btn-mini toggable" data-target="#sidebar"><i class="icon-ellipsis-vertical"></i></button>
     </div>
     <a class="brand logo" href="#"><img src="img/box32.png" alt="FeedBox"> FeedBox</a>
 </div>
@@ -31,7 +29,7 @@
                 <div class="logo text-center hidden-phone"><a href="#"><img src="img/box128-1.png" width="128" alt="FeedBox"></a></div>
                 <ul class="nav nav-list">
                     <li>
-                        <div class="btn-group pull-right" style="margin-top: 2px;">
+                        <div class="btn-group hidden-phone pull-right" style="margin-top: 2px;">
                             <button class="btn btn-mini reload" title="Reload"><i class="icon-refresh"></i></button>
                             <button class="btn btn-mini mark-as-read" title="Mark all as read"><i class="icon-eye-close"></i></button>
                         </div>
@@ -72,7 +70,7 @@
 </script>
 
 <script type="text/template" id="tpl-empty">
-    <div class="alert alert-info">List is empty.</div>
+    <div class="alert alert-warning">Dude, there is nothing in this list.</div>
 </script>
 
 <script type="text/template" id="tpl-item">
@@ -87,8 +85,7 @@
                 <% } %>
                 <button class="btn btn-mini open-entry-link"><i class="icon-external-link"></i></button>
                 </div>
-                <%- model.get('source').get('name') %>
-                - <%- model.timeHumanize() %>
+                <%- model.timeHumanize() %> &dash; <%- model.get('source').get('name') %>
             </div>
             <div class="entry-title"><%= model.get('title') %></div>
         </div>

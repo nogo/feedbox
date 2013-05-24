@@ -90,7 +90,11 @@ html,body {
 .nav-sidebar-top .btn-navbar {
     background: #424242;
     border-color: #5E5E5E;
-    margin-top: 5px;
+    color: #848484;
+    font-size: 18px;
+    text-shadow: none;
+    height: 30px;
+    width: 60px;
 }
 
 .nav-sidebar-top .btn-navbar .icon-bar {
