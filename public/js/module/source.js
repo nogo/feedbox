@@ -2,7 +2,6 @@
 
 App.Module.Source = {
     Model: Backbone.Model.extend({
-        urlRoot: 'api.php/sources',
         hasErrors: function() {
             return !_.isEmpty(this.get('errors'));
         }
@@ -60,7 +59,8 @@ App.Module.Source = {
 
                 if (this.model) {
                     var that = this;
-                    $.ajax('api.php/update/' + this.model.id, {
+                    Backbone.ajax({
+                        url: BASE_URL + '/update/' + this.model.id,
                         cache: false,
                         dataType: 'json',
                         success: function(data, status, xhr) {
@@ -182,6 +182,12 @@ App.Module.Source.Views.List = App.Views.List.extend({
         // Call parent contructor
         App.Views.List.prototype.render.call(this);
 
+        // Update element height
+        this.updateHeight();
+
+        return this;
+    },
+    updateHeight: function() {
         var position = this.$el.position(),
             height = $(window).height() - this.options.bottom;
 
@@ -189,14 +195,12 @@ App.Module.Source.Views.List = App.Views.List.extend({
             height -= position.top;
         }
         this.$el.height(height);
-
-        return this;
     }
 });
 
 App.Module.Source.Collection = Backbone.Collection.extend({
     model: App.Module.Source.Model,
-    url: 'api.php/sources',
+    url: BASE_URL + '/sources',
     comparator: function(model) {
         return model.get('name');
     }

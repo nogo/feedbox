@@ -172,7 +172,8 @@ App.router.route('sources/:id/edit', function(id) {
 
 App.router.route('sources/update', function() {
     App.notifier.add("Update started.", "success");
-    $.ajax('api.php/update', {
+    Backbone.ajax({
+        url: BASE_PATH + '/update',
         cache: false,
         dataType: 'text',
         success: function() {
@@ -191,7 +192,8 @@ App.router.route('sources/:id/update', function(id) {
         model = sources.get(id);
 
     if (model) {
-        $.ajax('api.php/update/' + model.id, {
+        Backbone.ajax({
+            url: BASE_PATH + '/update/' + model.id,
             cache: false,
             dataType: 'text',
             success: function() {
