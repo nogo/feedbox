@@ -25,6 +25,8 @@ class Items extends AbstractRestController
         $this->app->post('/items', array($this, 'postAction'));
         $this->app->put('/items/:id', array($this, 'putAction'))->conditions(['id' => '\d+']);
         $this->app->delete('/items/:id', array($this, 'deleteAction'))->conditions(['id' => '\d+']);
+
+        $this->app->put('/read', array($this, 'readAction'));
     }
 
     /**
@@ -54,5 +56,34 @@ class Items extends AbstractRestController
         $result = $this->getRepository()->fetchAllWithFilter($params);
 
         $this->renderJson($result);
+    }
+
+    public function readAction()
+    {
+        $json = trim($this->app->request()->getBody());
+        if (empty($json)) {
+            $this->render('Data not valid', 400);
+            return;
+        }
+
+        $request_data = json_decode($json, true);
+        if (!is_array($request_data)) {
+            $this->render('Data not valid', 400);
+            return;
+        }
+
+        $dt = date('Y-m-d H:i:s');
+
+        foreach($request_data as $id) {
+            $id = intval($id);
+            $item = $this->getRepository()->fetchOneById($id);
+            if ($item !== false) {
+                $item['read'] = $dt;
+                $item['updated_at'] = $dt;
+                $this->getRepository()->persist($item);
+            }
+        }
+
+        $this->render('OK');
     }
 }
