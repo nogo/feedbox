@@ -32,15 +32,19 @@ App.Module.Sidebar = {
                     e.preventDefault();
                 }
 
-                var data =  App.Session.get('item-collection-data'),
-                    that = this;
+                var that = this;
 
                 // save models read state
-                this.items.markItemRead();
-
-                // get the next items
-                this.items.fetchNext(true).done(function(models, textStatus, jqXHR) {
-                    that.items.trigger('sync', that.items, models, jqXHR);
+                this.items.markItemRead({
+                    success: function(models, textStatus, jqXHR) {
+                        that.items.fetchNext({
+                            reset: true,
+                            success: function(models, textStatus, jqXHR) {
+                                var view = App.Session.get('content-view');
+                                view.el.scrollTop = 0;
+                            }
+                        });
+                    }
                 });
             },
             reload: function(e) {
@@ -48,12 +52,12 @@ App.Module.Sidebar = {
                     e.preventDefault();
                 }
 
-                var that = this;
-
-                this.items.fetchNext(true).done(function(models, textStatus, jqXHR) {
-                    that.items.trigger('sync', that.items, models, jqXHR);
-                    var view = App.Session.get('content-view');
-                    view.el.scrollTop = 0;
+                this.items.fetchNext({
+                    reset: true,
+                    success: function(models, textStatus, jqXHR) {
+                        var view = App.Session.get('content-view');
+                        view.el.scrollTop = 0;
+                    }
                 });
             }
         })

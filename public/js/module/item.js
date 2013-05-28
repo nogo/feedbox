@@ -14,7 +14,7 @@ App.Module.Item = {
             }
             return response;
         },
-        timeHumanize: function() {
+        timeHumanize: function () {
             var date = moment(this.get('pubdate'));
             if (date.isSame(moment(), 'day')) {
                 return date.format('HH:mm:ss');
@@ -31,7 +31,7 @@ App.Module.Item = {
                 'click .open-entry-link': 'openLink',
                 'click .starred': 'itemStarred'
             },
-            render: function() {
+            render: function () {
                 // Call parent contructor
                 App.Views.ListItem.prototype.render.call(this);
 
@@ -100,13 +100,13 @@ App.Module.Item = {
                     this.model.save({ 'starred': 1 });
                 }
             },
-            openLink: function(e) {
+            openLink: function (e) {
                 if (e) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
 
-                var win=window.open(this.model.get('uri'), '_blank');
+                var win = window.open(this.model.get('uri'), '_blank');
                 win.focus();
 
                 if (this.model) {
@@ -138,7 +138,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
     events: {
         'scroll': 'addMore'
     },
-    initialize: function() {
+    initialize: function () {
         // Call parent contructor
         App.Views.List.prototype.initialize.call(this);
 
@@ -146,7 +146,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
             this.collection.on('sync', this.retrieveItemCount, this);
         }
     },
-    render: function() {
+    render: function () {
         // Call parent contructor
         App.Views.List.prototype.render.call(this);
 
@@ -156,7 +156,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
 
         return this;
     },
-    remove: function() {
+    remove: function () {
         // Call parent contructor
         App.Views.List.prototype.remove.call(this);
 
@@ -166,7 +166,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
 
         return this;
     },
-    updateHeight: function() {
+    updateHeight: function () {
         var position = this.$el.position(),
             height = $(window).height() - this.options.bottom;
 
@@ -175,7 +175,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
         }
         this.$el.height(height);
     },
-    retrieveItemCount: function(collection, response, options) {
+    retrieveItemCount: function (collection, response, options) {
         if (options) {
             var xhr = undefined;
             if (options.hasOwnProperty('getResponseHeader')) {
@@ -192,15 +192,17 @@ App.Module.Item.Views.List = App.Views.List.extend({
             }
         }
     },
-    addMore: function(e) {
+    addMore: function (e) {
         var triggerPoint = 100; // 100px from the bottom
         if (!this.isLoading) {
             if(this.el.scrollTop + this.el.clientHeight + triggerPoint > this.el.scrollHeight) {
                 this.isLoading = true;
                 if (!this.collection.endReached()) {
                     var that = this;
-                    this.collection.fetchNext().done(function() {
-                        that.isLoading = false;
+                    this.collection.fetchNext({
+                        success: function() {
+                            that.isLoading = false;
+                        }
                     });
                 }
             }
@@ -211,66 +213,61 @@ App.Module.Item.Views.List = App.Views.List.extend({
 App.Module.Item.Collection = Backbone.Collection.extend({
     model: App.Module.Item.Model,
     url: BASE_URL + '/items',
-    total: function(total) {
+    total: function (total) {
         if (total !== undefined) {
             this.totalCount = total;
         }
 
         return this.totalCount || 0;
     },
-    markItemRead: function() {
-        var models = this.map(function(model) {
-            var read = model.get('read');
-            if (read === undefined || read === null) {
-                return model.id;
-            }
-            return undefined;
-        });
+    markItemRead: function (options) {
+        options = options || {};
 
-        return Backbone.ajax({
-            url: BASE_URL + '/read',
-            data:  JSON.stringify(models),
-            dataType: 'json',
-            type: 'PUT'
-        });
-    },
-    removeItemRead: function() {
-        var models = this.filter(function(model) {
-            var read = model.get('read');
-            return read !== undefined && read !== null;
-        });
-
-        this.remove(models);
-    },
-    fetchNext: function(reset, success, error) {
-        var data = App.Session.get('item-collection-data'),
-            options = {
-                async: false,
-                data: data,
-                success: function(data, textStatus, jqXHR) {
-                    App.Session.set('item-collection-data', data);
-                    if (success) {
-                        success(data, textStatus, jqXHR);
-                    }
-                },
-                error: function(data, textStatus, jqXHR) {
-                    if (error) {
-                        error(data, textStatus, jqXHR);
-                    }
+        var models = this.map(function (model) {
+                var read = model.get('read');
+                if (read === undefined || read === null) {
+                    return model.id;
                 }
-            };
+                return undefined;
+            }),
+            params = _.extend({
+                url: BASE_URL + '/read',
+                data: JSON.stringify(models),
+                dataType: 'json',
+                type: 'PUT'
+            }, options);
 
-        if (reset) {
-            options.reset = true;
+        return Backbone.ajax(params);
+    },
+    fetchNext: function (options) {
+        options = options || {};
+
+        var data = App.Session.get('item-collection-data'),
+            params = _.extend({ data: data }, options);
+
+        if (options.reset) {
             data.page = 1;
         } else {
-            options.remove = true;
+            params.remove = false;
             data.page += 1;
         }
 
-        return this.fetch(options);
+        params.success = function (models, textStatus, jqXHR) {
+            App.Session.set('item-collection-data', data);
+            if (options.success) {
+                options.success(models, textStatus, jqXHR);
+            }
+        }
+
+        if (options.error) {
+            params.error = function (models, textStatus, jqXHR) {
+                options.error(models, textStatus, jqXHR);
+            }
+        }
+
+        return this.fetch(params);
     },
-    endReached: function() {
+    endReached: function () {
         return (this.length >= this.totalCount);
     }
 

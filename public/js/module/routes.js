@@ -171,12 +171,15 @@ App.router.route('sources/:id/edit', function(id) {
 });
 
 App.router.route('sources/update', function() {
+    var sources = App.Session.get('source-collection');
+
     App.notifier.add("Update started.", "success");
     Backbone.ajax({
-        url: BASE_PATH + '/update',
+        url: BASE_URL + '/update',
         cache: false,
-        dataType: 'text',
-        success: function() {
+        dataType: 'json',
+        success: function(models, textStatus, jqXHR) {
+            sources.set(models);
             App.notifier.add("Update successfull.", "success");
             App.notifier.show('#content');
         },
@@ -193,12 +196,12 @@ App.router.route('sources/:id/update', function(id) {
 
     if (model) {
         Backbone.ajax({
-            url: BASE_PATH + '/update/' + model.id,
-            cache: false,
-            dataType: 'text',
-            success: function() {
+            url: BASE_URL + '/update/' + model.id,
+            dataType: 'json',
+            success: function(modelData, textStatus, jqXHR) {
+                model.set(modelData);
                 App.notifier.add(model.get('name') + " - Source update successfull.", "success");
-                model.fetch();
+
             },
             error: function() {
                 App.notifier.add(model.get('name') + " - Source update failed.", "error");
