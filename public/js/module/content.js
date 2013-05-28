@@ -8,32 +8,40 @@ App.Module.Content = {
                 template: '#tpl-content-footer'
             },
             initialize: function() {
-                this.items = App.Session.get('item-collection');
-                this.itemTotal = 0;
-
-                if (this.items) {
-                    this.items.on('sync', this.render, this);
+                if (this.collection) {
+                    this.collection.on('sync', this.updateItemTotal, this);
                 }
             },
-            render: function(collection, xhr, options) {
-                if(options && options.hasOwnProperty('getResponseHeader')) {
-                    options = {
-                        xhr: options
-                    };
-                }
-                if(options && options.xhr && options.xhr.getResponseHeader('X-Items-Total')) {
-                    this.itemTotal = options.xhr.getResponseHeader('X-Items-Total');
-                }
-
-                var html = App.render(this.options.template, {total: this.itemTotal});
-                if (html) {
-                    this.$el.html(html);
+            render: function() {
+                if (this.collection) {
+                    var html = App.render(this.options.template, { total: this.collection.total() });
+                    if (html) {
+                        this.$el.html(html);
+                    }
                 }
                 return this;
             },
             remove: function() {
-                if (this.items) {
-                    this.items.off('sync', this.render, this);
+                if (this.collection) {
+                    this.collection.off('sync', this.render, this);
+                }
+            },
+            updateItemTotal: function(collection, response, options) {
+                if (options) {
+                    var xhr = undefined;
+                    if (options.hasOwnProperty('getResponseHeader')) {
+                        xhr = options;
+                    } else if (options.xhr) {
+                        xhr = options.xhr;
+                    }
+
+                    if (xhr) {
+                        var total = xhr.getResponseHeader('X-Items-Total');
+                        if (collection && collection.total) {
+                            collection.total(total);
+                            this.render();
+                        }
+                    }
                 }
             },
             hide: function(e) {
@@ -42,7 +50,9 @@ App.Module.Content = {
         })
     },
     initialize: function(App) {
-        var footer = new this.Views.Footer();
+        var footer = new this.Views.Footer({
+            collection: App.Session.get('item-collection')
+        });
         footer.render();
         App.Session.set('content-footer-view', footer);
 

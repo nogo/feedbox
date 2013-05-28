@@ -32,49 +32,28 @@ App.Module.Sidebar = {
                     e.preventDefault();
                 }
 
-                var marked = []
-                this.items.each(function(model) {
-                    if (!model.get('read')) {
-                        model.save({ 'read': moment().format('YYYY-MM-DD HH:mm:ss') });
-                        marked.push(model);
-                    }
+                var data =  App.Session.get('item-collection-data'),
+                    that = this;
+
+                // save models read state
+                this.items.markItemRead();
+
+                // get the next items
+                this.items.fetchNext(true).done(function(models, textStatus, jqXHR) {
+                    that.items.trigger('sync', that.items, models, jqXHR);
                 });
-
-                var data =  App.Session.get('item-collection-data');
-                data.page = 1;
-                this.items.fetch({
-                    remove: false,
-                    async: false,
-                    data: data,
-                    success: function(models, textStatus, jqXHR) {
-                        App.Session.set('item-collection-data', data);
-                    },
-                    error: function() {
-
-                    }
-                });
-
-                this.items.remove(marked);
             },
             reload: function(e) {
                 if (e) {
                     e.preventDefault();
                 }
 
-                var data =  App.Session.get('item-collection-data');
-                data.page = 1;
-                this.items.fetch({
-                    remove: true,
-                    async: false,
-                    data: data,
-                    success: function(models, textStatus, jqXHR) {
-                        App.Session.set('item-collection-data', data);
-                        var view = App.Session.get('content-view');
-                        view.el.scrollTop = 0;
-                    },
-                    error: function() {
+                var that = this;
 
-                    }
+                this.items.fetchNext(true).done(function(models, textStatus, jqXHR) {
+                    that.items.trigger('sync', that.items, models, jqXHR);
+                    var view = App.Session.get('content-view');
+                    view.el.scrollTop = 0;
                 });
             }
         })
