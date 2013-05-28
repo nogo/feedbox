@@ -38,15 +38,15 @@ App.Views.List = Backbone.View.extend({
         prefix: '',
         item: {
             attributes: {},
-            prepend: false,
-            prependNew: false,
             tagName: 'div',
             template: '',
             View: App.Views.ListItem
         }
     },
-    initialize: function (config) {
+    initialize: function () {
+        // ListItems object
         this.items = {};
+
         // Assign function to collection events
         if (this.collection) {
             this.collection.on('reset', this.addAll, this);
@@ -85,68 +85,35 @@ App.Views.List = Backbone.View.extend({
         return this;
     },
     addAll: function () {
-        var tEmpty = '', that = this;
+        var that = this;
 
-        if (this.options.emptyTemplate) {
-            tEmpty = App.render(this.options.emptyTemplate);
+        // remove exiting models
+        if (this.items) {
+            for (var name in this.items) {
+                if (this.items.hasOwnProperty(name)) {
+                    this.items[name].remove();
+                }
+            }
         }
-
-        // remove all content
-        this.$el.addClass('loading').html('');
 
         // run addItem on each collection item
         if (this.collection && this.collection.length > 0) {
             this.options.isEmpty = false;
 
-            if (this.options.groupBy && that.options.groupBy.key) {
-                var groupTemplate = App.render(this.options.groupBy.template),
-                    items = this.collection.groupBy(that.options.groupBy.key),
-                    sorted = _.without(_.keys(items), 'undefined').sort();
+            var items = [];
+            this.collection.each(function (model) {
+                var view = that.renderItem(model);
+                that.items[model.id] = view;
+                items.push(view.el);
+            });
 
-                for (var i = 0; i < sorted.length; i++) {
-                    var name = sorted[i];
-                    this.addElement($(groupTemplate({ title: name })));
-                    _.each(items[name], function (model) {
-                        var view = that.renderItem(model);
-                        that.items[model.id] = view;
-                        that.addElement(view.$el);
-                    });
-                }
-
-                if (items['undefined'] && this.options.groupBy['undefined']) {
-                    this.addElement($(groupTemplate({ title: this.options.groupBy['undefined'] })));
-                    _.each(items['undefined'], function (model) {
-                        var view = that.renderItem(model);
-                        that.items[model.id] = view;
-                        that.addElement(view.$el);
-                    });
-                }
-
-            } else {
-                this.collection.each(function (model) {
-                    var view = that.renderItem(model);
-                    that.items[model.id] = view;
-                    that.addElement(view.$el);
-                });
-            }
-        }
-
-        this.$el.removeClass('loading');
-
-        if (this.options.emptyTemplate && this.$el.is(":empty")) {
-            this.$el.html(tEmpty());
+            this.$el.append(items);
+        } else if (this.options.emptyTemplate && this.$el.is(":empty")) {
+            var emptyTemplate = App.render(this.options.emptyTemplate);
+            this.$el.html(emptyTemplate());
             this.options.isEmpty = true;
         }
         return this;
-    },
-    addElement: function ($el) {
-        if (!$el.is(':empty')) {
-            if (this.options.item.prepend) {
-                this.$el.prepend($el);
-            } else {
-                this.$el.append($el);
-            }
-        }
     },
     addItem: function (model) {
         if (this.options.isEmpty) {
@@ -155,8 +122,8 @@ App.Views.List = Backbone.View.extend({
         }
 
         var view = this.renderItem(model);
-        this.addElement(view.$el);
         this.items[model.id] = view;
+        this.$el.append(view.el);
 
         return this;
     },
@@ -165,8 +132,6 @@ App.Views.List = Backbone.View.extend({
             var oldView = this.items[model.id],
                 newItem = this.renderItem(model);
 
-            //newItem.$el.addClass(classes);
-            //item.replaceWith(newItem.el);
             oldView.$el.after(newItem.el);
             oldView.remove();
             this.items[model.id] = newItem;
@@ -186,11 +151,8 @@ App.Views.List = Backbone.View.extend({
         }).render();
     },
     removeItem: function (model) {
-        if (model.id !== undefined) {
-            $('#' + this.options.prefix + model.id).empty().detach();
-            if (this.collection.length === 0) {
-                this.collection.reset();
-            }
+        if (model.id !== undefined && this.items[model.id]) {
+            this.items[model.id].remove();
         }
         return this;
     }
