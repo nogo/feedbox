@@ -74,6 +74,7 @@ class Items extends AbstractRestController
 
         $dt = date('Y-m-d H:i:s');
 
+        $updated_items = array();
         foreach($request_data as $id) {
             $id = intval($id);
             $item = $this->getRepository()->fetchOneById($id);
@@ -81,9 +82,10 @@ class Items extends AbstractRestController
                 $item['read'] = $dt;
                 $item['updated_at'] = $dt;
                 $this->getRepository()->persist($item);
+                $updated_items[] = $item;
             }
         }
 
-        $this->render('OK');
+        $this->renderJson($updated_items);
     }
 }
