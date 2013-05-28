@@ -14,7 +14,10 @@ App.Module.Content = {
             },
             render: function() {
                 if (this.collection) {
-                    var html = App.render(this.options.template, { total: this.collection.total() });
+                    var html = App.render(this.options.template, {
+                        length: this.collection.length,
+                        total: this.collection.total()
+                    });
                     if (html) {
                         this.$el.html(html);
                     }
