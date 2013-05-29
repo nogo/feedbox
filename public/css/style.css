@@ -42,6 +42,15 @@ html,body {
     font-style: normal;
 }
 
+.loading {
+    display: inline-block;
+    background: url('../img/loading.gif') no-repeat center center;
+    height: 16px;
+    line-height: 16px;
+    vertical-align: baseline;
+    width: 16px;
+}
+
 .nowrap {
     white-space: nowrap;
 }

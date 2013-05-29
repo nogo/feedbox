@@ -2,7 +2,7 @@
 
 App.Module.Source = {
     Model: Backbone.Model.extend({
-        hasErrors: function() {
+        hasErrors: function () {
             return !_.isEmpty(this.get('errors'));
         }
     }),
@@ -13,7 +13,7 @@ App.Module.Source = {
                 'click .update': 'updateItem',
                 'click .delete': 'deleteItem'
             },
-            render: function() {
+            render: function () {
                 // Call parent contructor
                 App.Views.ListItem.prototype.render.call(this);
 
@@ -37,7 +37,7 @@ App.Module.Source = {
 
                 return this;
             },
-            activateItem: function(e) {
+            activateItem: function (e) {
                 if (e) {
                     e.preventDefault();
                 }
@@ -52,7 +52,7 @@ App.Module.Source = {
                     }
                 }
             },
-            updateItem: function(e) {
+            updateItem: function (e) {
                 if (e) {
                     e.preventDefault();
                 }
@@ -63,12 +63,12 @@ App.Module.Source = {
                         url: BASE_URL + '/update/' + this.model.id,
                         cache: false,
                         dataType: 'json',
-                        success: function(data, status, xhr) {
+                        success: function (data, status, xhr) {
                             App.notifier.add(that.model.get('name') + " - Source update successfull.", "success");
                             that.model.set(data);
                             App.notifier.show('#content');
                         },
-                        error: function(xhr, status, errors) {
+                        error: function (xhr, status, errors) {
                             App.notifier.add(that.model.get('name') + " - Source update failed.", "error");
                             if (xhr.responseText) {
                                 that.model.set(jQuery.parseJSON(xhr.responseText));
@@ -78,7 +78,7 @@ App.Module.Source = {
                     });
                 }
             },
-            deleteItem: function(e) {
+            deleteItem: function (e) {
                 if (e) {
                     e.preventDefault();
                 }
@@ -95,7 +95,8 @@ App.Module.Source = {
                 'click .cancel': 'close',
                 'submit': 'save'
             },
-            initialize: function () {},
+            initialize: function () {
+            },
             render: function () {
                 // grep template with jquery and generate template stub
                 var html = App.render(this.template, { model: this.model });
@@ -112,7 +113,7 @@ App.Module.Source = {
 
                 return this;
             },
-            save: function(e) {
+            save: function (e) {
                 if (e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -121,30 +122,32 @@ App.Module.Source = {
                 if (this.model) {
                     var that = this,
                         data = App.Module.Form.Serialize(this.$el),
-                        isNew = this.model.isNew();
+                        isNew = this.model.isNew(),
+                        options = {
+                            wait: true,
+                            success: function (model) {
+                                App.notifier.add(data.name + " - All data are saved properly.", "success");
+                                that.close();
+                            },
+                            error: function (model, response, scope) {
+                                $('.save i.icon').remove();
+                                $('.cancel').removeAttr('disabled');
+                                App.notifier.add(response.status + ": " + response.statusText, "error");
+                                App.notifier.show();
+                            }
+                        };
 
-                    this.$('.save').append(' <i class="icon loading-14-white"></i>');
+                    this.$('.save').prepend('<i class="loading"></i> ');
                     this.$('.cancel').attr('disabled', 'disabled');
 
-                    this.model.save(data, {
-                        wait: true,
-                        success: function(model) {
-                            App.notifier.add(that.model.get('name') + " - All data are saved properly.", "success");
-                            if (isNew) {
-                                that.collection.add(model);
-                            }
-                            that.close();
-                        },
-                        error: function(model, response, scope) {
-                            $('.save i.icon').remove();
-                            $('.cancel').removeAttr('disabled');
-                            App.notifier.add(response.status + ": " + response.statusText, "error");
-                            App.notifier.show();
-                        }
-                    });
+                    if (this.model.isNew()) {
+                        this.collection.create(data, options);
+                    } else {
+                        this.model.save(data, options);
+                    }
                 }
             },
-            close: function(e) {
+            close: function (e) {
                 if (e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -178,7 +181,7 @@ App.Module.Source.Views.List = App.Views.List.extend({
             View: App.Module.Source.Views.Item
         }
     },
-    render: function() {
+    render: function () {
         // Call parent contructor
         App.Views.List.prototype.render.call(this);
 
@@ -187,7 +190,7 @@ App.Module.Source.Views.List = App.Views.List.extend({
 
         return this;
     },
-    updateHeight: function() {
+    updateHeight: function () {
         var position = this.$el.position(),
             height = $(window).height() - this.options.bottom;
 
@@ -201,7 +204,7 @@ App.Module.Source.Views.List = App.Views.List.extend({
 App.Module.Source.Collection = Backbone.Collection.extend({
     model: App.Module.Source.Model,
     url: BASE_URL + '/sources',
-    comparator: function(model) {
+    comparator: function (model) {
         return model.get('name');
     }
 });
