@@ -106,11 +106,9 @@ html,body {
     width: 60px;
 }
 
-.nav-sidebar-top .btn-navbar .icon-bar {
-    display: block;
-    width: 18px;
-    height: 2px;
-    background-color: #848484;
+.nav-sidebar-top a.btn-navbar {
+    line-height: 31px;
+    width: 50px;
 }
 
 .nav-header {

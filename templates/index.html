@@ -15,11 +15,17 @@
 
 <div id="sidebar-top" class="nav-sidebar-top visible-phone">
     <div class="pull-right">
-        <button class="btn btn-navbar btn-mini reload"><i class="icon-refresh"></i></button>
-        <button class="btn btn-navbar btn-mini mark-as-read"><i class="icon-eye-close"></i></button>
-        <button class="btn btn-navbar btn-mini toggable" data-target="#sidebar"><i class="icon-ellipsis-vertical"></i></button>
+        <div class="btn-group">
+            <button class="btn btn-navbar btn-mini reload"><i class="icon-refresh"></i></button>
+            <button class="btn btn-navbar btn-mini mark-as-read"><i class="icon-eye-close"></i></button>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-navbar btn-mini" href="#unread"><i class="icon-inbox"></i></a>
+            <a class="btn btn-navbar btn-mini" href="#starred"><i class="icon-star"></i></a>
+            <a class="btn btn-navbar btn-mini" href="#sources"><i class="icon-wrench"></i></a>
+        </div>
     </div>
-    <a class="brand logo" href="#"><img src="img/box32.png" alt="FeedBox"> FeedBox</a>
+    <a class="brand logo nowrap" href="#"><img src="img/box32.png" alt="FeedBox"> FeedBox</a>
 </div>
 
 <div class="container-fluid">
@@ -85,15 +91,15 @@
 <script type="text/template" id="tpl-item">
     <header class="entry-header foldable">
         <div class="visible-phone">
-            <div class="entry-source">
-                <div class="btn-group pull-right">
+            <div class="btn-group pull-right" style="margin-top: 12px; margin-right: 12px;">
                 <% if (model.get('starred') == 1) { %>
-                <button class="btn btn-mini starred"><i class="icon-star"></i></button>
+                <button class="btn starred"><i class="icon-star"></i></button>
                 <% } else { %>
-                <button class="btn btn-mini starred"><i class="icon-star-empty"></i></button>
+                <button class="btn starred"><i class="icon-star-empty"></i></button>
                 <% } %>
-                <button class="btn btn-mini open-entry-link"><i class="icon-external-link"></i></button>
-                </div>
+                <button class="btn open-entry-link"><i class="icon-external-link"></i></button>
+            </div>
+            <div class="entry-source">
                 <%- model.timeHumanize() %> &dash; <%- model.get('source').get('name') %>
             </div>
             <div class="entry-title"><%= model.get('title') %></div>
