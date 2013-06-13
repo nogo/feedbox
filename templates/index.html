@@ -13,32 +13,32 @@
 </head>
 <body>
 
-<div>
-    <section id="sidebar" class="hidden-phone">
-        <div class="logo text-center"><a href="#"><img src="img/box128-1.png" width="128" alt="FeedBox"></a></div>
-        <nav id="sidebar-sources"></nav>
-    </section>
-    <div id="content">
-        <header id="content-header">
-            <div class="pull-right">
-                <a class="btn" href="#sources/add" title="Add"><i class="icon-plus"></i></a>
-                <button class="btn mark-as-read" title="Mark all as read"><i class="icon-eye-close"></i></button>
-                <button class="btn reload" title="Reload"><i class="icon-refresh"></i></button>
-            </div>
-            <ul class="nav nav-tabs">
-                <li><a class="menu-item menu-item-unread" href="#unread">
-                    <span class="hidden-phone"><i class="icon-inbox"></i> Unread</span><span class="visible-phone"><img
-                        src="img/box32.png" alt="FeedBox" width="16"> FeedBox</span></a>
-                </li>
-                <li><a class="menu-item menu-item-read" href="#read"><i class="icon-circle-blank"></i><span class="hidden-phone"> Read</span></a></li>
-                <li><a class="menu-item menu-item-starred" href="#starred"><i class="icon-star"></i><span class="hidden-phone"> Starred</span></a></li>
-                <li><a class="menu-item menu-item-sources" href="#sources"><i class="icon-download-alt"></i><span class="hidden-phone"> Sources</span></a></li>
-            </ul>
-        </header>
-        <div id="content-list"></div>
-        <footer id="content-footer"></footer>
-    </div>
-</div>
+<div id="notification"></div>
+
+<section id="sidebar" class="hidden-phone">
+    <div class="logo text-center"><a href="#"><img src="img/box128-1.png" width="128" alt="FeedBox"></a></div>
+    <nav id="sidebar-sources"></nav>
+</section>
+<section id="content">
+    <header id="content-header">
+        <div class="pull-right">
+            <a class="btn" href="#sources/add" title="Add"><i class="icon-plus"></i></a>
+            <button class="btn mark-as-read" title="Mark all as read"><i class="icon-eye-close"></i></button>
+            <button class="btn reload" title="Reload"><i class="icon-refresh"></i></button>
+        </div>
+        <ul class="nav nav-tabs">
+            <li><a class="menu-item menu-item-unread" href="#unread">
+                <span class="hidden-phone"><i class="icon-inbox"></i> Unread</span><span class="visible-phone"><img
+                    src="img/box32.png" alt="FeedBox" width="16"> FeedBox</span></a>
+            </li>
+            <li><a class="menu-item menu-item-read" href="#read"><i class="icon-circle-blank"></i><span class="hidden-phone"> Read</span></a></li>
+            <li><a class="menu-item menu-item-starred" href="#starred"><i class="icon-star"></i><span class="hidden-phone"> Starred</span></a></li>
+            <li><a class="menu-item menu-item-sources" href="#sources"><i class="icon-download-alt"></i><span class="hidden-phone"> Sources</span></a></li>
+        </ul>
+    </header>
+    <div id="content-list"></div>
+    <footer id="content-footer"></footer>
+</section>
 
 <!-- templates -->
 

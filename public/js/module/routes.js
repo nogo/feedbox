@@ -181,11 +181,11 @@ App.router.route('sources/update', function() {
         success: function(models, textStatus, jqXHR) {
             sources.set(models);
             App.notifier.add("Update successfull.", "success");
-            App.notifier.show('#content');
+            App.notifier.show('#notification');
         },
         error: function() {
             App.notifier.add("Update failed.", "error");
-            App.notifier.show('#content');
+            App.notifier.show('#notification');
         }
     });
 });

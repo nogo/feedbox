@@ -88,6 +88,14 @@ html,body {
 }
 
 /* absolute layout */
+#notification {
+    position: absolute;
+    top: 0px;
+    left: 20px;
+    right: 20px;
+    z-index: 50;
+}
+
 #sidebar {
     position: absolute;
     top: 20px;
@@ -138,7 +146,6 @@ html,body {
     left: 0px;
     right: 20px;
 }
-
 
 @media (max-width: 767px) {
     #content {

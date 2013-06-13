@@ -66,14 +66,14 @@ App.Module.Source = {
                         success: function (data, status, xhr) {
                             App.notifier.add(that.model.get('name') + " - Source update successfull.", "success");
                             that.model.set(data);
-                            App.notifier.show('#content');
+                            App.notifier.show('#notification');
                         },
                         error: function (xhr, status, errors) {
                             App.notifier.add(that.model.get('name') + " - Source update failed.", "error");
                             if (xhr.responseText) {
                                 that.model.set(jQuery.parseJSON(xhr.responseText));
                             }
-                            App.notifier.show('#content');
+                            App.notifier.show('#notification');
                         }
                     });
                 }

@@ -132,7 +132,7 @@ var App = {
                 App.Session.set(section, view);
                 App.Session.set(section + '-name', name);
             }
-            this.notifier.show('#content');
+            this.notifier.show('#notification');
         }
     },
     selectMenuItem: function(item) {
