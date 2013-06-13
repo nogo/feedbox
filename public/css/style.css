@@ -1,3 +1,14 @@
+@font-face {
+    font-family: 'SearsTowerRegular';
+    src: url('../font/Sears_Tower-webfont.eot');
+    src: url('../font/Sears_Tower-webfont.eot?#iefix') format('embedded-opentype'),
+    url('../font/Sears_Tower-webfont.woff') format('woff'),
+    url('../font/Sears_Tower-webfont.ttf') format('truetype'),
+    url('../font/Sears_Tower-webfont.svg#SearsTowerRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* boostrap tweak */
 
 a:hover, a:focus,
@@ -5,6 +16,7 @@ a:hover, a:focus,
     text-decoration: none;
 }
 
+.nav-tabs > li > a,
 .nav-list > li > a,
 .nav-list .nav-header {
     color: #ccc;
@@ -31,26 +43,6 @@ html,body {
     background-color: #424242;
 }
 
-@font-face {
-    font-family: 'SearsTowerRegular';
-    src: url('../font/Sears_Tower-webfont.eot');
-    src: url('../font/Sears_Tower-webfont.eot?#iefix') format('embedded-opentype'),
-    url('../font/Sears_Tower-webfont.woff') format('woff'),
-    url('../font/Sears_Tower-webfont.ttf') format('truetype'),
-    url('../font/Sears_Tower-webfont.svg#SearsTowerRegular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
-.loading {
-    display: inline-block;
-    background: url('../img/loading.gif') no-repeat center center;
-    height: 16px;
-    line-height: 16px;
-    vertical-align: baseline;
-    width: 16px;
-}
-
 .nowrap {
     white-space: nowrap;
 }
@@ -62,57 +54,6 @@ html,body {
 .scrollable {
     overflow-x: hidden;
     overflow-y: auto;
-}
-
-
-@media (min-width: 979px) {
-    .container-fluid {
-        padding-top: 20px;
-    }
-}
-
-/* sidebar */
-@media (min-width: 979px) {
-    .nav-sidebar {
-        position:fixed;
-        top: 20px;
-        left: 20px;
-        bottom: 20px;
-        width: 14.893617021276595%;
-    }
-}
-
-@media (max-width: 767px) {
-    #sidebar {
-        display: none;
-    }
-}
-
-.nav-sidebar {
-    overflow: hidden;
-}
-
-.nav-sidebar-top {
-    padding: 3px 0;
-}
-
-.nav-sidebar-top .btn-navbar {
-    background: #424242;
-    border-color: #5E5E5E;
-    color: #848484;
-    font-size: 18px;
-    text-shadow: none;
-    height: 30px;
-    width: 60px;
-}
-
-.nav-sidebar-top a.btn-navbar {
-    line-height: 31px;
-    width: 50px;
-}
-
-.nav-header {
-    text-shadow: none;
 }
 
 .logo {
@@ -144,6 +85,65 @@ html,body {
     padding-left: 4px;
     vertical-align: top;
     width: 10%;
+}
+
+/* absolute layout */
+#sidebar {
+    position: absolute;
+    top: 20px;
+    left: 0px;
+    bottom: 20px;
+    width: 300px;
+}
+
+#sidebar-sources {
+    overflow: hidden;
+    overflow-y: auto;
+    position: absolute;
+    top: 130px;
+    bottom: 0px;
+    left: 20px;
+    right: 10px;
+}
+
+#content {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 300px;
+    right: 0px;
+}
+
+#content-header {
+    position: absolute;
+    top: 10px;
+    bottom: 50px;
+    left: 0px;
+    right: 20px;
+}
+
+#content-list {
+    overflow: hidden;
+    overflow-y: auto;
+    position: absolute;
+    top: 50px;
+    bottom: 20px;
+    left: 0px;
+    right: 20px;
+}
+
+#content-footer {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 20px;
+}
+
+
+@media (max-width: 767px) {
+    #content {
+        left: 20px;
+    }
 }
 
 /* entry layout */

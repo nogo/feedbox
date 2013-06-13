@@ -185,19 +185,7 @@ App.Module.Source.Views.List = App.Views.List.extend({
         // Call parent contructor
         App.Views.List.prototype.render.call(this);
 
-        // Update element height
-        this.updateHeight();
-
         return this;
-    },
-    updateHeight: function () {
-        var position = this.$el.position(),
-            height = $(window).height() - this.options.bottom;
-
-        if (position) {
-            height -= position.top;
-        }
-        this.$el.height(height);
     }
 });
 

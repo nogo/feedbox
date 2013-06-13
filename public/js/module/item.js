@@ -150,8 +150,6 @@ App.Module.Item.Views.List = App.Views.List.extend({
         // Call parent contructor
         App.Views.List.prototype.render.call(this);
 
-        this.updateHeight();
-
         this.isLoading = false;
 
         return this;
@@ -165,15 +163,6 @@ App.Module.Item.Views.List = App.Views.List.extend({
         }
 
         return this;
-    },
-    updateHeight: function () {
-        var position = this.$el.position(),
-            height = $(window).height() - this.options.bottom;
-
-        if (position) {
-            height -= position.top;
-        }
-        this.$el.height(height);
     },
     retrieveItemCount: function (collection, response, options) {
         if (options) {

@@ -2,6 +2,50 @@
 
 App.Module.Content = {
     Views: {
+        Header: Backbone.View.extend({
+            el: '#content-header',
+            events: {
+                'click .toggable': 'toggable',
+                'click .mark-as-read': 'markAsRead',
+                'click .reload': 'reload'
+            },
+            render: function() {
+                return this;
+            },
+            markAsRead: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                var that = this;
+
+                // save models read state
+                this.collection.markItemRead({
+                    success: function(models, textStatus, jqXHR) {
+                        that.collection.fetchNext({
+                            reset: true,
+                            success: function(models, textStatus, jqXHR) {
+                                var view = App.Session.get('content-view');
+                                view.el.scrollTop = 0;
+                            }
+                        });
+                    }
+                });
+            },
+            reload: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                this.collection.fetchNext({
+                    reset: true,
+                    success: function(models, textStatus, jqXHR) {
+                        var view = App.Session.get('content-view');
+                        view.el.scrollTop = 0;
+                    }
+                });
+            }
+        }),
         Footer: Backbone.View.extend({
             el: '#content-footer',
             options: {
@@ -53,6 +97,12 @@ App.Module.Content = {
         })
     },
     initialize: function(App) {
+        var header = new this.Views.Header({
+            collection: App.Session.get('item-collection')
+        });
+        header.render();
+        App.Session.set('content-header-view', header);
+
         var footer = new this.Views.Footer({
             collection: App.Session.get('item-collection')
         });
