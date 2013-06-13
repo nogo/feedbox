@@ -23,13 +23,13 @@
     <header id="content-header">
         <div class="pull-right">
             <a class="btn" href="#sources/add" title="Add"><i class="icon-plus"></i></a>
-            <button class="btn mark-as-read" title="Mark all as read"><i class="icon-eye-close"></i></button>
+            <button class="btn mark-as-read" title="Mark all as read"><i class="icon-circle-blank"></i></button>
             <button class="btn reload" title="Reload"><i class="icon-refresh"></i></button>
         </div>
         <ul class="nav nav-tabs">
             <li><a class="menu-item menu-item-unread" href="#unread">
                 <span class="hidden-phone"><i class="icon-inbox"></i> Unread</span><span class="visible-phone"><img
-                    src="img/box32.png" alt="FeedBox" width="16"> FeedBox</span></a>
+                    src="img/box32.png" alt="FeedBox" width="16"><span class="hidden-small-screen"> FeedBox</span></span></a>
             </li>
             <li><a class="menu-item menu-item-read" href="#read"><i class="icon-circle-blank"></i><span class="hidden-phone"> Read</span></a></li>
             <li><a class="menu-item menu-item-starred" href="#starred"><i class="icon-star"></i><span class="hidden-phone"> Starred</span></a></li>
@@ -95,15 +95,15 @@
             <div class="entry-link span1"><button class="btn btn-mini open-entry-link"><i class="icon-external-link"></i></button></div>
         </div>
     </header>
-    <div class="entry-details foldable">
-        <h4><%= model.get('title') %></h4>
+    <div class="entry-details">
+        <h4 class="foldable"><%= model.get('title') %></h4>
         <div class="entry-content"><%= model.get('content') %></div>
     </div>
     <footer class="entry-controls">
         <% if (model.get('read')) { %>
-        <button class="btn btn-link read"><i class="icon-eye-open"></i> mark as unread</button>
+        <button class="btn btn-link read"><i class="icon-circle"></i> mark as unread</button>
         <% } else { %>
-        <button class="btn btn-link read"><i class="icon-eye-close"></i> mark as read</button>
+        <button class="btn btn-link read"><i class="icon-circle-blank"></i> mark as read</button>
         <% } %>
         <button class="btn btn-link open-entry-link"><i class="icon-external-link"></i> open</button>
         <span><i class="icon-time"></i> <%- model.timeHumanize() %></span>
