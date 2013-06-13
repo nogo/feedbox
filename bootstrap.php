@@ -1,7 +1,6 @@
 <?php
 
 use Nogo\Feedbox\Helper\ConfigLoader;
-use Slim\Extras\Log\DateTimeFileWriter;
 use Slim\Slim;
 
 define('ROOT_DIR', dirname(__FILE__));
@@ -16,11 +15,3 @@ $configLoader = new ConfigLoader(
 );
 
 $app = new Slim($configLoader->getConfig());
-$app->config(
-    'log.writer',
-    new DateTimeFileWriter(
-        array(
-            'path' => $app->config('log_dir')
-        )
-    )
-);
