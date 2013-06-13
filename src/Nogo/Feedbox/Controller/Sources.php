@@ -2,8 +2,7 @@
 namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
-use Nogo\Feedbox\Feed\Runner;
-use Nogo\Feedbox\Repository\Repository;
+use Nogo\Feedbox\Helper\Fetcher;
 use Nogo\Feedbox\Repository\Source as SourceRepository;
 use Nogo\Feedbox\Repository\Item as ItemRepository;
 
@@ -28,7 +27,7 @@ class Sources extends AbstractRestController
     }
 
     /**
-     * @return Repository
+     * @return SourceRepository
      */
     public function getRepository(AbstractConnection $connection = null)
     {
@@ -45,15 +44,10 @@ class Sources extends AbstractRestController
     {
         $sources = $this->getRepository()->fetchAllActiveWithUri();
 
-        $defaultWorkerClass = $this->app->config('runner.default_worker');
-
-        $runner = new Runner();
-        $runner->setWorker(new $defaultWorkerClass());
-
         $result = array();
         foreach($sources as $source) {
             if(isset($source['uri'])) {
-                $result[] = $this->fetchSource($source, $runner);
+                $result[] = $this->fetchSource($source);
             }
         }
 
@@ -89,20 +83,31 @@ class Sources extends AbstractRestController
         $this->renderJson($source, $status);
     }
 
-    protected function fetchSource($source, Runner $runner = null)
+    /**
+     * @param array $source
+     * @return array
+     */
+    protected function fetchSource(array $source)
     {
-        if ($runner == null) {
-            $defaultWorkerClass = $this->app->config('runner.default_worker');
+        $itemRepository = new ItemRepository($this->connection);
 
-            $runner = new Runner();
-            $runner->setWorker(new $defaultWorkerClass());
+        $fetcher = new Fetcher();
+        $fetcher->setTimeout($this->app->config('fetcher.timeout'));
+        $content = $fetcher->get($source['uri']);
+
+        $defaultWorkerClass = $this->app->config('worker.default');
+
+        /**
+         * @var $worker \Nogo\Feedbox\Feed\Worker
+         */
+        $worker = new $defaultWorkerClass();
+        $worker->setContent($content);
+        try {
+            $items = $worker->execute();
+        } catch (\Exception $e) {
+            $items = null;
         }
 
-        $runner->setTimeout($this->app->config('runner.timeout'));
-        $runner->setUri($source['uri']);
-        $items = $runner->run();
-
-        $itemRepository = new ItemRepository($this->connection);
         if ($items != null) {
             foreach($items as $item) {
                 if (isset($item['uid'])) {
@@ -124,11 +129,12 @@ class Sources extends AbstractRestController
             }
         }
 
+
         $source['last_update'] = date('Y-m-d H:i:s');
         if (empty($source['period'])) {
-            $source['period'] = $runner->getUpdateInterval();
+            $source['period'] = $worker->getUpdateInterval();
         }
-        $source['errors'] = $runner->getErrors();
+        $source['errors'] = $worker->getErrors();
         $source['unread'] = $itemRepository->countUnread([$source['id']]);
         $this->getRepository()->persist($source);
 

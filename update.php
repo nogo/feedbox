@@ -1,6 +1,6 @@
 <?php
 
-use Nogo\Feedbox\Feed\Runner;
+use Nogo\Feedbox\Helper\Fetcher;
 use Nogo\Feedbox\Helper\ConfigLoader;
 use Nogo\Feedbox\Helper\DatabaseConnector;
 use Nogo\Feedbox\Repository\Item;
@@ -35,11 +35,10 @@ $itemRepository = new Item($connection);
 $sources = $sourceRepository->fetchAllActiveWithUri();
 
 // get the feed runner
-$defaultWorkerClass = $config['runner.default_worker'];
+$defaultWorkerClass = $config['worker.default'];
 
-$feedRunner = new Runner();
-$feedRunner->setWorker(new $defaultWorkerClass());
-$feedRunner->setTimeout($config['runner.timeout']);
+$fetcher = new Fetcher();
+$fetcher->setTimeout($config['fetcher.timeout']);
 
 $now = new \DateTime();
 foreach ($sources as $source) {
@@ -82,8 +81,14 @@ foreach ($sources as $source) {
         if ($config['debug']) {
             echo sprintf("Read source [%s]: ", $source['name']);
         }
-        $feedRunner->setUri($source['uri']);
-        $items = $feedRunner->run();
+
+        $content = $fetcher->get($source['uri']);
+        /**
+         * @var $worker \Nogo\Feedbox\Feed\Worker
+         */
+        $worker = new $defaultWorkerClass();
+        $worker->setContent($content);
+        $items = $worker->execute();
 
         if ($items != null) {
             foreach($items as $item) {
@@ -107,9 +112,9 @@ foreach ($sources as $source) {
 
             $source['last_update'] = date('Y-m-d H:i:s');
             if (empty($source['period'])) {
-                $source['period'] = $feedRunner->getUpdateInterval();
+                $source['period'] = $worker->getUpdateInterval();
             }
-            $source['errors'] = $feedRunner->getErrors();
+            $source['errors'] = $worker->getErrors();
             $count = $source['unread'];
             $source['unread'] = $itemRepository->countUnread([$source['id']]);
             $sourceRepository->persist($source);
@@ -118,12 +123,12 @@ foreach ($sources as $source) {
                 echo sprintf("%d new items.\n", $source['unread'] - $count);
             }
         } else {
-            $source['errors'] = $feedRunner->getErrors();
+            $source['errors'] = $worker->getErrors();
             $source['unread'] = $itemRepository->countUnread([$source['id']]);
             $sourceRepository->persist($source);
 
             if ($config['debug']) {
-                echo sprintf("%s\n", $feedRunner->getErrors());
+                echo sprintf("%s\n", $worker->getErrors());
             }
         }
     }

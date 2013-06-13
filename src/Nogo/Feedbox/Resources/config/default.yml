@@ -20,9 +20,9 @@ database_dsn:      "%data_dir%/database.sdb"
 database_username: ""
 database_password: ""
 
-# Feed runner
-runner.timeout: 10
-runner.default_worker: "Nogo\Feedbox\Feed\Worker\Rss"
+# Feed setting
+fetcher.timeout: 10
+worker.default: "Nogo\Feedbox\Feed\Rss"
 
 # API
 api.content_type: "application/json"

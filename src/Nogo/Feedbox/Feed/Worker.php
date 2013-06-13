@@ -1,8 +1,6 @@
 <?php
 namespace Nogo\Feedbox\Feed;
 
-use Zend\Feed\Reader\Feed\AbstractFeed;
-
 /**
  * Class Worker
  * @package Nogo\Feedbox\Feed
@@ -10,12 +8,24 @@ use Zend\Feed\Reader\Feed\AbstractFeed;
 interface Worker
 {
     /**
-     * Set feet to process
+     * Set content for worker
      *
-     * @param AbstractFeed $feed
+     * @param string $content
      * @return Worker
      */
-    public function setFeed(AbstractFeed $feed);
+    public function setContent($content);
+
+    /**
+     * Return worker errors
+     *
+     * @return mixed
+     */
+    public function getErrors();
+
+    /**
+     * @return string
+     */
+    public function getUpdateInterval();
 
     /**
      * Execute worker
