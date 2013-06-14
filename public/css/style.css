@@ -72,6 +72,20 @@ html,body {
     text-decoration: none;
 }
 
+.icon {
+    color: #000;
+    display: inline-block;
+    height: 14px;
+    line-height: 14px;
+    vertical-align: text-top;
+    width: 14px;
+}
+
+.loading {
+    background: url('../img/loading.gif') no-repeat center center;
+    min-height: 16px;
+}
+
 .source-name {
     display: inline-block;
     overflow: hidden;

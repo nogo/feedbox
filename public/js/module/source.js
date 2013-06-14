@@ -137,7 +137,7 @@ App.Module.Source = {
                             }
                         };
 
-                    this.$('.save').prepend('<i class="loading"></i> ');
+                    this.$('.save').prepend('<i class="icon loading"></i> ');
                     this.$('.cancel').attr('disabled', 'disabled');
 
                     if (this.model.isNew()) {
