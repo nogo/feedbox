@@ -41,7 +41,8 @@ App.Views.List = Backbone.View.extend({
             tagName: 'div',
             template: '',
             View: App.Views.ListItem
-        }
+        },
+        isEmpty: true
     },
     initialize: function () {
         // ListItems object
@@ -96,13 +97,12 @@ App.Views.List = Backbone.View.extend({
             }
         }
 
+        // clear html
+        this.$el.html('');
+        this.options.isEmpty = true;
+
         // run addItem on each collection item
         if (this.collection && this.collection.length > 0) {
-            if (this.options.isEmpty) {
-                this.$el.html('');
-                this.options.isEmpty = false;
-            }
-
             var items = [];
             this.collection.each(function (model) {
                 var view = that.renderItem(model);
@@ -110,11 +110,15 @@ App.Views.List = Backbone.View.extend({
                 items.push(view.el);
             });
 
-            this.$el.append(items);
-        } else if (this.options.emptyTemplate && this.$el.is(":empty")) {
+            if (items.length > 0) {
+                this.options.isEmpty = false;
+                this.$el.append(items);
+            }
+        }
+
+        if (this.options.isEmpty && this.options.emptyTemplate) {
             var emptyTemplate = App.render(this.options.emptyTemplate);
             this.$el.html(emptyTemplate());
-            this.options.isEmpty = true;
         }
         return this;
     },
