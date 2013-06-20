@@ -82,13 +82,19 @@ foreach ($sources as $source) {
             echo sprintf("Read source [%s]: ", $source['name']);
         }
 
+        $items = null;
+
         $content = $fetcher->get($source['uri']);
         /**
          * @var $worker \Nogo\Feedbox\Feed\Worker
          */
         $worker = new $defaultWorkerClass();
         $worker->setContent($content);
-        $items = $worker->execute();
+        try {
+            $items = $worker->execute();
+        } catch (\Exception $e) {
+            $items = null;
+        }
 
         if ($items != null) {
             foreach($items as $item) {
@@ -120,7 +126,7 @@ foreach ($sources as $source) {
             $sourceRepository->persist($source);
 
             if ($config['debug']) {
-                echo sprintf("%d new items.\n", $source['unread'] - $count);
+                echo sprintf("%d new items.\n", abs($source['unread'] - $count));
             }
         } else {
             $source['errors'] = $worker->getErrors();

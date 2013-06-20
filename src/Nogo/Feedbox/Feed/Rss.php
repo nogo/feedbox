@@ -86,7 +86,7 @@ class Rss implements Worker
     public function execute()
     {
         if ($this->feed == null) {
-            throw new \Exception();
+            throw new \Exception("Feed object is null");
         }
 
         $result = array();
