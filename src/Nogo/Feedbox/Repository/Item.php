@@ -1,14 +1,46 @@
 <?php
 namespace Nogo\Feedbox\Repository;
 
+use Nogo\Feedbox\Helper\Validator;
+
 class Item extends AbstractRepository
 {
-    protected $table = 'items';
-    protected $fields = ['source_id', 'read', 'starred', 'title', 'content', 'uid', 'uri'];
+    const TABLE = 'items';
 
-    public function getFields()
+    protected $filter = array(
+        'id' => FILTER_VALIDATE_INT,
+        'source_id' => FILTER_VALIDATE_INT,
+        'read' => array(
+            'filter' => FILTER_CALLBACK,
+            'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
+        ),
+        'starred' => FILTER_VALIDATE_BOOLEAN,
+        'title' => FILTER_SANITIZE_STRING,
+        'pubdate' => array(
+            'filter' => FILTER_CALLBACK,
+            'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
+        ),
+        'content' => FILTER_UNSAFE_RAW,
+        'uid' => FILTER_SANITIZE_STRING,
+        'uri' => FILTER_VALIDATE_URL,
+        'created_at'  => array(
+            'filter' => FILTER_CALLBACK,
+            'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
+        ),
+        'updated_at' => array(
+            'filter' => FILTER_CALLBACK,
+            'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
+        )
+    );
+
+    public function tableName()
     {
-        return $this->fields;
+        return self::TABLE;
+    }
+
+    public function validate(array $entity)
+    {
+        return filter_var_array($entity, $this->filter, false);
     }
 
     public function fetchAllWithFilter(array $filter = array(), $count = false)
@@ -19,7 +51,7 @@ class Item extends AbstractRepository
         $select = $this->connection->newSelect();
 
         $select
-            ->from($this->getTable());
+            ->from($this->tableName());
 
         if ($count) {
             $select->cols(['count(*)']);
@@ -78,10 +110,6 @@ class Item extends AbstractRepository
         return $this->connection->fetchAll($select, $bind);
     }
 
-    public function getTable()
-    {
-        return $this->table;
-    }
 
     public function countUnread(array $sourceIds = array())
     {
@@ -90,7 +118,7 @@ class Item extends AbstractRepository
          */
         $select = $this->connection->newSelect();
         $select->cols(['count(*)'])
-            ->from($this->table)
+            ->from($this->tableName())
             ->where('read IS NULL');
 
         $bind = [];

@@ -16,6 +16,56 @@ class Items extends AbstractRestController
      */
     protected $repository;
 
+    /**
+     * @var array
+     */
+    protected $fields = [
+        'id' => [
+            'read' => true,
+            'write' => false
+        ],
+        'source_id' => [
+            'read' => true,
+            'write' => false
+        ],
+        'read' => [
+            'read' => true,
+            'write' => true
+        ],
+        'starred' => [
+            'read' => true,
+            'write' => true
+        ],
+        'title' => [
+            'read' => true,
+            'write' => false
+        ],
+        'pubdate' => [
+            'read' => true,
+            'write' => false
+        ],
+        'content' => [
+            'read' => true,
+            'write' => false
+        ],
+        'uid' => [
+            'read' => true,
+            'write' => false
+        ],
+        'uri' => [
+            'read' => true,
+            'write' => false
+        ],
+        'created_at' => [
+            'read' => true,
+            'write' => false
+        ],
+        'updated_at' => [
+            'read' => true,
+            'write' => false
+        ]
+    ];
+
     protected $allowed_params = ['page', 'limit', 'unread', 'starred', 'source', 'sortby'];
 
     public function enable()
@@ -47,6 +97,11 @@ class Items extends AbstractRestController
         return $this->repository;
     }
 
+    public function getApiDefinition()
+    {
+        return $this->fields;
+    }
+
     public function listAction()
     {
         $params = $this->getParameter($this->allowed_params);
@@ -55,7 +110,14 @@ class Items extends AbstractRestController
         $this->app->response()->header('X-Items-Total', $result[0]['count(*)']);
         $result = $this->getRepository()->fetchAllWithFilter($params);
 
-        $this->renderJson($result);
+        $readable = $this->readableFields();
+
+        $output = [];
+        foreach($result as $data) {
+            $output[] = $this->serializeData($data, $readable);
+        }
+
+        $this->renderJson($output);
     }
 
     public function readAction()

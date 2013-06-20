@@ -7,8 +7,8 @@ interface Repository {
 
     public function __construct(AbstractConnection $connection);
 
-    public function getTable();
-    public function getFields();
+    public function tableName();
+    public function validate(array $data);
 
     public function fetchAll();
     public function fetchOneById($id);

@@ -12,6 +12,16 @@ use Nogo\Feedbox\Repository\Repository;
 abstract class AbstractRestController extends AbstractController
 {
     /**
+     * @var array
+     */
+    private $readable = array();
+
+    /**
+     * @var array
+     */
+    private $writable = array();
+
+    /**
      * Get Repository
      *
      * @param AbstractConnection $connection
@@ -20,16 +30,30 @@ abstract class AbstractRestController extends AbstractController
     abstract public function getRepository(AbstractConnection $connection = null);
 
     /**
+     * Api definition
+     *
+     * @return array
+     */
+    abstract public function getApiDefinition();
+
+    /**
      * GET /resource
      */
     public function listAction()
     {
         $result = $this->getRepository()->fetchAll();
-        $this->renderJson($result);
+
+        $readable = $this->readableFields();
+        $output = [];
+        foreach($result as $data) {
+            $output[] = $this->serializeData($data, $readable);
+        }
+
+        $this->renderJson($output);
     }
 
     /**
-     * GET /resource/id
+     * GET /resource/:id
      *
      * @param $id
      */
@@ -42,7 +66,8 @@ abstract class AbstractRestController extends AbstractController
             return;
         }
 
-        $this->renderJson($result);
+        $output = $this->serializeData($result, $this->readableFields());
+        $this->renderJson($output);
     }
 
     /**
@@ -58,25 +83,22 @@ abstract class AbstractRestController extends AbstractController
 
         $request_data = json_decode($json, true);
 
-        $entity = [
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-        $writable = $this->getRepository()->getFields();
-        foreach ($writable as $field) {
-            if (isset($request_data[$field])) {
-                $entity[$field] = $request_data[$field];
-            }
-        }
+        $entity = $this->deserializeData($request_data, $this->writableFields());
 
         if (!empty($entity)) {
+            $entity['created_at'] = date('Y-m-d H:i:s');
+            $entity['updated_at'] = $entity['created_at'];
             $entity['id'] = $this->getRepository()->persist($entity);
-            $this->renderJson($entity);
+
+            $result = $this->getRepository()->fetchOneById($entity['id']);
+            $this->renderJson($result);
+        } else {
+            $this->render('Data not valid', 400);
         }
     }
 
     /**
-     * PUT /resource/id
+     * PUT /resource/:id
      *
      * @param $id
      */
@@ -97,30 +119,23 @@ abstract class AbstractRestController extends AbstractController
 
         $request_data = json_decode($json, true);
 
-        $dt = date('Y-m-d H:i:s', strtotime('now'));
+        $writable = $this->writableFields();
+        $entity = $this->deserializeData($request_data, $writable);
 
-        $entity = [
-            'id' => $result['id'],
-            'updated_at' => $dt
-        ];
-        $writable = $this->getRepository()->getFields();
-        foreach ($writable as $field) {
-            if (array_key_exists($field, $request_data) && $request_data[$field] != $result[$field]) {
-                $entity[$field] = $request_data[$field];
-                $result[$field] = $request_data[$field];
-            }
-        }
-
-        if (count($entity) > 2) {
+        if (!empty($entity)) {
+            $entity['id'] = $result['id'];
+            $entity['updated_at'] = date('Y-m-d H:i:s');
             $this->getRepository()->persist($entity);
-            $result['updated_at'] = $dt;
+
+            // fetch entity
+            $result = $this->getRepository()->fetchOneById($id);
         }
 
         $this->renderJson($result);
     }
 
     /**
-     * DELETE /resource/id
+     * DELETE /resource/:id
      *
      * @param $id
      */
@@ -132,5 +147,97 @@ abstract class AbstractRestController extends AbstractController
         } else {
             $this->render('Item deleted');
         }
+    }
+
+    /**
+     * Array of readable fields defined by api
+     * @return array
+     */
+    protected function readableFields()
+    {
+        if (empty($this->readable)) {
+            $api = $this->getApiDefinition();
+            $this->readable = [];
+            foreach($api as $key => $param) {
+                if (isset($param['read']) && $param['read']) {
+                    $name = $key;
+                    if (array_key_exists('name', $param)) {
+                        if (!empty($param['name'])) {
+                            $name = $param['name'];
+                        }
+                    }
+                    $this->readable[$key] = $name;
+                }
+            }
+        }
+
+        return $this->readable;
+    }
+
+    /**
+     * Array of writable fields defined by api
+     * @return array
+     */
+    protected function writableFields()
+    {
+        if (empty($this->writable)) {
+            $api = $this->getApiDefinition();
+            $this->writable = [];
+            foreach($api as $key => $param) {
+                if (isset($param['write']) && $param['write']) {
+                    $name = $key;
+                    if (array_key_exists('name', $param)) {
+                        if (!empty($param['name'])) {
+                            $name = $param['name'];
+                        }
+                    }
+                    $this->writable[$key] = $name;
+                }
+            }
+        }
+
+        return $this->writable;
+    }
+
+    /**
+     * Deserialize data array with api definition
+     *
+     * @param array $data [ name => value ]
+     * @param array $api [ key => name ]
+     * @param array $result
+     * @return array [ key => value ]
+     */
+    protected function deserializeData(array $data, array $api, array $result = [])
+    {
+        foreach ($api as $key => $name) {
+            if (array_key_exists($name, $data)) {
+                if (array_key_exists($key, $result)) {
+                    if ($data[$name] != $result[$key]) {
+                        $result[$key] = $data[$name];
+                    }
+                } else {
+                    $result[$key] = $data[$name];
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Serialize data array with api definition
+     *
+     * @param array $data [ key => value ]
+     * @param array $api [ key => name ]
+     * @param array $result
+     * @return array [ name => value ]
+     */
+    protected function serializeData(array $data, array $api, array $result = [])
+    {
+        foreach ($api as $key => $name) {
+            if (array_key_exists($key, $data)) {
+               $result[$name] = $data[$key];
+            }
+        }
+        return $result;
     }
 }

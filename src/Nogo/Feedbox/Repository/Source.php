@@ -4,21 +4,48 @@ namespace Nogo\Feedbox\Repository;
 
 class Source extends AbstractRepository
 {
-    protected $table = 'sources';
-    protected $fields = ['name', 'uri', 'active', 'period'];
+    const TABLE = 'sources';
 
-    public function getTable()
+    protected $filter = array(
+        'id' => FILTER_VALIDATE_INT,
+        'name' => FILTER_SANITIZE_STRING,
+        'uri' => FILTER_VALIDATE_URL,
+        'icon' => FILTER_UNSAFE_RAW,
+        'active' => FILTER_VALIDATE_BOOLEAN,
+        'unread' => FILTER_VALIDATE_INT,
+        'errors' => FILTER_SANITIZE_STRING,
+        'period' => array(
+            'filter' => FILTER_VALIDATE_REGEXP,
+            'options' => array(
+                'regexp' => '/everytime|hourly|daily|weekly|yearly/'
+            )
+        ),
+        'last_update' => array(
+            'filter' => FILTER_CALLBACK,
+            'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
+        ),
+        'created_at' => array(
+            'filter' => FILTER_CALLBACK,
+            'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
+        ),
+        'updated_at' => array(
+            'filter' => FILTER_CALLBACK,
+            'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
+        )
+    );
+
+    public function tableName()
     {
-        return $this->table;
+        return self::TABLE;
     }
 
-    public function getFields()
+    public function validate(array $entity)
     {
-        return $this->fields;
+        return filter_var_array($entity, $this->filter, false);
     }
 
     public function fetchAllActiveWithUri()
     {
-        return $this->connection->fetchAll('SELECT * FROM ' . $this->getTable() . ' WHERE active = 1 AND uri IS NOT NULL');
+        return $this->connection->fetchAll('SELECT * FROM ' . $this->tableName() . ' WHERE active = 1 AND uri IS NOT NULL');
     }
 }

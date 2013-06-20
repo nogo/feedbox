@@ -4,7 +4,10 @@ Feed reader inspired by Google Reader and Selfoss.
 
 ## Installation
 
-- Not ready yet
+* Download and extract package (http://feedbox.de/dl/feedbox.zip)
+
+* Check index.php, the installer will do the rest
+
 
 ## Credits
 

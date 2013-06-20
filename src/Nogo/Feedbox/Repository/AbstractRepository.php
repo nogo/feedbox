@@ -25,13 +25,14 @@ abstract class AbstractRepository implements Repository
 
     public function fetchAll()
     {
-        return $this->connection->fetchAll("SELECT * FROM " . $this->getTable());
+        return $this->connection->fetchAll("SELECT * FROM " . $this->tableName());
     }
 
     public function fetchOneById($id)
     {
-        $id = intval($id);
-        return $this->connection->fetchOne("SELECT * FROM " . $this->getTable() . " WHERE id = :id", ['id' => $id]);
+        $id = filter_var($id, FILTER_VALIDATE_INT);
+
+        return $this->connection->fetchOne("SELECT * FROM " . $this->tableName() . " WHERE id = :id", ['id' => $id]);
     }
 
     public function fetchOneBy($name, $value)
@@ -41,7 +42,7 @@ abstract class AbstractRepository implements Repository
          */
         $select = $this->connection->newSelect();
         $select->cols(['*'])
-            ->from($this->getTable())
+            ->from($this->tableName())
             ->where($name . '= :' . $name);
 
         return $this->connection->fetchOne($select, [$name => $value]);
@@ -49,13 +50,15 @@ abstract class AbstractRepository implements Repository
 
     public function persist(array $entity)
     {
+        $entity = $this->validate($entity);
+
         if (isset($entity['id'])) {
             $id = $entity['id'];
             unset($entity['id']);
 
-            return $this->connection->update($this->getTable(), $entity, 'id = :id', ['id' => $id]);
+            return $this->connection->update($this->tableName(), $entity, 'id = :id', ['id' => $id]);
         } else {
-            $this->connection->insert($this->getTable(), $entity);
+            $this->connection->insert($this->tableName(), $entity);
 
             return $this->connection->lastInsertId();
         }
@@ -63,7 +66,7 @@ abstract class AbstractRepository implements Repository
 
     public function remove($id)
     {
-        return $this->connection->delete($this->getTable(), 'id = :id', ['id' => $id]);
+        return $this->connection->delete($this->tableName(), 'id = :id', ['id' => $id]);
     }
 
 

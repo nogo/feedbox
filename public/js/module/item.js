@@ -106,12 +106,12 @@ App.Module.Item = {
                     e.stopPropagation();
                 }
 
-                var win = window.open(this.model.get('uri'), '_blank');
-                win.focus();
-
-                if (this.model) {
+                if (!this.model.get('read')) {
                     this.model.save({ 'read': moment().format('YYYY-MM-DD HH:mm:ss') });
                 }
+
+                var win = window.open(this.model.get('uri'), '_blank');
+                win.focus();
             }
         })
     },
