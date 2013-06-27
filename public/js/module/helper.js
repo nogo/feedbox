@@ -103,16 +103,17 @@ App.Views.List = Backbone.View.extend({
 
         // run addItem on each collection item
         if (this.collection && this.collection.length > 0) {
-            var items = [];
+            var elements = [];
+
             this.collection.each(function (model) {
                 var view = that.renderItem(model);
                 that.items[model.id] = view;
-                items.push(view.el);
+                elements.push(view.el);
             });
 
-            if (items.length > 0) {
+            if (elements.length > 0) {
                 this.options.isEmpty = false;
-                this.$el.append(items);
+                this.$el.append(elements);
             }
         }
 

@@ -6,10 +6,9 @@ App.Module.Sidebar = {
             el: '#sidebar',
             initialize: function() {
                 this.tags = App.Session.get('tag-collection');
-                this.sources = App.Session.get('source-collection');
-                this.items = App.Session.get('item-collection');
             },
             render: function() {
+                var elements = [];
                 var tagList = new App.Views.List({
                     prefix: 'tag-',
                     tagName: 'ul',
@@ -20,44 +19,40 @@ App.Module.Sidebar = {
                     item: {
                         tagName: 'li',
                         template: '#tpl-sidebar-tag-item',
-                        View: App.Views.ListItem
+                        View: App.Module.Tag.Views.SidebarItem
                     }
                 });
+                elements.push(tagList.render().el);
 
-                this.$('#sidebar-sources').html(tagList.render().el);
+                var sources = App.Session.get('tagless-source-collection', function() {
+                    var sourceCollection = App.Session.get('source-collection');
+                    return new App.Module.Source.Collection(
+                        sourceCollection.filter(function(model) {
+                            var tagId = model.get('tag_id');
+                            return tagId === null || tagId === '';
+                        })
+                    );
+                });
+                if (sources.length > 0) {
+                    var sourceList = new App.Views.List({
+                        prefix: 'source-',
+                        tagName: 'ul',
+                        collection: sources,
+                        attributes: {
+                            'class': 'nav nav-list'
+                        },
+                        item: {
+                            tagName: 'li',
+                            template: '#tpl-sidebar-source-item',
+                            View: App.Views.ListItem
+                        }
+                    });
+                    elements.push(sourceList.render().el);
+                }
 
-                // Source view
-//                var sourceList = new App.Views.List({
-//                    prefix: 'source-',
-//                    tagName: 'ul',
-//                    collection: this.sources,
-//                    attributes: {
-//                        'class': 'nav nav-list'
-//                    },
-//                    item: {
-//                        tagName: 'li',
-//                        template: '#tpl-sidebar-source-item',
-//                        View: App.Views.ListItem
-//                    }
-//                });
-//                this.$('#sidebar-sources').html(sourceList.render().el);
+                this.$('#sidebar-sources').html(elements);
 
                 return this;
-            },
-            toggable: function(e) {
-                if (e) {
-                    e.preventDefault();
-                }
-
-                var component = $(e.currentTarget),
-                    target = this.$(component.data('target'));
-
-                if (target) {
-                    target.toggle();
-                    var position = target.position(),
-                        height = $(window).height() - position.top - 40;
-                    target.height(height);
-                }
             }
         })
     },

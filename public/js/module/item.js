@@ -68,6 +68,15 @@ App.Module.Item = {
                     } else {
                         this.$el.addClass('entry-unfolded');
                     }
+
+                    if (this.model.get('source')) {
+                        if (this.model.get('source').get('tag')) {
+                            var color = this.model.get('source').get('tag').get('color');
+                            if (color) {
+                                this.$el.attr('style', 'border-left-color: ' + color);
+                            }
+                        }
+                    }
                 }
 
                 return this;
@@ -119,16 +128,12 @@ App.Module.Item = {
             },
             openLink: function (e) {
                 if (e) {
-                    e.preventDefault();
                     e.stopPropagation();
                 }
 
                 if (!this.model.get('read')) {
                     this.model.read(true);
                 }
-
-                var win = window.open(this.model.get('uri'), '_blank');
-                win.focus();
             }
         })
     },

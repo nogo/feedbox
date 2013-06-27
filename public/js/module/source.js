@@ -4,6 +4,15 @@ App.Module.Source = {
     Model: Backbone.Model.extend({
         hasErrors: function () {
             return !_.isEmpty(this.get('errors'));
+        },
+        parse: function (response, options) {
+            var tags = App.Session.get('tag-collection');
+            if (tags) {
+                if (response.tag_id) {
+                    response.tag = tags.get(response.tag_id);
+                }
+            }
+            return response;
         }
     }),
     Views: {
@@ -91,9 +100,12 @@ App.Module.Source = {
             events: {
                 'click .save': 'save',
                 'click .cancel': 'close',
+                'change #source-tag': 'addNewTag',
                 'submit': 'save'
             },
             initialize: function () {
+                this.tags = App.Session.get('tag-collection');
+                this.tag = this.model.get('tag');
             },
             render: function () {
                 // grep template with jquery and generate template stub
@@ -107,9 +119,22 @@ App.Module.Source = {
                     this.$('legend').text('Add source')
                 }
 
-                App.Module.Form.Bind(this.$el, this.model.toJSON());
+                App.Module.Form.Bind(this.$el, this.model.toJSON(), {silent: true});
+
+                // render tags
+                var tagname = this.$('#source-tag');
+                if (this.tag) {
+                    tagname.val(this.tag.get('name'));
+                }
+                tagname.typeahead({
+                    source: this.tags.pluck("name")
+                });
 
                 return this;
+            },
+            remove: function () {
+                this.undelegateEvents();
+                this.$el.html('');
             },
             save: function (e) {
                 if (e) {
@@ -119,23 +144,41 @@ App.Module.Source = {
 
                 if (this.model) {
                     var that = this,
-                        data = App.Module.Form.Serialize(this.$el),
-                        isNew = this.model.isNew(),
-                        options = {
-                            wait: true,
-                            success: function (model) {
-                                App.notify(data.name + " - All data are saved properly.", "success");
-                                that.close();
-                            },
-                            error: function (model, response, scope) {
-                                $('.save i.icon').remove();
-                                $('.cancel').removeAttr('disabled');
-                                App.notify(response.status + ": " + response.statusText, "error");
-                            }
-                        };
+                        data = App.Module.Form.Serialize(this.$el)
+
+                    if (!_.isEmpty(data['tag_name'])) {
+                        var tag = this.tags.findWhere({name: this.$('#source-tag').val()});
+                        if (tag) {
+                            data['tag_id'] = tag.id;
+                        }
+                    } else {
+                        data['tag_id'] = null;
+                    }
 
                     this.$('.save').prepend('<i class="icon loading"></i> ');
                     this.$('.cancel').attr('disabled', 'disabled');
+
+                    var options = {
+                        wait: true,
+                        success: function (model) {
+                            App.notify(model.get('name') + " - All data are saved properly.", "success");
+                            var collection = App.Session.get('tagless-source-collection');
+                            if (data['tag_id']) {
+                                model.get('tag').sources().add(model);
+                                collection.remove(model);
+                            } else {
+                                this.tag.sources().remove(model);
+                                collection.add(model);
+                            }
+                            that.close();
+                        },
+                        error: function (model, response, scope) {
+                            $('.save i.icon').remove();
+                            $('.cancel').removeAttr('disabled');
+                            App.notify(response.status + ": " + response.statusText, "error");
+                        }
+                    };
+
 
                     if (this.model.isNew()) {
                         this.collection.create(data, options);
@@ -152,9 +195,29 @@ App.Module.Source = {
 
                 App.router.navigate('settings/sources', { trigger: true });
             },
-            remove: function () {
-                this.undelegateEvents();
-                this.$el.html('');
+            addNewTag: function(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                var component = e.currentTarget,
+                    tagname = component.value;
+
+                if (!_.isEmpty(tagname)) {
+                    var tag = this.tags.findWhere({ name: tagname });
+                    if (!tag) {
+                        this.tags.create({ name: tagname }, {
+                            wait: true,
+                            success: function (model) {
+                                App.notify("Tag created.", "success");
+                            },
+                            error: function (model, response, scope) {
+                                App.notify("Tag could not be created.", "error");
+                            }
+                        });
+                    }
+                }
             }
         })
     },
@@ -190,7 +253,7 @@ App.Module.Source.Collection = Backbone.Collection.extend({
     model: App.Module.Source.Model,
     url: BASE_URL + '/sources',
     comparator: function (model) {
-        return model.get('name');
+        return model.get('name').toLowerCase();
     }
 });
 App.Module.Source.initialize(App);
@@ -198,7 +261,8 @@ App.Module.Source.initialize(App);
 /* Routes */
 
 App.router.route('sources/:id', function(id) {
-    var items = App.Session.get('item-collection');
+    var items = App.Session.get('item-collection'),
+        settings = App.Session.get('setting-collection');
 
     App.switchView('content-view', 'item-list', function() {
         return new App.Module.Item.Views.List({
@@ -209,7 +273,10 @@ App.router.route('sources/:id', function(id) {
     if (items) {
         var data = App.Session.get('item-collection-data', function() {
                 return {
-                    unread: true
+                    unread: true,
+                    page: 1,
+                    limit: settings.getByKey('view.unread.count', 50),
+                    sortby: settings.getByKey('view.unread.sortby', 'newest')
                 };
             }),
             selectedMenuItem = ['.menu-item-source-' + id];
@@ -222,9 +289,11 @@ App.router.route('sources/:id', function(id) {
             selectedMenuItem.push('.menu-item-starred');
         }
 
-        data.limit = 50;
         data.page = 1;
         data.source = id;
+        if (data.tag) {
+            delete data.tag;
+        }
 
         App.Session.set('item-collection-data', data);
         items.fetch({

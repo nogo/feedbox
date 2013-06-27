@@ -96,19 +96,65 @@ html,body {
     min-height: 16px;
 }
 
-.source-name {
+.source-name,
+.tag-name {
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 85%;
+}
+
+.tag-name {
+    width: 75%;
+}
+
+.source-name {
+    width: 75%;
 }
 
 .source-unread {
     display: inline-block;
-    padding-left: 4px;
     vertical-align: top;
     width: 10%;
+}
+
+.editable {
+    cursor: text;
+}
+.editable:hover {
+    background: #848484;
+}
+.editable-textarea {
+    display: inline-block;
+}
+.editable-textarea:focus {
+    -moz-appearance: textfield-multiline;
+    -webkit-appearance: textarea;
+    border: 1px solid gray;
+    color: #000;
+    font: medium -moz-fixed;
+    font: -webkit-small-control;
+    min-height: 120px;
+    overflow: auto;
+    padding: 2px;
+    resize: both;
+    white-space:pre;
+}
+.editable-input:focus {
+    -moz-appearance: textfield;
+    -webkit-appearance: textfield;
+    background-color: white;
+    background-color: -moz-field;
+    border: 1px solid darkgray;
+    box-shadow: 1px 1px 1px 0 lightgray inset;
+    color: #000;
+    font: -moz-field;
+    font: -webkit-small-control;
+    margin-top: 5px;
+    height: 25px;
+    padding: 2px 3px;
+    resize: horizontal;
+    white-space: nowrap;
 }
 
 #search {
@@ -202,6 +248,14 @@ html,body {
     .hidden-small-screen {
         display: none;
     }
+}
+
+.tag-sources {
+    display: none;
+}
+
+.tag-unfolded .tag-sources {
+    display: block;
 }
 
 /* entry layout */

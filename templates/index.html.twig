@@ -67,13 +67,18 @@
     </script>
 
     <script type="text/template" id="tpl-sidebar-tag-item">
-        <a class="menu-item menu-item-source-<%- model.id %>" href="#tag/<%- model.id %>"><span class="source-name"><%- model.get('name') %></span><span
-                    class="source-unread"><%- model.get('unread') %></span></a>
+        <div class="pull-right">
+            <span class="badge" style="background: <%- model.get('color') %>"><%- model.get('unread') %></span>
+            <button class="btn btn-mini toggable" data-toggle="#tag-sources-<%- model.id %>"><i class="icon-chevron-down"></i></button>
+        </div>
+        <a class="menu-item menu-item-tag-<%- model.id %>" href="#tag/<%- model.id %>"><span class="tag-name"><%- model.get('name') %></span></a>
     </script>
 
     <script type="text/template" id="tpl-sidebar-source-item">
-        <a class="menu-item menu-item-source-<%- model.id %>" href="#sources/<%- model.id %>"><span class="source-name"><%- model.get('name') %></span><span
-                    class="source-unread"><%- model.get('unread') %></span></a>
+        <div class="pull-right">
+            <span class="badge"><%- model.get('unread') %></span>
+        </div>
+        <a class="menu-item menu-item-source-<%- model.id %>" href="#sources/<%- model.id %>"><span class="source-name"><%- model.get('name') %></span></a>
     </script>
 
     <script type="text/template" id="tpl-footer">
@@ -95,7 +100,7 @@
                     <% } else { %>
                     <button class="btn starred"><i class="icon-star-empty"></i></button>
                     <% } %>
-                    <button class="btn open-entry-link"><i class="icon-external-link"></i></button>
+                    <a class="btn btn-mini open-entry-link" href="<%= model.get('uri') %>" target="_blank"><i class="icon-external-link"></i></a>
                 </div>
                 <div class="entry-source">
                     <%- model.timeHumanize() %> &dash; <%- model.get('source').get('name') %>
@@ -114,7 +119,7 @@
                 <div class="entry-title span7"><%= model.get('title') %></div>
                 <div class="entry-date span2"><%- model.timeHumanize() %></div>
                 <div class="entry-link span1">
-                    <button class="btn btn-mini open-entry-link"><i class="icon-external-link"></i></button>
+                    <a class="btn btn-mini open-entry-link" href="<%= model.get('uri') %>" target="_blank"><i class="icon-external-link"></i></a>
                 </div>
             </div>
         </header>
@@ -129,8 +134,8 @@
             <% } else { %>
             <button class="btn btn-link read"><i class="icon-circle-blank"></i> mark as read</button>
             <% } %>
-            <button class="btn btn-link open-entry-link"><i class="icon-chevron-up"></i> close</button>
-            <button class="btn btn-link open-entry-link"><i class="icon-external-link"></i> open</button>
+            <button class="btn btn-link foldable"><i class="icon-chevron-up"></i> close</button>
+            <a class="btn btn-link open-entry-link" href="<%= model.get('uri') %>" target="_blank"><i class="icon-external-link"></i> open</a>
             <span><i class="icon-time"></i> <%- model.timeHumanize() %></span>
             <span><i class="icon-rss"></i> <%- model.get('source').get('name') %></span>
         </footer>
@@ -150,8 +155,15 @@
         <small>
             <span class="box-info"><i class="icon-inbox"></i> <%- model.get('unread') %></span>
             <span class="box-info"><i class="icon-refresh"></i> <%- model.get('period') %></span>
+            <% if (model.get('tag')) { %>
+            <span class="box-info"><i class="icon-tag"></i> <%- model.get('tag').get('name') %></span>
+            <% } %>
             <span class="box-info"><i class="icon-time"></i> <%- model.get('last_update') %></span>
         </small>
+    </script>
+
+    <script type="text/template" id="tpl-source-form-option">
+        <option value="<%- value %>"><%- name %></option>
     </script>
 
     <script type="text/template" id="tpl-source-form">
@@ -178,6 +190,14 @@
 
                     <div class="controls">
                         <input type="url" id="source-uri" name="uri" class="input-block-level" required="required">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="source-tag">Tag</label>
+
+                    <div class="controls">
+                        <input type="text" id="source-tag" name="tag_name" class="input-block-level" autocomplete="off">
+                        <input type="hidden" id="source-tagid" name="tag_id">
                     </div>
                 </div>
                 <div class="control-group">
@@ -211,8 +231,8 @@
     </script>
 
     <script type="text/template" id="tpl-setting-tag">
-        <td contenteditable="true"><%- model.get('name') %></td>
-        <td contenteditable="true"><%- model.get('color') %></td>
+        <td class="editable editable-input" data-editor-model-key="name" contenteditable="true"><%- model.get('name') %></td>
+        <td class="editable editable-input" data-editor-model-key="color" contenteditable="true"><%- model.get('color') %></td>
         <td><button class="btn delete"><i class="icon-trash"></i></button></td>
     </script>
 
