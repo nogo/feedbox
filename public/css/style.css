@@ -16,11 +16,22 @@ a:hover, a:focus,
     text-decoration: none;
 }
 
+.nav-tabs {
+    margin-bottom: 0;
+}
+
 .nav-tabs > li > a,
 .nav-list > li > a,
 .nav-list .nav-header {
+    border: none;
     color: #ccc;
     text-shadow: none;
+}
+
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover,
+.nav-tabs > .active > a:focus {
+    border: none;
 }
 
 .nav-list > li.active > a,
@@ -57,18 +68,17 @@ html,body {
 }
 
 .logo {
-    color: #1a1a1a;
-    font-family: 'SearsTowerRegular';
-    font-size: 15px;
-    font-weight: bold;
+    color: #ccc;
+    font-family: 'SearsTowerRegular', sans-serif;
+    font-size: 30px;
+    line-height: 32px;
 }
 
 .logo a {
-    color: #1a1a1a;
+    color: #ccc;
 }
 .logo a:hover,
 .logo a:focus {
-    color: #1a1a1a;
     text-decoration: none;
 }
 
@@ -101,64 +111,71 @@ html,body {
     width: 10%;
 }
 
+#search {
+    margin: 0 10px 0 0;
+}
+
+#search .input-append {
+    margin: 0;
+}
+
 /* absolute layout */
 #notification {
     position: absolute;
-    top: 0px;
+    top: 0;
     left: 20px;
     right: 20px;
     z-index: 50;
 }
 
+#header {
+    padding-top: 10px;
+    padding-right: 5px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    left: 300px;
+}
+
+#footer {
+    position: absolute;
+    bottom: 0;
+    left: 300px;
+    right: 20px;
+}
+
 #sidebar {
     position: absolute;
-    top: 20px;
-    left: 0px;
-    bottom: 20px;
+    top: 0;
+    left: 0;
+    bottom: 0px;
     width: 300px;
+}
+
+#sidebar-logo {
+    position: absolute;
+    top: 10px;
+    left: 20px;
 }
 
 #sidebar-sources {
     overflow: hidden;
     overflow-y: auto;
     position: absolute;
-    top: 130px;
-    bottom: 0px;
+    top: 50px;
+    bottom: 25px;
     left: 10px;
-    right: 10px;
+    right: 25px;
 }
 
 #content {
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 300px;
-    right: 0px;
-}
-
-#content-header {
-    position: absolute;
-    top: 10px;
-    bottom: 50px;
-    left: 0px;
-    right: 20px;
-}
-
-#content-list {
-    overflow: hidden;
+    overflow-x: hidden;
     overflow-y: auto;
     position: absolute;
     top: 50px;
-    bottom: 20px;
-    left: 0px;
-    right: 20px;
-}
-
-#content-footer {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    right: 20px;
+    right: 0;
+    bottom: 25px;
+    left: 300px;
 }
 
 @media (min-width: 768px) and (max-width: 979px) {
@@ -166,12 +183,16 @@ html,body {
         width: 200px;
     }
 
-    #content {
+    #header,
+    #footer,
+    #content{
         left: 200px;
     }
 }
 
 @media (max-width: 767px) {
+    #header,
+    #footer,
     #content {
         left: 20px;
     }
@@ -316,5 +337,5 @@ form.well {
 }
 
 form.well .form-actions {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
