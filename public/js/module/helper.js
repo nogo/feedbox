@@ -218,15 +218,19 @@ App.Module.Object = {
 
 
 App.Module.Form = {
-    Bind: function($form, data, ignore) {
-        ignore = ignore || {};
+    Bind: function($form, data, options) {
+        options = _.extend({
+            splitter: '-',
+            ignore: {},
+            silent: false
+        }, options);
 
         $(':input[name]', $form).each(function (idx, input) {
             var $input = $(input),
                 name = input.name;
 
-            if (name && !ignore[name]) {
-                var parts = name.split('-'),
+            if (name && !options.ignore[name]) {
+                var parts = name.split(options.splitter),
                     value = App.Module.Object.Get(data, parts);
 
                 switch (input.type) {
@@ -239,7 +243,10 @@ App.Module.Form = {
                     default:
                         $input.val(value);
                 }
-                $input.trigger('change');
+
+                if (!options.silent) {
+                    $input.trigger('change');
+                }
             }
         });
     },

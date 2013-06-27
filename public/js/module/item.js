@@ -14,6 +14,25 @@ App.Module.Item = {
             }
             return response;
         },
+        read: function(read) {
+            var sources = App.Session.get('source-collection'),
+                source = sources.get(this.get('source_id')),
+                unread = source.get('unread');
+
+            if (read) {
+                this.save({ 'read': moment().format('YYYY-MM-DD HH:mm:ss') });
+                unread--;
+            } else {
+                this.save({ 'read': null });
+                unread++;
+            }
+
+            if (unread >= 0) {
+                source.set('unread', unread);
+            }
+
+            return this;
+        },
         timeHumanize: function () {
             var date = moment(this.get('pubdate'));
             if (date.isSame(moment(), 'day')) {
@@ -64,10 +83,8 @@ App.Module.Item = {
                         read = this.model.get('read');
                     if (folded) {
                         if (read == undefined || read == null) {
-                            this.model.save({
-                                'folded': false,
-                                'read': moment().format('YYYY-MM-DD HH:mm:ss')
-                            });
+                            this.model.read(true);
+                            this.model.set('folded', false);
                         } else {
                             this.model.set('folded', false);
                         }
@@ -83,9 +100,9 @@ App.Module.Item = {
                 }
 
                 if (this.model.get('read')) {
-                    this.model.save({ 'read': null });
+                    this.model.read(false);
                 } else {
-                    this.model.save({ 'read': moment().format('YYYY-MM-DD HH:mm:ss') });
+                    this.model.read(true);
                 }
             },
             itemStarred: function (e) {
@@ -107,7 +124,7 @@ App.Module.Item = {
                 }
 
                 if (!this.model.get('read')) {
-                    this.model.save({ 'read': moment().format('YYYY-MM-DD HH:mm:ss') });
+                    this.model.read(true);
                 }
 
                 var win = window.open(this.model.get('uri'), '_blank');
@@ -121,7 +138,7 @@ App.Module.Item = {
 };
 
 App.Module.Item.Views.List = App.Views.List.extend({
-    el: '#content-list',
+    el: '#content',
     options: {
         prefix: 'item-',
         bottom: 20,

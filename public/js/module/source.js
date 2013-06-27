@@ -64,16 +64,14 @@ App.Module.Source = {
                         cache: false,
                         dataType: 'json',
                         success: function (data, status, xhr) {
-                            App.notifier.add(that.model.get('name') + " - Source update successfull.", "success");
+                            App.notify(that.model.get('name') + " - Source update successfull.", "success");
                             that.model.set(data);
-                            App.notifier.show('#notification');
                         },
                         error: function (xhr, status, errors) {
-                            App.notifier.add(that.model.get('name') + " - Source update failed.", "error");
+                            App.notify(that.model.get('name') + " - Source update failed.", "error");
                             if (xhr.responseText) {
                                 that.model.set(jQuery.parseJSON(xhr.responseText));
                             }
-                            App.notifier.show('#notification');
                         }
                     });
                 }
@@ -109,7 +107,7 @@ App.Module.Source = {
                     this.$('legend').text('Add source')
                 }
 
-                App.Module.Form.Bind(this.$el, this.model.toJSON(), this.ignore);
+                App.Module.Form.Bind(this.$el, this.model.toJSON());
 
                 return this;
             },
@@ -126,14 +124,13 @@ App.Module.Source = {
                         options = {
                             wait: true,
                             success: function (model) {
-                                App.notifier.add(data.name + " - All data are saved properly.", "success");
+                                App.notify(data.name + " - All data are saved properly.", "success");
                                 that.close();
                             },
                             error: function (model, response, scope) {
                                 $('.save i.icon').remove();
                                 $('.cancel').removeAttr('disabled');
-                                App.notifier.add(response.status + ": " + response.statusText, "error");
-                                App.notifier.show();
+                                App.notify(response.status + ": " + response.statusText, "error");
                             }
                         };
 
@@ -153,7 +150,7 @@ App.Module.Source = {
                     e.stopPropagation();
                 }
 
-                App.router.navigate('sources', { trigger: true });
+                App.router.navigate('settings/sources', { trigger: true });
             },
             remove: function () {
                 this.undelegateEvents();
@@ -167,7 +164,7 @@ App.Module.Source = {
 };
 
 App.Module.Source.Views.List = App.Views.List.extend({
-    el: '#content-list',
+    el: '#content',
     options: {
         prefix: 'source-',
         bottom: 20,
@@ -197,3 +194,117 @@ App.Module.Source.Collection = Backbone.Collection.extend({
     }
 });
 App.Module.Source.initialize(App);
+
+/* Routes */
+
+App.router.route('sources/:id', function(id) {
+    var items = App.Session.get('item-collection');
+
+    App.switchView('content-view', 'item-list', function() {
+        return new App.Module.Item.Views.List({
+            collection: items
+        });
+    });
+
+    if (items) {
+        var data = App.Session.get('item-collection-data', function() {
+                return {
+                    unread: true
+                };
+            }),
+            selectedMenuItem = ['.menu-item-source-' + id];
+
+        if (data.unread) {
+            selectedMenuItem.push('.menu-item-unread');
+        } else if (!data.unread) {
+            selectedMenuItem.push('.menu-item-read');
+        } else if (data.starred) {
+            selectedMenuItem.push('.menu-item-starred');
+        }
+
+        data.limit = 50;
+        data.page = 1;
+        data.source = id;
+
+        App.Session.set('item-collection-data', data);
+        items.fetch({
+            reset: true,
+            data: data
+        });
+        App.Session.set('selected-menu-items', selectedMenuItem);
+        App.selectMenuItem();
+    }
+});
+
+App.router.route('sources/add', function() {
+    var sources = App.Session.get('source-collection'),
+        model = new App.Module.Source.Model();
+
+    App.switchView('content-view', 'source-add', function() {
+        return new App.Module.Source.Views.Form({
+            el: '#content',
+            model: model,
+            collection: sources
+        });
+    });
+    App.Session.get('footer-view').hide();
+});
+
+App.router.route('sources/:id/edit', function(id) {
+    var sources = App.Session.get('source-collection'),
+        model = sources.get(id);
+
+    if (model) {
+        App.switchView('content-view', 'source-edit', function() {
+            return new App.Module.Source.Views.Form({
+                el: '#content',
+                model: model,
+                collection: sources
+            });
+        });
+        App.Session.get('footer-view').hide();
+    } else {
+        App.notify("Source not found", "error");
+        App.router.navigate('settings/sources', { trigger: true });
+    }
+});
+
+App.router.route('sources/update', function() {
+    var sources = App.Session.get('source-collection');
+
+    App.notify("Update started.", "success");
+    Backbone.ajax({
+        url: BASE_URL + '/update',
+        cache: false,
+        dataType: 'json',
+        success: function(models, textStatus, jqXHR) {
+            sources.set(models);
+            App.notify("Update successfull.", "success");
+        },
+        error: function() {
+            App.notify("Update failed.", "error");
+        }
+    });
+});
+
+App.router.route('sources/:id/update', function(id) {
+    var sources = App.Session.get('source-collection'),
+        model = sources.get(id);
+
+    if (model) {
+        Backbone.ajax({
+            url: BASE_URL + '/update/' + model.id,
+            dataType: 'json',
+            success: function(modelData, textStatus, jqXHR) {
+                model.set(modelData);
+                App.notify(model.get('name') + " - Source update successfull.", "success");
+
+            },
+            error: function() {
+                App.notify(model.get('name') + " - Source update failed.", "error");
+            }
+        });
+    }
+
+    App.router.navigate('settings/sources', { trigger: true });
+});

@@ -5,25 +5,42 @@ App.Module.Sidebar = {
         Main: Backbone.View.extend({
             el: '#sidebar',
             initialize: function() {
+                this.tags = App.Session.get('tag-collection');
                 this.sources = App.Session.get('source-collection');
                 this.items = App.Session.get('item-collection');
             },
             render: function() {
-                // Source view
-                var sourceList = new App.Views.List({
-                    prefix: 'source-',
+                var tagList = new App.Views.List({
+                    prefix: 'tag-',
                     tagName: 'ul',
-                    collection: this.sources,
+                    collection: this.tags,
                     attributes: {
                         'class': 'nav nav-list'
                     },
                     item: {
                         tagName: 'li',
-                        template: '#tpl-sidebar-source-item',
+                        template: '#tpl-sidebar-tag-item',
                         View: App.Views.ListItem
                     }
                 });
-                this.$('#sidebar-sources').html(sourceList.render().el);
+
+                this.$('#sidebar-sources').html(tagList.render().el);
+
+                // Source view
+//                var sourceList = new App.Views.List({
+//                    prefix: 'source-',
+//                    tagName: 'ul',
+//                    collection: this.sources,
+//                    attributes: {
+//                        'class': 'nav nav-list'
+//                    },
+//                    item: {
+//                        tagName: 'li',
+//                        template: '#tpl-sidebar-source-item',
+//                        View: App.Views.ListItem
+//                    }
+//                });
+//                this.$('#sidebar-sources').html(sourceList.render().el);
 
                 return this;
             },
@@ -45,7 +62,12 @@ App.Module.Sidebar = {
         })
     },
     initialize: function(App) {
+        this.tags = App.Session.get('tag-collection');
         this.sources = App.Session.get('source-collection');
+
+        if (this.tags) {
+            this.tags.fetch({ async: false });
+        }
 
         if (this.sources) {
             this.sources.fetch({ async: false });

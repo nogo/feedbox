@@ -3,7 +3,7 @@
 App.Module.Content = {
     Views: {
         Header: Backbone.View.extend({
-            el: '#content-header',
+            el: '#header',
             events: {
                 'click .toggable': 'toggable',
                 'click .mark-as-read': 'markAsRead',
@@ -47,9 +47,9 @@ App.Module.Content = {
             }
         }),
         Footer: Backbone.View.extend({
-            el: '#content-footer',
+            el: '#footer',
             options: {
-                template: '#tpl-content-footer'
+                template: '#tpl-footer'
             },
             initialize: function() {
                 if (this.collection) {
@@ -101,13 +101,13 @@ App.Module.Content = {
             collection: App.Session.get('item-collection')
         });
         header.render();
-        App.Session.set('content-header-view', header);
+        App.Session.set('header-view', header);
 
         var footer = new this.Views.Footer({
             collection: App.Session.get('item-collection')
         });
         footer.render();
-        App.Session.set('content-footer-view', footer);
+        App.Session.set('footer-view', footer);
 
     }
 };
