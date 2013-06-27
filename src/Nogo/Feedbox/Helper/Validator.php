@@ -7,8 +7,12 @@ class Validator
     {
         $result = false;
         try {
-            $dt = new \DateTime($value);
-            $result = $dt->format("Y-m-d H:i:s");
+            if ($value == null) {
+                $result = null;
+            } else {
+                $dt = new \DateTime($value);
+                $result = $dt->format("Y-m-d H:i:s");
+            }
         } catch (\Exception $e) {
 
         }
