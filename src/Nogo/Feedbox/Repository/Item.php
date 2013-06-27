@@ -96,6 +96,16 @@ class Item extends AbstractRepository
                             break;
                     }
                     break;
+                case 'tag':
+                    $value = intval($value);
+                    if ($value) {
+                        $sources = $this->connection->fetchCol("SELECT id FROM sources WHERE tag_id = :tag_id", ['tag_id' => $value]);
+                        if (!empty($sources)) {
+                            $bind['source_list'] = $sources;
+                            $select->where('source_id IN (:source_list)');
+                        }
+                    }
+                    break;
                 case 'source':
                     $value = intval($value);
                     if ($value) {

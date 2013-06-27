@@ -66,7 +66,7 @@ class Items extends AbstractRestController
         ]
     ];
 
-    protected $allowed_params = ['page', 'limit', 'unread', 'starred', 'source', 'sortby'];
+    protected $allowed_params = ['page', 'limit', 'unread', 'starred', 'source', 'sortby', 'tag'];
 
     public function enable()
     {
