@@ -3,15 +3,25 @@
 use Nogo\Feedbox\Repository\Source;
 use Nogo\Feedbox\Helper\DatabaseConnector;
 use Nogo\Feedbox\Helper\OpmlLoader;
+use Slim\Extras\Views\Twig as Twig;
 use Symfony\Component\Yaml\Yaml;
 
 require_once dirname(__FILE__) . '/../bootstrap.php';
+
+Twig::$twigOptions = array(
+    'charset' => 'utf-8',
+    'cache' => $app->config('cache_dir'),
+    'auto_reload' => true,
+    'strict_variables' => false,
+    'autoescape' => true
+);
+$app->view(new Twig());
 
 $app->get(
     '/',
     function () use ($app) {
         if ($app->config('installed')) {
-            $app->render('install_done.html');
+            $app->render('done.html.twig');
         } else {
             $data = array();
 
@@ -23,7 +33,7 @@ $app->get(
                 $data['data_dir_error'] = 'Data [' . $app->config('data_dir') . '] directory not writable.';
             }
 
-            $app->render('install.html', $data);
+            $app->render('install.html.twig', $data);
         }
     }
 );
@@ -82,10 +92,7 @@ $app->post(
         $db = $connector->getInstance();
 
         if ($db != null) {
-            DatabaseConnector::loadSqlFile(
-                $db,
-                ROOT_DIR . '/src/Nogo/Feedbox/Resources/sql/' . $app->config('database_adapter') . '.sql'
-            );
+            $connector->migrate($db, ROOT_DIR . '/src/Nogo/Feedbox/Resources/sql/' . $app->config('database_adapter'));
 
             $opml = trim($request->post('opml'));
             if (!empty($opml)) {
@@ -102,7 +109,41 @@ $app->post(
             }
         }
 
-        $app->render('install_done.html');
+        $app->render('done.html.twig');
+    }
+);
+
+$app->get(
+    '/migrate',
+    function() use ($app, $configLoader)  {
+        $connector = new DatabaseConnector(
+            $app->config('database_adapter'),
+            $app->config('database_dsn'),
+            $app->config('database_username'),
+            $app->config('database_password')
+        );
+        $db = $connector->getInstance();
+
+        $ignore = $app->config('api.migration');
+        if ($ignore == null) {
+            $ignore = [];
+        }
+
+        try {
+            $migrations = $db->fetchAll("SELECT * FROM version");
+            foreach($migrations as $migration) {
+                $ignore[] = $migration['key'];
+            }
+            $ignore = array_unique($ignore);
+        } catch (PDOException $e) {}
+
+        $queries = $connector->migrate(
+            $db,
+            ROOT_DIR . '/src/Nogo/Feedbox/Resources/sql/' . $app->config('database_adapter'),
+            $ignore
+        );
+
+        $app->render('done.html.twig', array('msg' => $queries));
     }
 );
 

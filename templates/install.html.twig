@@ -1,18 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>FeedBox</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/font-awesome.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <link rel="shortcut icon" href="img/feedbox.ico" type="image/x-icon"/>
-</head>
-<body>
+{% extends "base.html.twig" %}
 
+{% block content %}
 <div class="container">
     <h1 class="page-header">
         <img src="img/feedbox128.png" alt="FeedBox"/> Install
@@ -107,5 +95,4 @@
     </form>
 </div>
 
-</body>
-</html>
+{% endblock %}

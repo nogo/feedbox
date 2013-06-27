@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Feedbox - Install{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1 class="page-header">
+        <img src="img/feedbox128.png" alt="FeedBox"/> Install
+    </h1>
+
+    {% for message in msg %}
+    <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <div class="alert alert-success">
+        Done. Go to <a href="index.php">index</a>.
+    </div>
+</div>
+
+{% endblock %}
