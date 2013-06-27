@@ -17,6 +17,7 @@ class Tag extends AbstractRepository
         'id' => FILTER_VALIDATE_INT,
         'name' => FILTER_SANITIZE_STRING,
         'color' => FILTER_SANITIZE_STRING,
+        'unread' => FILTER_VALIDATE_INT,
         'created_at'  => array(
             'filter' => FILTER_CALLBACK,
             'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')

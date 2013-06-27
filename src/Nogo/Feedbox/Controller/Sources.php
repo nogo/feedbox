@@ -4,6 +4,7 @@ namespace Nogo\Feedbox\Controller;
 use Aura\Sql\Connection\AbstractConnection;
 use Nogo\Feedbox\Helper\Fetcher;
 use Nogo\Feedbox\Repository\Source as SourceRepository;
+use Nogo\Feedbox\Repository\Tag as TagRepository;
 use Nogo\Feedbox\Repository\Item as ItemRepository;
 
 class Sources extends AbstractRestController
@@ -149,6 +150,7 @@ class Sources extends AbstractRestController
     protected function fetchSource(array $source)
     {
         $itemRepository = new ItemRepository($this->connection);
+        $tagRepository = new TagRepository($this->connection);
 
         $fetcher = new Fetcher();
         $fetcher->setTimeout($this->app->config('fetcher.timeout'));
@@ -194,8 +196,17 @@ class Sources extends AbstractRestController
             $source['period'] = $worker->getUpdateInterval();
         }
         $source['errors'] = $worker->getErrors();
-        $source['unread'] = $itemRepository->countUnread([$source['id']]);
+        $source['unread'] = $itemRepository->countSourceUnread([$source['id']]);
         $this->getRepository()->persist($source);
+
+        // update tag unread counter
+        if (!empty($source['tag_id'])) {
+            $tag = $tagRepository->fetchOneById($source['tag_id']);
+            if ($tag) {
+                $tag['unread'] = $this->getRepository()->countTagUnread([$tag['id']]);
+                $tagRepository->persist($tag);
+            }
+        }
 
         return $source;
     }

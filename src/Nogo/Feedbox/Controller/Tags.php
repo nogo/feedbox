@@ -36,6 +36,10 @@ class Tags extends AbstractRestController
             'read' => true,
             'write' => false
         ],
+        'unread' => [
+            'read' => true,
+            'write' => false
+        ],
         'created_at' => [
             'read' => true,
             'write' => false

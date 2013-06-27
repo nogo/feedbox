@@ -60,4 +60,22 @@ class Source extends AbstractRepository
     {
         return $this->connection->fetchAll('SELECT * FROM ' . $this->tableName() . ' WHERE active = 1 AND uri IS NOT NULL');
     }
+
+    public function countTagUnread(array $tagIds = array())
+    {
+        /**
+         * @var $select \Aura\Sql\Query\Select
+         */
+        $select = $this->connection->newSelect();
+        $select->cols(['SUM(unread)'])
+            ->from($this->tableName());
+
+        $bind = [];
+        if (!empty($tagIds)) {
+            $select->where('tag_id IN (:tag_id)');
+            $bind['tag_id'] = $tagIds;
+        }
+
+        return $this->connection->fetchValue($select, $bind);
+    }
 }

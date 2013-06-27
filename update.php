@@ -5,6 +5,7 @@ use Nogo\Feedbox\Helper\ConfigLoader;
 use Nogo\Feedbox\Helper\DatabaseConnector;
 use Nogo\Feedbox\Repository\Item;
 use Nogo\Feedbox\Repository\Source;
+use Nogo\Feedbox\Repository\Tag;
 
 define('ROOT_DIR', dirname(__FILE__));
 
@@ -29,6 +30,7 @@ $connection = $connector->getInstance();
 
 // create repositories
 $sourceRepository = new Source($connection);
+$tagRepository = new Tag($connection);
 $itemRepository = new Item($connection);
 
 // fetch active sources with uri
@@ -121,17 +123,37 @@ foreach ($sources as $source) {
                 $source['period'] = $worker->getUpdateInterval();
             }
             $source['errors'] = $worker->getErrors();
+
+            // update source unread counter
             $count = $source['unread'];
-            $source['unread'] = $itemRepository->countUnread([$source['id']]);
+            $source['unread'] = $itemRepository->countSourceUnread([$source['id']]);
             $sourceRepository->persist($source);
+
+            // update tag unread counter
+            if (!empty($source['tag_id'])) {
+                $tag = $tagRepository->fetchOneById($source['tag_id']);
+                if ($tag) {
+                    $tag['unread'] = $sourceRepository->countTagUnread([$tag['id']]);
+                    $tagRepository->persist($tag);
+                }
+            }
 
             if ($config['debug']) {
                 echo sprintf("%d new items.\n", abs($source['unread'] - $count));
             }
         } else {
             $source['errors'] = $worker->getErrors();
-            $source['unread'] = $itemRepository->countUnread([$source['id']]);
+            $source['unread'] = $itemRepository->countSourceUnread([$source['id']]);
             $sourceRepository->persist($source);
+
+            // update tag unread counter
+            if (!empty($source['tag_id'])) {
+                $tag = $tagRepository->fetchOneById($source['tag_id']);
+                if ($tag) {
+                    $tag['unread'] = $sourceRepository->countTagUnread([$tag['id']]);
+                    $tagRepository->persist($tag);
+                }
+            }
 
             if ($config['debug']) {
                 echo sprintf("%s\n", $worker->getErrors());

@@ -104,18 +104,29 @@ html,body {
     white-space: nowrap;
 }
 
-.tag-name {
-    width: 75%;
-}
-
 .source-name {
-    width: 75%;
+    width: 81%;
 }
 
-.source-unread {
+.tag-name {
+    width: 70%;
+}
+
+.tag-toggle {
     display: inline-block;
+    text-align: center;
     vertical-align: top;
     width: 10%;
+}
+
+.source-unread,
+.tag-unread {
+    background: #212121;
+    border-radius: 7px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+    width: 15%;
 }
 
 .editable {

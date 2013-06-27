@@ -67,18 +67,19 @@
     </script>
 
     <script type="text/template" id="tpl-sidebar-tag-item">
-        <div class="pull-right">
-            <span class="badge" style="background: <%- model.get('color') %>"><%- model.get('unread') %></span>
-            <button class="btn btn-mini toggable" data-toggle="#tag-sources-<%- model.id %>"><i class="icon-chevron-down"></i></button>
-        </div>
-        <a class="menu-item menu-item-tag-<%- model.id %>" href="#tag/<%- model.id %>"><span class="tag-name"><%- model.get('name') %></span></a>
+        <a class="menu-item menu-item-tag-<%- model.id %>" href="#tag/<%- model.id %>">
+            <span class="tag-name"><%- model.get('name') %></span>
+            <span class="tag-unread" style="background: <%- model.get('color') %>"><%- model.get('unread') %></span>
+            <button class="btn btn-mini toggable tag-toggle" data-toggle="#tag-sources-<%- model.id %>"><i class="icon-plus"></i></button>
+        </a>
+
     </script>
 
     <script type="text/template" id="tpl-sidebar-source-item">
-        <div class="pull-right">
-            <span class="badge"><%- model.get('unread') %></span>
-        </div>
-        <a class="menu-item menu-item-source-<%- model.id %>" href="#sources/<%- model.id %>"><span class="source-name"><%- model.get('name') %></span></a>
+        <a class="menu-item menu-item-source-<%- model.id %>" href="#sources/<%- model.id %>">
+            <span class="source-name"><%- model.get('name') %></span>
+            <span class="source-unread"><%- model.get('unread') %></span>
+        </a>
     </script>
 
     <script type="text/template" id="tpl-footer">
@@ -261,7 +262,14 @@
                         <option value="oldest">Oldest</option>
                     </select>
                 </div>
-
+                <div class="controls controls-row">
+                    <label class="span2" for="view-starred-sortby">Starred</label>
+                    <input class="span2 update" id="view-starred-count" name="view.starred.count" value="50">
+                    <select class="span2 update" id="view-starred-sortby" name="view.starred.sortby">
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                    </select>
+                </div>
             </div>
             <div class="tab-pane well" id="tab-setting-tags">
                 <table class="table">
