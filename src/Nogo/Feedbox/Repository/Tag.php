@@ -1,31 +1,23 @@
 <?php
-
 namespace Nogo\Feedbox\Repository;
 
-class Source extends AbstractRepository
+/**
+ * Class Tag
+ * @package Nogo\Feedbox\Repository
+ */
+class Tag extends AbstractRepository
 {
     const ID = 'id';
-    const TABLE = 'sources';
+    const TABLE = 'tags';
 
+    /**
+     * @var array input validation
+     */
     protected $filter = array(
         'id' => FILTER_VALIDATE_INT,
         'name' => FILTER_SANITIZE_STRING,
-        'uri' => FILTER_VALIDATE_URL,
-        'icon' => FILTER_UNSAFE_RAW,
-        'active' => FILTER_VALIDATE_BOOLEAN,
-        'unread' => FILTER_VALIDATE_INT,
-        'errors' => FILTER_SANITIZE_STRING,
-        'period' => array(
-            'filter' => FILTER_VALIDATE_REGEXP,
-            'options' => array(
-                'regexp' => '/everytime|hourly|daily|weekly|yearly/'
-            )
-        ),
-        'last_update' => array(
-            'filter' => FILTER_CALLBACK,
-            'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
-        ),
-        'created_at' => array(
+        'color' => FILTER_SANITIZE_STRING,
+        'created_at'  => array(
             'filter' => FILTER_CALLBACK,
             'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
         ),
@@ -40,11 +32,20 @@ class Source extends AbstractRepository
         return self::ID;
     }
 
+    /**
+     * @return string table name
+     */
     public function tableName()
     {
         return self::TABLE;
     }
 
+    /**
+     * validate input
+     *
+     * @param array $entity
+     * @return mixed
+     */
     public function validate(array $entity)
     {
         return filter_var_array($entity, $this->filter, false);
@@ -59,16 +60,11 @@ class Source extends AbstractRepository
         $result = [];
         foreach ($entities as $entity) {
             $tag['sources'] = $this->connection->fetchCol(
-                "SELECT tag_id FROM source_tags WHERE source_id = :id",
+                "SELECT source_id FROM source_tags WHERE tag_id = :id",
                 ['id' => $entity['id']]
             );
             $result[] = $entity;
         }
         return $result;
-    }
-
-    public function fetchAllActiveWithUri()
-    {
-        return $this->connection->fetchAll('SELECT * FROM ' . $this->tableName() . ' WHERE active = 1 AND uri IS NOT NULL');
     }
 }

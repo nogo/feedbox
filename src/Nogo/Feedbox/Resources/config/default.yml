@@ -25,9 +25,12 @@ fetcher.timeout: 10
 worker.default: "Nogo\Feedbox\Feed\Rss"
 
 # API
+api.version:      "v1"
+api.migration:
+    - 1368823260
 api.content_type: "application/json"
 api.controller:
-    - "Nogo\Feedbox\Controller\Sources"
     - "Nogo\Feedbox\Controller\Items"
-
-
+    - "Nogo\Feedbox\Controller\Settings"
+    - "Nogo\Feedbox\Controller\Sources"
+    - "Nogo\Feedbox\Controller\Tags"
