@@ -125,23 +125,43 @@ class DatabaseConnector
     }
 
     /**
-     * Load a sql file
+     * Migrate sql files into a database.
      *
-     * @param AbstractConnection $conn
-     * @param $file
+     * @param $path, directory with sql files
+     * @param array $ignore, filename to ignore
+     * @return array of sql queries
      */
-    public static function loadSqlFile(AbstractConnection $conn, $file)
+    public static function migrate(AbstractConnection $conn, $path, array $ignore = [])
     {
-        if (file_exists($file)) {
-            $sql = file_get_contents($file);
+        $result = [];
 
-            if (!empty($sql)) {
-                $queries = explode(';', $sql);
-                foreach ($queries as $q) {
-                    $conn->query(trim($q) . ";");
+        if (file_exists($path) && is_dir($path)) {
+            $files = scandir($path);
+            if ($files !== false) {
+                $queries = [];
+
+                foreach ($files as $file) {
+                    $fileinfo = pathinfo($path . DIRECTORY_SEPARATOR . $file);
+                    if ($fileinfo['extension'] === 'sql'
+                        && !in_array($fileinfo['filename'], $ignore)) {
+
+                        $sql = file_get_contents($path . DIRECTORY_SEPARATOR . $file);
+                        $queries = array_merge($queries, explode(';', $sql));
+                    }
+                }
+
+                if (!empty($queries)) {
+                    foreach ($queries as $q) {
+                        $query = trim($q);
+                        if (!empty($query)) {
+                            $conn->query($query . ';');
+                            $result[] = $query;
+                        }
+                    }
                 }
             }
         }
-    }
 
+        return $result;
+    }
 }
