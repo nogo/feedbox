@@ -1,10 +1,13 @@
 <?php
 namespace Nogo\Feedbox\Repository;
 
-use Nogo\Feedbox\Helper\Validator;
-
+/**
+ * Class Item
+ * @package Nogo\Feedbox\Repository
+ */
 class Item extends AbstractRepository
 {
+    const ID = 'id';
     const TABLE = 'items';
 
     protected $filter = array(
@@ -33,6 +36,11 @@ class Item extends AbstractRepository
         )
     );
 
+    public function identifier()
+    {
+        return self::ID;
+    }
+
     public function tableName()
     {
         return self::TABLE;
@@ -41,6 +49,11 @@ class Item extends AbstractRepository
     public function validate(array $entity)
     {
         return filter_var_array($entity, $this->filter, false);
+    }
+
+    public function addRelations(array $entities)
+    {
+        return $entities;
     }
 
     public function fetchAllWithFilter(array $filter = array(), $count = false)

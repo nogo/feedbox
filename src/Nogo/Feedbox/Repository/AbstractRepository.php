@@ -25,14 +25,12 @@ abstract class AbstractRepository implements Repository
 
     public function fetchAll()
     {
-        return $this->connection->fetchAll("SELECT * FROM " . $this->tableName());
+        return $this->addRelations($this->connection->fetchAll("SELECT * FROM " . $this->tableName()));
     }
 
     public function fetchOneById($id)
     {
-        $id = filter_var($id, FILTER_VALIDATE_INT);
-
-        return $this->connection->fetchOne("SELECT * FROM " . $this->tableName() . " WHERE id = :id", ['id' => $id]);
+        return $this->addRelations($this->fetchOneBy($this->identifier(), $id));
     }
 
     public function fetchOneBy($name, $value)
@@ -43,20 +41,21 @@ abstract class AbstractRepository implements Repository
         $select = $this->connection->newSelect();
         $select->cols(['*'])
             ->from($this->tableName())
-            ->where($name . '= :' . $name);
+            ->where($name . ' = :' . $name);
 
-        return $this->connection->fetchOne($select, [$name => $value]);
+        return $this->addRelations($this->connection->fetchOne($select, [ $name => $value ]));
     }
 
     public function persist(array $entity)
     {
         $entity = $this->validate($entity);
+        $id_key = $this->identifier();
 
-        if (isset($entity['id'])) {
-            $id = $entity['id'];
-            unset($entity['id']);
+        if (isset($entity[$id_key])) {
+            $id = $entity[$id_key];
+            unset($entity[$id_key]);
 
-            return $this->connection->update($this->tableName(), $entity, 'id = :id', ['id' => $id]);
+            return $this->connection->update($this->tableName(), $entity, $id_key . ' = :id', ['id' => $id]);
         } else {
             $this->connection->insert($this->tableName(), $entity);
 
@@ -66,8 +65,8 @@ abstract class AbstractRepository implements Repository
 
     public function remove($id)
     {
-        return $this->connection->delete($this->tableName(), 'id = :id', ['id' => $id]);
+        $id = $this->identifier();
+
+        return $this->connection->delete($this->tableName(), $id . ' = :id', ['id' => $id]);
     }
-
-
 }

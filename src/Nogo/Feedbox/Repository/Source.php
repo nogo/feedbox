@@ -4,6 +4,7 @@ namespace Nogo\Feedbox\Repository;
 
 class Source extends AbstractRepository
 {
+    const ID = 'id';
     const TABLE = 'sources';
 
     protected $filter = array(
@@ -33,6 +34,11 @@ class Source extends AbstractRepository
             'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
         )
     );
+
+    public function identifier()
+    {
+        return self::ID;
+    }
 
     public function tableName()
     {

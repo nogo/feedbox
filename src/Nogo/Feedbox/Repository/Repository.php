@@ -7,6 +7,7 @@ interface Repository {
 
     public function __construct(AbstractConnection $connection);
 
+    public function identifier();
     public function tableName();
     public function validate(array $data);
 
@@ -15,4 +16,6 @@ interface Repository {
 
     public function persist(array $entity);
     public function remove($id);
+
+    public function addRelations(array $entities);
 }
