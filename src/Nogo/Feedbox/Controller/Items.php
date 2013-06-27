@@ -2,8 +2,8 @@
 namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
-use Nogo\Feedbox\Repository\Repository;
 use Nogo\Feedbox\Repository\Item as ItemRepository;
+use Nogo\Feedbox\Repository\Repository;
 
 /**
  * Class Items
@@ -15,7 +15,6 @@ class Items extends AbstractRestController
      * @var ItemRepository
      */
     protected $repository;
-
     /**
      * @var array
      */
@@ -65,8 +64,7 @@ class Items extends AbstractRestController
             'write' => false
         ]
     ];
-
-    protected $allowed_params = ['page', 'limit', 'unread', 'starred', 'source', 'sortby', 'tag'];
+    protected $allowed_params = ['mode', 'page', 'limit', 'sortby', 'source', 'tag', 'search'];
 
     public function enable()
     {
@@ -77,6 +75,29 @@ class Items extends AbstractRestController
         $this->app->delete('/items/:id', array($this, 'deleteAction'))->conditions(['id' => '\d+']);
 
         $this->app->put('/read', array($this, 'readAction'));
+    }
+
+    public function getApiDefinition()
+    {
+        return $this->fields;
+    }
+
+    public function listAction()
+    {
+        $params = $this->getParameter($this->allowed_params);
+
+        $result = $this->getRepository()->fetchAllWithFilter($params, true);
+        $this->app->response()->header('X-Items-Total', $result[0]['count(*)']);
+        $result = $this->getRepository()->fetchAllWithFilter($params);
+
+        $readable = $this->readableFields();
+
+        $output = [];
+        foreach ($result as $data) {
+            $output[] = $this->serializeData($data, $readable);
+        }
+
+        $this->renderJson($output);
     }
 
     /**
@@ -97,29 +118,6 @@ class Items extends AbstractRestController
         return $this->repository;
     }
 
-    public function getApiDefinition()
-    {
-        return $this->fields;
-    }
-
-    public function listAction()
-    {
-        $params = $this->getParameter($this->allowed_params);
-
-        $result = $this->getRepository()->fetchAllWithFilter($params, true);
-        $this->app->response()->header('X-Items-Total', $result[0]['count(*)']);
-        $result = $this->getRepository()->fetchAllWithFilter($params);
-
-        $readable = $this->readableFields();
-
-        $output = [];
-        foreach($result as $data) {
-            $output[] = $this->serializeData($data, $readable);
-        }
-
-        $this->renderJson($output);
-    }
-
     public function readAction()
     {
         $json = trim($this->app->request()->getBody());
@@ -137,7 +135,7 @@ class Items extends AbstractRestController
         $dt = date('Y-m-d H:i:s');
 
         $updated_items = array();
-        foreach($request_data as $id) {
+        foreach ($request_data as $id) {
             $id = intval($id);
             $item = $this->getRepository()->fetchOneById($id);
             if ($item !== false) {

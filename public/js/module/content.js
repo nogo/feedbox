@@ -5,6 +5,7 @@ App.Module.Content = {
         Header: Backbone.View.extend({
             el: '#header',
             events: {
+                'submit #search': 'search',
                 'click .toggable': 'toggable',
                 'click .mark-as-read': 'markAsRead',
                 'click .reload': 'reload'
@@ -44,6 +45,19 @@ App.Module.Content = {
                         view.el.scrollTop = 0;
                     }
                 });
+            },
+            search: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                var value = Backbone.$.trim(this.$('#search-input').val());
+
+                if (!_.isEmpty(value)) {
+                    value = _.escape(value.replace(/\s+/g, '+'));
+                    App.router.navigate('search/' + value, {trigger: true});
+                }
+
             }
         }),
         Footer: Backbone.View.extend({

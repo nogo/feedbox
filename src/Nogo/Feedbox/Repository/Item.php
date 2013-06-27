@@ -86,6 +86,27 @@ class Item extends AbstractRepository
             }
 
             switch ($key) {
+                case 'mode':
+                    $value = filter_var($value, FILTER_SANITIZE_STRING);
+                    switch($value) {
+                        case 'unread':
+                            $select->where('read IS NULL');
+                            break;
+                        case 'read':
+                            $select->where('read IS NOT NULL');
+                            break;
+                        case 'starred':
+                            $select->where('starred = 1');
+                            break;
+                    }
+                    break;
+                case 'search':
+                    $value = filter_var($value, FILTER_SANITIZE_STRING);
+                    if ($value) {
+                        $select->where('title LIKE :value OR content LIKE :value');
+                        $bind['value'] = '%' . $value . '%';
+                    }
+                    break;
                 case 'sortby':
                     switch ($value) {
                         case 'oldest':
@@ -97,7 +118,7 @@ class Item extends AbstractRepository
                     }
                     break;
                 case 'tag':
-                    $value = intval($value);
+                    $value = filter_var($value, FILTER_VALIDATE_INT);
                     if ($value) {
                         $sources = $this->connection->fetchCol("SELECT id FROM sources WHERE tag_id = :tag_id", ['tag_id' => $value]);
                         if (!empty($sources)) {
@@ -107,24 +128,10 @@ class Item extends AbstractRepository
                     }
                     break;
                 case 'source':
-                    $value = intval($value);
+                    $value = filter_var($value, FILTER_VALIDATE_INT);
                     if ($value) {
                         $bind['source'] = $value;
                         $select->where('source_id = :source');
-                    }
-                    break;
-                case 'starred':
-                    if ($value) {
-                        $select->where('starred = 1');
-                    } else {
-                        $select->where('starred = 0');
-                    }
-                    break;
-                case 'unread':
-                    if ($value == 'true' || $value == 1) {
-                        $select->where('read IS NULL');
-                    } else {
-                        $select->where('read IS NOT NULL');
                     }
                     break;
             }
@@ -133,8 +140,7 @@ class Item extends AbstractRepository
         return $this->connection->fetchAll($select, $bind);
     }
 
-
-    public function countUnread(array $sourceIds = array())
+    public function countSourceUnread(array $sourceIds = array())
     {
         /**
          * @var $select \Aura\Sql\Query\Select
@@ -150,7 +156,14 @@ class Item extends AbstractRepository
             $bind['source_id'] = $sourceIds;
         }
 
-        return $result = $this->connection->fetchValue($select, $bind);
+        return $this->connection->fetchValue($select, $bind);
+    }
 
+    public function countTagUnread($tag)
+    {
+        $sources = $this->connection
+            ->fetchCol("SELECT id FROM sources WHERE tag_id = :tag_id", ['tag_id' => $tag]);
+
+        return $this->countSourceUnread($sources);
     }
 }

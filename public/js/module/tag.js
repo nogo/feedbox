@@ -189,7 +189,7 @@ App.router.route('tag/:id', function(id) {
     if (items) {
         var data = App.Session.get('item-collection-data', function() {
                 return {
-                    unread: true,
+                    mode: 'unread',
                     page: 1,
                     limit: settings.getByKey('view.unread.count', 50),
                     sortby: settings.getByKey('view.unread.sortby', 'newest')
@@ -197,14 +197,7 @@ App.router.route('tag/:id', function(id) {
             }),
             selectedMenuItem = ['.menu-item-tag-' + id];
 
-        if (data.unread) {
-            selectedMenuItem.push('.menu-item-unread');
-        } else if (!data.unread) {
-            selectedMenuItem.push('.menu-item-read');
-        } else if (data.starred) {
-            selectedMenuItem.push('.menu-item-starred');
-        }
-
+        selectedMenuItem.push('.menu-item-' + data.mode);
         data.page = 1;
         data.tag = id;
         if (data.source) {
