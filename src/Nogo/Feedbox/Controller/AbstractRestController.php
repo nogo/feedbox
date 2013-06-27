@@ -91,7 +91,8 @@ abstract class AbstractRestController extends AbstractController
             $entity['id'] = $this->getRepository()->persist($entity);
 
             $result = $this->getRepository()->fetchOneById($entity['id']);
-            $this->renderJson($result);
+            $output = $this->serializeData($result, $this->readableFields());
+            $this->renderJson($output);
         } else {
             $this->render('Data not valid', 400);
         }
@@ -131,7 +132,8 @@ abstract class AbstractRestController extends AbstractController
             $result = $this->getRepository()->fetchOneById($id);
         }
 
-        $this->renderJson($result);
+        $output = $this->serializeData($result, $this->readableFields());
+        $this->renderJson($output);
     }
 
     /**
