@@ -26,7 +26,7 @@ worker.default: "Nogo\Feedbox\Feed\Rss"
 
 # API
 api.version:      "v1"
-api.migration:
+api.migration.ignore:
     - 1368823260
 api.content_type: "application/json"
 api.controller:

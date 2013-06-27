@@ -124,7 +124,7 @@ $app->get(
         );
         $db = $connector->getInstance();
 
-        $ignore = $app->config('api.migration');
+        $ignore = $app->config('api.migration.ignore');
         if ($ignore == null) {
             $ignore = [];
         }
