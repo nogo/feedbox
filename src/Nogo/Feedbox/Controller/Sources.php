@@ -53,6 +53,10 @@ class Sources extends AbstractRestController
             'read' => true,
             'write' => true
         ],
+        'tag_id' => [
+            'read' => true,
+            'write' => true
+        ],
         'created_at' => [
             'read' => true,
             'write' => false

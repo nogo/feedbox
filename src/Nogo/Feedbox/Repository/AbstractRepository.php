@@ -25,12 +25,18 @@ abstract class AbstractRepository implements Repository
 
     public function fetchAll()
     {
-        return $this->addRelations($this->connection->fetchAll("SELECT * FROM " . $this->tableName()));
+        $result = $this->connection->fetchAll("SELECT * FROM " . $this->tableName());
+
+        if (!empty($result)) {
+            $result = $this->addRelations($result);
+        }
+
+        return $result;
     }
 
     public function fetchOneById($id)
     {
-        return $this->addRelations($this->fetchOneBy($this->identifier(), $id));
+        return $this->fetchOneBy($this->identifier(), $id);
     }
 
     public function fetchOneBy($name, $value)
@@ -43,7 +49,13 @@ abstract class AbstractRepository implements Repository
             ->from($this->tableName())
             ->where($name . ' = :' . $name);
 
-        return $this->addRelations($this->connection->fetchOne($select, [ $name => $value ]));
+        $result = $this->connection->fetchOne($select, [ $name => $value ]);
+
+        if (!empty($result)) {
+            $result = $this->addRelations($result);
+        }
+
+        return $result;
     }
 
     public function persist(array $entity)
@@ -65,8 +77,6 @@ abstract class AbstractRepository implements Repository
 
     public function remove($id)
     {
-        $id = $this->identifier();
-
-        return $this->connection->delete($this->tableName(), $id . ' = :id', ['id' => $id]);
+        return $this->connection->delete($this->tableName(), $this->identifier() . ' = :id', ['id' => $id]);
     }
 }

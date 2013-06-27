@@ -25,6 +25,7 @@ class Source extends AbstractRepository
             'filter' => FILTER_CALLBACK,
             'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
         ),
+        'tag_id' => FILTER_VALIDATE_INT,
         'created_at' => array(
             'filter' => FILTER_CALLBACK,
             'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
@@ -52,19 +53,7 @@ class Source extends AbstractRepository
 
     public function addRelations(array $entities)
     {
-        if (array_key_exists('id', $entities)) {
-            $entities = [$entities];
-        }
-
-        $result = [];
-        foreach ($entities as $entity) {
-            $tag['sources'] = $this->connection->fetchCol(
-                "SELECT tag_id FROM source_tags WHERE source_id = :id",
-                ['id' => $entity['id']]
-            );
-            $result[] = $entity;
-        }
-        return $result;
+        return $entities;
     }
 
     public function fetchAllActiveWithUri()

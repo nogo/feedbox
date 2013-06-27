@@ -54,17 +54,26 @@ class Tag extends AbstractRepository
     public function addRelations(array $entities)
     {
         if (array_key_exists('id', $entities)) {
-            $entities = [$entities];
-        }
-
-        $result = [];
-        foreach ($entities as $entity) {
-            $tag['sources'] = $this->connection->fetchCol(
-                "SELECT source_id FROM source_tags WHERE tag_id = :id",
-                ['id' => $entity['id']]
+            $entities['sources'] = $this->connection->fetchCol(
+                "SELECT id FROM sources WHERE tag_id = :id",
+                ['id' => $entities['id']]
             );
-            $result[] = $entity;
+            return $entities;
+        } else {
+            $result = [];
+            foreach ($entities as $entity) {
+                $entity['sources'] = $this->connection->fetchCol(
+                    "SELECT id FROM sources WHERE tag_id = :id",
+                    ['id' => $entity['id']]
+                );
+                $result[] = $entity;
+            }
+            return $result;
         }
-        return $result;
+    }
+
+    public function remove($id)
+    {
+        return $this->connection->delete($this->tableName(), $this->identifier() . ' = :id', ['id' => $id]);
     }
 }

@@ -34,7 +34,7 @@ class Tags extends AbstractRestController
         ],
         'sources' => [
             'read' => true,
-            'write' => true
+            'write' => false
         ],
         'created_at' => [
             'read' => true,
