@@ -61,42 +61,28 @@ var App = {
             }
         };
     }(),
-    notifier: function() {
-        return {
-            add: function (message, type, delay) {
-                var template = App.render("#tpl-application-notification");
-                if (template) {
-                    var data = {message: message, type: ' alert-info'};
-                    if (type !== undefined) {
-                        data.type = ' alert-' + type;
-                    }
-                    if (delay === undefined) {
-                        delay = 2000;
-                    }
-
-                    var $el = $(template(data).trim());
-                    if (delay) {
-                        $el.delay(2000).promise().done(function () {
-                            $el.fadeOut('slow', function() {
-                                $el.detach().remove();
-                            });
-                        });
-                    }
-                    var queue = App.Session.get('notify-queue', function() { return [] });
-                    queue.push($el);
-                }
-            },
-            show: function(el) {
-                var queue = App.Session.get('notify-queue', function() { return [] }),
-                    header = $(el);
-                if (queue.length > 0 && header) {
-                    while (queue.length > 0) {
-                        header.prepend(queue.pop());
-                    }
-                }
+    notify: function(message, type, delay) {
+        var template = App.render("#tpl-application-notification");
+        if (template) {
+            var data = {message: message, type: ' alert-info'};
+            if (type !== undefined) {
+                data.type = ' alert-' + type;
             }
+            if (delay === undefined) {
+                delay = 2000;
+            }
+
+            var $el = $(template(data).trim());
+            if (delay) {
+                $el.delay(2000).promise().done(function () {
+                    $el.fadeOut('slow', function() {
+                        $el.detach().remove();
+                    });
+                });
+            }
+            $('#notification').prepend($el);
         }
-    }(),
+    },
     render: function(name, data) {
         var templates = this.Session.get('templates', function() {
             return {}
@@ -132,7 +118,6 @@ var App = {
                 App.Session.set(section, view);
                 App.Session.set(section + '-name', name);
             }
-            this.notifier.show('#notification');
         }
     },
     selectMenuItem: function(item) {
