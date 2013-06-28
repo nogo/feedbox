@@ -34,7 +34,7 @@ $tagRepository = new Tag($connection);
 $itemRepository = new Item($connection);
 
 // fetch active sources with uri
-$sources = $sourceRepository->fetchAllActiveWithUri();
+$sources = $sourceRepository->findAllActiveWithUri();
 
 // get the feed runner
 $defaultWorkerClass = $config['worker.default'];
@@ -101,7 +101,7 @@ foreach ($sources as $source) {
         if ($items != null) {
             foreach($items as $item) {
                 if (isset($item['uid'])) {
-                    $dbItem = $itemRepository->fetchOneBy('uid', $item['uid']);
+                    $dbItem = $itemRepository->find('uid', $item['uid']);
                     if (!empty($dbItem)) {
                         if ($item['content'] !== $dbItem['content']
                             || $item['title'] !== $dbItem['title']) {
@@ -131,7 +131,7 @@ foreach ($sources as $source) {
 
             // update tag unread counter
             if (!empty($source['tag_id'])) {
-                $tag = $tagRepository->fetchOneById($source['tag_id']);
+                $tag = $tagRepository->find($source['tag_id']);
                 if ($tag) {
                     $tag['unread'] = $sourceRepository->countTagUnread([$tag['id']]);
                     $tagRepository->persist($tag);
@@ -148,7 +148,7 @@ foreach ($sources as $source) {
 
             // update tag unread counter
             if (!empty($source['tag_id'])) {
-                $tag = $tagRepository->fetchOneById($source['tag_id']);
+                $tag = $tagRepository->find($source['tag_id']);
                 if ($tag) {
                     $tag['unread'] = $sourceRepository->countTagUnread([$tag['id']]);
                     $tagRepository->persist($tag);
