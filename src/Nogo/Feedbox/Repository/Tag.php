@@ -52,7 +52,7 @@ class Tag extends AbstractRepository
         return filter_var_array($entity, $this->filter, false);
     }
 
-    public function addRelations(array $entities)
+    public function withRelations(array $entities)
     {
         if (array_key_exists('id', $entities)) {
             $entities['sources'] = $this->connection->fetchCol(

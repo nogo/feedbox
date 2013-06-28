@@ -3,6 +3,11 @@ namespace Nogo\Feedbox\Repository;
 
 use Aura\Sql\Connection\AbstractConnection;
 
+/**
+ * Class AbstractRepository
+ *
+ * @package Nogo\Feedbox\Repository
+ */
 abstract class AbstractRepository implements Repository
 {
     /**
@@ -10,6 +15,9 @@ abstract class AbstractRepository implements Repository
      */
     protected $connection;
 
+    /**
+     * @param AbstractConnection $connection
+     */
     public function __construct(AbstractConnection $connection)
     {
         $this->connection = $connection;
@@ -23,23 +31,25 @@ abstract class AbstractRepository implements Repository
         return $this->connection;
     }
 
-    public function fetchAll()
+    /**
+     * Find entity by id.
+     *
+     * @param $id
+     * @return array | boolean
+     */
+    public function find($id)
     {
-        $result = $this->connection->fetchAll("SELECT * FROM " . $this->tableName());
-
-        if (!empty($result)) {
-            $result = $this->addRelations($result);
-        }
-
-        return $result;
+        return $this->findBy($this->identifier(), $id);
     }
 
-    public function fetchOneById($id)
-    {
-        return $this->fetchOneBy($this->identifier(), $id);
-    }
-
-    public function fetchOneBy($name, $value)
+    /**
+     * Find one entity by name and value.
+     *
+     * @param $name
+     * @param $value
+     * @return array | boolean
+     */
+    public function findBy($name, $value)
     {
         /**
          * @var $select \Aura\Sql\Query\Select
@@ -52,12 +62,67 @@ abstract class AbstractRepository implements Repository
         $result = $this->connection->fetchOne($select, [ $name => $value ]);
 
         if (!empty($result)) {
-            $result = $this->addRelations($result);
+            $result = $this->withRelations($result);
         }
 
         return $result;
     }
 
+    /**
+     * Find all entity by name and value.
+     *
+     * @param $name
+     * @param $value
+     * @return array | boolean
+     */
+    public function findAllBy($name, $value)
+    {
+        /**
+         * @var $select \Aura\Sql\Query\Select
+         */
+        $select = $this->connection->newSelect();
+        $select->cols(['*'])
+            ->from($this->tableName())
+            ->where($name . ' = :' . $name);
+
+        $result = $this->connection->fetchAll($select, [ $name => $value ]);
+
+        if (!empty($result)) {
+            $result = $this->withRelations($result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Ffind all entities.
+     *
+     * @return array
+     */
+    public function findAll()
+    {
+        /**
+         * @var $select \Aura\Sql\Query\Select
+         */
+        $select = $this->connection->newSelect();
+        $select->cols(['*'])
+            ->from($this->tableName());
+
+        $result = $this->connection->fetchAll($select);
+
+        if (!empty($result)) {
+            $result = $this->withRelations($result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Persist entity, do insert if entity has now identifier and update with identifier.
+     *
+     * @param array $entity
+     * @return int last insert id or updated rows
+     */
     public function persist(array $entity)
     {
         $entity = $this->validate($entity);
@@ -75,6 +140,12 @@ abstract class AbstractRepository implements Repository
         }
     }
 
+    /**
+     * Delete entity.
+     *
+     * @param $id
+     * @return int deleted rows
+     */
     public function remove($id)
     {
         return $this->connection->delete($this->tableName(), $this->identifier() . ' = :id', ['id' => $id]);

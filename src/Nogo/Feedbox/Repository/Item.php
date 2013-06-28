@@ -51,12 +51,12 @@ class Item extends AbstractRepository
         return filter_var_array($entity, $this->filter, false);
     }
 
-    public function addRelations(array $entities)
+    public function withRelations(array $entities)
     {
         return $entities;
     }
 
-    public function fetchAllWithFilter(array $filter = array(), $count = false)
+    public function findAllFiltered(array $filter = array(), $count = false)
     {
         /**
          * @var $select \Aura\Sql\Query\Select
