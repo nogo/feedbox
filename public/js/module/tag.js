@@ -24,11 +24,38 @@ App.Module.Tag = {
     Views: {
         Item: App.Views.ListItem.extend({
             events: {
+                'click .update': 'updateItem',
                 'click .delete': 'deleteItem',
                 'click .editable': 'click',
                 'focus .editable': 'focus',
                 'blur .editable': 'save',
                 'keyup .editable': 'keyup'
+            },
+            updateItem: function (e) {
+                if (e) {
+                    e.preventDefault();
+                }
+
+                if (this.model) {
+                    var that = this,
+                        user = App.Session.get('user');
+                    Backbone.ajax({
+                        url: BASE_URL + '/update/tag/' + this.model.id,
+                        cache: false,
+                        dataType: 'json',
+                        headers: user.accessHeader(),
+                        success: function (data, status, xhr) {
+                            App.notify(that.model.get('name') + " - Tag update successfull.", "success");
+                            that.model.set(data);
+                        },
+                        error: function (xhr, status, errors) {
+                            App.notify(that.model.get('name') + " - Tag update failed.", "error");
+                            if (xhr.responseText) {
+                                that.model.set(jQuery.parseJSON(xhr.responseText));
+                            }
+                        }
+                    });
+                }
             },
             deleteItem: function (e) {
                 if (e) {

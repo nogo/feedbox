@@ -67,11 +67,13 @@ App.Module.Source = {
                 }
 
                 if (this.model) {
-                    var that = this;
+                    var that = this,
+                        user = App.Session.get('user');
                     Backbone.ajax({
-                        url: BASE_URL + '/update/' + this.model.id,
+                        url: BASE_URL + '/update/source/' + this.model.id,
                         cache: false,
                         dataType: 'json',
+                        headers: user.accessHeader(),
                         success: function (data, status, xhr) {
                             App.notify(that.model.get('name') + " - Source update successfull.", "success");
                             that.model.set(data);
@@ -339,13 +341,15 @@ App.router.route('sources/:id/edit', function(id) {
 });
 
 App.router.route('sources/update', function() {
-    var sources = App.Session.get('source-collection');
+    var sources = App.Session.get('source-collection'),
+        user = App.Session.get('user');
 
     App.notify("Update started.", "success");
     Backbone.ajax({
         url: BASE_URL + '/update',
         cache: false,
         dataType: 'json',
+        headers: user.accessHeader(),
         success: function(models, textStatus, jqXHR) {
             sources.set(models);
             App.notify("Update successfull.", "success");
@@ -358,12 +362,14 @@ App.router.route('sources/update', function() {
 
 App.router.route('sources/:id/update', function(id) {
     var sources = App.Session.get('source-collection'),
-        model = sources.get(id);
+        model = sources.get(id),
+        user = App.Session.get('user');
 
     if (model) {
         Backbone.ajax({
             url: BASE_URL + '/update/' + model.id,
             dataType: 'json',
+            headers: user.accessHeader(),
             success: function(modelData, textStatus, jqXHR) {
                 model.set(modelData);
                 App.notify(model.get('name') + " - Source update successfull.", "success");

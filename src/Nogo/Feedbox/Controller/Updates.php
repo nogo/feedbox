@@ -98,7 +98,7 @@ class Updates extends AbstractController
                 $this->renderJson($this->sourceApi->serializeData($source), $status);
                 break;
             case 'tag':
-                $tag = $this->tagRepository->find($source['tag_id']);
+                $tag = $this->tagRepository->find($id);
 
                 if (empty($tag)) {
                     $this->render('Not found', 404);

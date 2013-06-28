@@ -28,6 +28,13 @@ var App = {
                     data.loggedIn = (data.user && data.token);
                     this.set(data);
                 },
+                accessHeader: function() {
+                    return {
+                        'AUTH_USER': this.get('user'),
+                        'AUTH_CLIENT': this.get('client'),
+                        'AUTH_TOKEN': this.get('token')
+                    };
+                },
                 signin: function(user, password) {
                     var that = this;
 
@@ -64,11 +71,7 @@ var App = {
                             user: this.get('user'),
                             client: this.get('client')
                         },
-                        headers: {
-                            'AUTH_USER': this.get('user'),
-                            'AUTH_CLIENT': this.get('client'),
-                            'AUTH_TOKEN': this.get('token')
-                        },
+                        headers: this.accessHeader(),
                         success: function(data, textStatus, jqXHR) {
                             localStorage.removeItem('user');
                             localStorage.removeItem('token');
