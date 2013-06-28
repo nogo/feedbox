@@ -70,7 +70,11 @@
         <a class="menu-item menu-item-tag-<%- model.id %>" href="#tag/<%- model.id %>">
             <span class="tag-name"><%- model.get('name') %></span>
             <span class="tag-unread" style="background: <%- model.get('color') %>"><%- model.get('unread') %></span>
-            <button class="btn btn-mini toggable tag-toggle" data-toggle="#tag-sources-<%- model.id %>"><i class="icon-plus"></i></button>
+            <% if (model.get('folded')) { %>
+            <button class="btn btn-mini toggable tag-toggle" data-toggle="#tag-sources-<%- model.id %>"><i class="icon-chevron-down"></i></button>
+            <% } else { %>
+            <button class="btn btn-mini toggable tag-toggle" data-toggle="#tag-sources-<%- model.id %>"><i class="icon-chevron-up"></i></button>
+            <% } %>
         </a>
 
     </script>
@@ -234,14 +238,17 @@
     <script type="text/template" id="tpl-setting-tag">
         <td class="editable editable-input" data-editor-model-key="name" contenteditable="true"><%- model.get('name') %></td>
         <td class="editable editable-input" data-editor-model-key="color" contenteditable="true"><%- model.get('color') %></td>
-        <td><button class="btn delete"><i class="icon-trash"></i></button></td>
+        <td>
+            <button class="btn update"><i class="icon-refresh"></i></button>
+            <button class="btn delete"><i class="icon-trash"></i></button>
+        </td>
     </script>
 
     <script type="text/template" id="tpl-settings">
         <ul class="nav nav-pills well well-small">
             <li class="active"><a href="#settings/view">View</a></li>
-            <li><a href="#settings/tags">Tags</a></li>
             <li><a href="#settings/sources">Sources</a></li>
+            <li><a href="#settings/tags">Tags</a></li>
         </ul>
 
         <div class="tab-content">
