@@ -2,6 +2,7 @@
 namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
+use Nogo\Feedbox\Api\Setting as SettingApi;
 use Nogo\Feedbox\Repository\Repository;
 use Nogo\Feedbox\Repository\Setting as SettingRepository;
 
@@ -17,30 +18,9 @@ class Settings extends AbstractRestController
     protected $repository;
 
     /**
-     * @var array
+     * @var SettingApi
      */
-    protected $fields = [
-        'id' => [
-            'read' => true,
-            'write' => false
-        ],
-        'key' => [
-            'read' => true,
-            'write' => true
-        ],
-        'value' => [
-            'read' => true,
-            'write' => true
-        ],
-        'created_at' => [
-            'read' => true,
-            'write' => false
-        ],
-        'updated_at' => [
-            'read' => true,
-            'write' => false
-        ]
-    ];
+    protected $apiDefinition;
 
     public function enable()
     {
@@ -69,8 +49,16 @@ class Settings extends AbstractRestController
         return $this->repository;
     }
 
+    /**
+     * Api definition
+     *
+     * @return SettingApi
+     */
     public function getApiDefinition()
     {
-        return $this->fields;
+        if ($this->apiDefinition == null) {
+            $this->apiDefinition = new SettingApi();
+        }
+        return $this->apiDefinition;
     }
 }

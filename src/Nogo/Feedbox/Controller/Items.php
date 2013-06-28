@@ -2,6 +2,7 @@
 namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
+use Nogo\Feedbox\Api\Item as ItemApi;
 use Nogo\Feedbox\Repository\Item as ItemRepository;
 use Nogo\Feedbox\Repository\Repository;
 
@@ -15,55 +16,12 @@ class Items extends AbstractRestController
      * @var ItemRepository
      */
     protected $repository;
+
     /**
-     * @var array
+     * @var ItemApi
      */
-    protected $fields = [
-        'id' => [
-            'read' => true,
-            'write' => false
-        ],
-        'source_id' => [
-            'read' => true,
-            'write' => false
-        ],
-        'read' => [
-            'read' => true,
-            'write' => true
-        ],
-        'starred' => [
-            'read' => true,
-            'write' => true
-        ],
-        'title' => [
-            'read' => true,
-            'write' => false
-        ],
-        'pubdate' => [
-            'read' => true,
-            'write' => false
-        ],
-        'content' => [
-            'read' => true,
-            'write' => false
-        ],
-        'uid' => [
-            'read' => true,
-            'write' => false
-        ],
-        'uri' => [
-            'read' => true,
-            'write' => false
-        ],
-        'created_at' => [
-            'read' => true,
-            'write' => false
-        ],
-        'updated_at' => [
-            'read' => true,
-            'write' => false
-        ]
-    ];
+    protected $apiDefinition;
+
     protected $allowed_params = ['mode', 'page', 'limit', 'sortby', 'source', 'tag', 'search'];
 
     public function enable()
@@ -75,29 +33,6 @@ class Items extends AbstractRestController
         $this->app->delete('/items/:id', array($this, 'deleteAction'))->conditions(['id' => '\d+']);
 
         $this->app->put('/read', array($this, 'readAction'));
-    }
-
-    public function getApiDefinition()
-    {
-        return $this->fields;
-    }
-
-    public function listAction()
-    {
-        $params = $this->getParameter($this->allowed_params);
-
-        $result = $this->getRepository()->fetchAllWithFilter($params, true);
-        $this->app->response()->header('X-Items-Total', $result[0]['count(*)']);
-        $result = $this->getRepository()->fetchAllWithFilter($params);
-
-        $readable = $this->readableFields();
-
-        $output = [];
-        foreach ($result as $data) {
-            $output[] = $this->serializeData($data, $readable);
-        }
-
-        $this->renderJson($output);
     }
 
     /**
@@ -116,6 +51,37 @@ class Items extends AbstractRestController
             $this->repository = new ItemRepository($connection);
         }
         return $this->repository;
+    }
+
+    /**
+     * Api definition
+     *
+     * @return ItemApi
+     */
+    public function getApiDefinition()
+    {
+        if ($this->apiDefinition == null) {
+            $this->apiDefinition = new ItemApi();
+        }
+        return $this->apiDefinition;
+    }
+
+    public function listAction()
+    {
+        $params = $this->getParameter($this->allowed_params);
+
+        $result = $this->getRepository()->findAllFiltered($params, true);
+        $this->app->response()->header('X-Items-Total', $result[0]['count(*)']);
+        $result = $this->getRepository()->findAllFiltered($params);
+
+        $readable = $this->getApiDefinition()->readableFields();
+
+        $output = [];
+        foreach ($result as $data) {
+            $output[] = $this->getApiDefinition()->serializeData($data, $readable);
+        }
+
+        $this->renderJson($output);
     }
 
     public function readAction()
@@ -137,7 +103,7 @@ class Items extends AbstractRestController
         $updated_items = array();
         foreach ($request_data as $id) {
             $id = intval($id);
-            $item = $this->getRepository()->fetchOneById($id);
+            $item = $this->getRepository()->find($id);
             if ($item !== false) {
                 $item['read'] = $dt;
                 $item['updated_at'] = $dt;
@@ -146,6 +112,12 @@ class Items extends AbstractRestController
             }
         }
 
-        $this->renderJson($updated_items);
+        $readable = $this->getApiDefinition()->readableFields();
+        $output = [];
+        foreach ($updated_items as $data) {
+            $output[] = $this->getApiDefinition()->serializeData($data, $readable);
+        }
+
+        $this->renderJson($output);
     }
 }

@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "109c8557fbf830bd54be406d1a23e058",
+    "hash": "2b25fc02c4b8e6e5ff08469526daf345",
     "packages": [
         {
             "name": "aura/installer-default",
@@ -109,6 +109,47 @@
                 "sqlite"
             ],
             "time": "2013-05-09 00:00:00"
+        },
+        {
+            "name": "hampel/json",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://bitbucket.org/hampel/json.git",
+                "reference": "0.1.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://bitbucket.org/hampel/json/get/0.1.1.zip",
+                "reference": "0.1.1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Hampel\\Json": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Simon Hampel",
+                    "email": "simon@hampelgroup.com"
+                }
+            ],
+            "description": "Wrapper for PHP json functions",
+            "homepage": "https://bitbucket.org/hampel/json",
+            "keywords": [
+                "json",
+                "php"
+            ],
+            "time": "2013-06-14 02:44:24"
         },
         {
             "name": "htmlawed/htmlawed",
@@ -874,7 +915,8 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "htmlawed/htmlawed": 20
+        "htmlawed/htmlawed": 20,
+        "hampel/json": 20
     },
     "platform": {
         "php": ">=5.4.0"

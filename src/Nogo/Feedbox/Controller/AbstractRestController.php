@@ -2,6 +2,9 @@
 namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
+use Hampel\Json\Json;
+use Hampel\Json\JsonException;
+use Nogo\Feedbox\Api\AbstractApi;
 use Nogo\Feedbox\Repository\Repository;
 
 /**
@@ -12,16 +15,6 @@ use Nogo\Feedbox\Repository\Repository;
 abstract class AbstractRestController extends AbstractController
 {
     /**
-     * @var array
-     */
-    private $readable = array();
-
-    /**
-     * @var array
-     */
-    private $writable = array();
-
-    /**
      * Get Repository
      *
      * @param AbstractConnection $connection
@@ -30,9 +23,10 @@ abstract class AbstractRestController extends AbstractController
     abstract public function getRepository(AbstractConnection $connection = null);
 
     /**
-     * Api definition
+     * Get Repository
      *
-     * @return array
+     * @param AbstractConnection $connection
+     * @return AbstractApi
      */
     abstract public function getApiDefinition();
 
@@ -41,12 +35,11 @@ abstract class AbstractRestController extends AbstractController
      */
     public function listAction()
     {
-        $result = $this->getRepository()->fetchAll();
+        $result = $this->getRepository()->findAll();
 
-        $readable = $this->readableFields();
         $output = [];
-        foreach($result as $data) {
-            $output[] = $this->serializeData($data, $readable);
+        foreach ($result as $data) {
+            $output[] = $this->getApiDefinition()->serializeData($data);
         }
 
         $this->renderJson($output);
@@ -59,14 +52,14 @@ abstract class AbstractRestController extends AbstractController
      */
     public function getAction($id)
     {
-        $result = $this->getRepository()->fetchOneById($id);
+        $result = $this->getRepository()->find($id);
 
         if ($result === false) {
             $this->render('Not found', 404);
             return;
         }
 
-        $output = $this->serializeData($result, $this->readableFields());
+        $output = $this->getApiDefinition()->serializeData($result);
         $this->renderJson($output);
     }
 
@@ -75,23 +68,21 @@ abstract class AbstractRestController extends AbstractController
      */
     public function postAction()
     {
-        $json = trim($this->app->request()->getBody());
-        if (empty($json)) {
+        $request_data = $this->jsonRequest();
+        if (empty($request_data)) {
             $this->render('Data not valid', 400);
             return;
         }
 
-        $request_data = json_decode($json, true);
-
-        $entity = $this->deserializeData($request_data, $this->writableFields());
+        $entity = $this->getApiDefinition()->deserializeData($request_data);
 
         if (!empty($entity)) {
             $entity['created_at'] = date('Y-m-d H:i:s');
             $entity['updated_at'] = $entity['created_at'];
             $entity['id'] = $this->getRepository()->persist($entity);
 
-            $result = $this->getRepository()->fetchOneById($entity['id']);
-            $output = $this->serializeData($result, $this->readableFields());
+            $result = $this->getRepository()->find($entity['id']);
+            $output = $this->getApiDefinition()->serializeData($result);
             $this->renderJson($output);
         } else {
             $this->render('Data not valid', 400);
@@ -105,34 +96,31 @@ abstract class AbstractRestController extends AbstractController
      */
     public function putAction($id)
     {
-        $result = $this->getRepository()->fetchOneById($id);
+        $result = $this->getRepository()->find($id);
 
         if ($result === false) {
             $this->render('Not found', 404);
             return;
         }
 
-        $json = trim($this->app->request()->getBody());
-        if (empty($json)) {
+        $request_data = $this->jsonRequest();
+        if (empty($request_data)) {
             $this->render('Data not valid', 400);
             return;
         }
 
-        $request_data = json_decode($json, true);
-
-        $writable = $this->writableFields();
-        $entity = $this->deserializeData($request_data, $writable);
+        $entity = $this->getApiDefinition()->deserializeData($request_data);
 
         if (!empty($entity)) {
             $entity['id'] = $result['id'];
             $entity['updated_at'] = date('Y-m-d H:i:s');
             $this->getRepository()->persist($entity);
 
-            // fetch entity
-            $result = $this->getRepository()->fetchOneById($id);
+            // find entity
+            $result = $this->getRepository()->find($id);
         }
 
-        $output = $this->serializeData($result, $this->readableFields());
+        $output = $this->getApiDefinition()->serializeData($result);
         $this->renderJson($output);
     }
 
@@ -151,95 +139,16 @@ abstract class AbstractRestController extends AbstractController
         }
     }
 
-    /**
-     * Array of readable fields defined by api
-     * @return array
-     */
-    protected function readableFields()
+    protected function jsonRequest()
     {
-        if (empty($this->readable)) {
-            $api = $this->getApiDefinition();
-            $this->readable = [];
-            foreach($api as $key => $param) {
-                if (isset($param['read']) && $param['read']) {
-                    $name = $key;
-                    if (array_key_exists('name', $param)) {
-                        if (!empty($param['name'])) {
-                            $name = $param['name'];
-                        }
-                    }
-                    $this->readable[$key] = $name;
-                }
-            }
+        $input = null;
+
+        try {
+            $input = Json::decode(trim($this->app->request()->getBody()), true);
+        } catch (JsonException $ex) {
+            $input = null;
         }
 
-        return $this->readable;
-    }
-
-    /**
-     * Array of writable fields defined by api
-     * @return array
-     */
-    protected function writableFields()
-    {
-        if (empty($this->writable)) {
-            $api = $this->getApiDefinition();
-            $this->writable = [];
-            foreach($api as $key => $param) {
-                if (isset($param['write']) && $param['write']) {
-                    $name = $key;
-                    if (array_key_exists('name', $param)) {
-                        if (!empty($param['name'])) {
-                            $name = $param['name'];
-                        }
-                    }
-                    $this->writable[$key] = $name;
-                }
-            }
-        }
-
-        return $this->writable;
-    }
-
-    /**
-     * Deserialize data array with api definition
-     *
-     * @param array $data [ name => value ]
-     * @param array $api [ key => name ]
-     * @param array $result
-     * @return array [ key => value ]
-     */
-    protected function deserializeData(array $data, array $api, array $result = [])
-    {
-        foreach ($api as $key => $name) {
-            if (array_key_exists($name, $data)) {
-                if (array_key_exists($key, $result)) {
-                    if ($data[$name] != $result[$key]) {
-                        $result[$key] = $data[$name];
-                    }
-                } else {
-                    $result[$key] = $data[$name];
-                }
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Serialize data array with api definition
-     *
-     * @param array $data [ key => value ]
-     * @param array $api [ key => name ]
-     * @param array $result
-     * @return array [ name => value ]
-     */
-    protected function serializeData(array $data, array $api, array $result = [])
-    {
-        foreach ($api as $key => $name) {
-            if (array_key_exists($key, $data)) {
-               $result[$name] = $data[$key];
-            }
-        }
-        return $result;
+        return $input;
     }
 }

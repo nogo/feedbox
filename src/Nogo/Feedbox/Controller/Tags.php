@@ -2,6 +2,7 @@
 namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
+use Nogo\Feedbox\Api\Tag as TagApi;
 use Nogo\Feedbox\Repository\Repository;
 use Nogo\Feedbox\Repository\Tag as TagRepository;
 
@@ -17,38 +18,11 @@ class Tags extends AbstractRestController
     protected $repository;
 
     /**
-     * @var array
+     * @var TagApi
      */
-    protected $fields = [
-        'id' => [
-            'read' => true,
-            'write' => false
-        ],
-        'name' => [
-            'read' => true,
-            'write' => true
-        ],
-        'color' => [
-            'read' => true,
-            'write' => true
-        ],
-        'sources' => [
-            'read' => true,
-            'write' => false
-        ],
-        'unread' => [
-            'read' => true,
-            'write' => false
-        ],
-        'created_at' => [
-            'read' => true,
-            'write' => false
-        ],
-        'updated_at' => [
-            'read' => true,
-            'write' => false
-        ]
-    ];
+    protected $apiDefinition;
+
+
 
     public function enable()
     {
@@ -77,8 +51,16 @@ class Tags extends AbstractRestController
         return $this->repository;
     }
 
+    /**
+     * Api definition
+     *
+     * @return TagApi
+     */
     public function getApiDefinition()
     {
-        return $this->fields;
+        if ($this->apiDefinition == null) {
+            $this->apiDefinition = new TagApi();
+        }
+        return $this->apiDefinition;
     }
 }

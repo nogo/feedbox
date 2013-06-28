@@ -3,6 +3,8 @@ namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
 use Slim\Slim;
+use Hampel\Json\Json;
+use Hampel\Json\JsonException;
 
 /**
  * Class AbstractController
@@ -54,17 +56,6 @@ abstract class AbstractController
     }
 
     /**
-     * Render array data as json with json_decode
-     *
-     * @param array $data
-     */
-    protected function renderJson(array $data, $status = 200)
-    {
-        $json = json_encode($data);
-        $this->render($json, $status);
-    }
-
-    /**
      * Render content and status
      *
      * @param $body
@@ -74,5 +65,20 @@ abstract class AbstractController
     {
         $this->app->response()->status($status);
         $this->app->response()->body($body);
+    }
+
+    /**
+     * Render array data as json with json_decode
+     *
+     * @param array $data
+     */
+    protected function renderJson(array $data, $status = 200)
+    {
+        try {
+            $json = Json::encode($data);
+            $this->render($json, $status);
+        } catch (JsonException $ex) {
+            $this->render('Data not valid', 400);
+        }
     }
 }
