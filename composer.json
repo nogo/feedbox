@@ -20,7 +20,8 @@
         "twig/twig": "1.13.*",
         "zendframework/zend-feed": "2.2.*",
         "zendframework/zend-servicemanager": "2.2.*",
-        "htmlawed/htmlawed": "dev-master"
+        "htmlawed/htmlawed": "dev-master",
+        "hampel/json": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"

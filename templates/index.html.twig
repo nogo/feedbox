@@ -1,5 +1,9 @@
 {% extends "base.html.twig" %}
 
+{% block htmlheader %}
+<html lang="en" manifest="cache.manifest">
+{% endblock %}
+
 {% block javascript %}
     <script type="text/javascript">
         var BASE_URL = 'api.php';

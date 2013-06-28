@@ -22,3 +22,4 @@ Feed reader inspired by Google Reader and Selfoss.
 * Selfoss: http://selfoss.aditu.de/
 
 * Box-Graphics: http://www.graphicsfuel.com/2012/01/cardboard-box-icon-psd/
+* RSS Icon: http://www.iconfinder.com/icondetails/60845/128/feed_orange_rss_social_icon
