@@ -39,6 +39,7 @@ class Access extends AbstractRepository
     {
         return $entity;
     }
+
     /**
      * Find one entity by name and value.
      *
@@ -56,12 +57,24 @@ class Access extends AbstractRepository
             ->from($this->tableName())
             ->where('user = :user AND client = :client');
 
-        $result = $this->connection->fetchOne($select, [ 'user' => $user, 'client' => $client ]);
+        $result = $this->connection->fetchOne($select, ['user' => $user, 'client' => $client]);
 
         if (!empty($result)) {
             $result = $this->withRelations($result);
         }
 
         return $result;
+    }
+
+    public function removeUserClient($user, $client)
+    {
+        /**
+         * @var $select \Aura\Sql\Query\Delete
+         */
+        $delete = $this->connection->newDelete();
+        $delete->from($this->tableName())
+            ->where('user = :user AND client = :client');
+
+        return $this->connection->query($delete, ['user' => $user, 'client' => $client]);
     }
 }

@@ -56,6 +56,23 @@ abstract class AbstractController
     }
 
     /**
+     * Decode json data from request
+     * @return mixed|null
+     */
+    protected function jsonRequest()
+    {
+        $input = null;
+
+        try {
+            $input = Json::decode(trim($this->app->request()->getBody()), true);
+        } catch (JsonException $ex) {
+            $input = null;
+        }
+
+        return $input;
+    }
+
+    /**
      * Render content and status
      *
      * @param $body

@@ -13,16 +13,6 @@ Twig::$twigOptions = array(
 );
 $app->view(new Twig());
 
-if ($app->config('login.enabled')) {
-    $app->add(
-        new \Nogo\Feedbox\Middleware\HttpBasicAuth(
-            $app->config('login.credentials'),
-            $app->config('login.realm'),
-            $app->config('login.algorithm')
-        )
-    );
-}
-
 $app->get('/',
     function () use ($app) {
         if (!$app->config('installed')) {

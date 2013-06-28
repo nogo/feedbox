@@ -138,17 +138,4 @@ abstract class AbstractRestController extends AbstractController
             $this->render('Item deleted');
         }
     }
-
-    protected function jsonRequest()
-    {
-        $input = null;
-
-        try {
-            $input = Json::decode(trim($this->app->request()->getBody()), true);
-        } catch (JsonException $ex) {
-            $input = null;
-        }
-
-        return $input;
-    }
 }

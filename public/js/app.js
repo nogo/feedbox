@@ -1,8 +1,140 @@
 "use strict";
 
 var App = {
-    Module: {},
-    Views: {},
+    Module: {
+        User: {
+            Model: Backbone.Model.extend({
+                url: BASE_URL + '/login',
+                defaults: {
+                    user: null,
+                    client: null,
+                    token: null,
+                    loggedIn: false
+                },
+                initialize: function () {
+                    var client = localStorage['client'],
+                        data = {
+                            user: localStorage['user'],
+                            token: localStorage['token']
+                        };
+
+                    if (client) {
+                        data.client = client;
+                    } else {
+                        data.client = Math.uuid();
+                        localStorage['client'] = data.client;
+                    }
+
+                    data.loggedIn = (data.user && data.token);
+                    this.set(data);
+                },
+                signin: function(user, password) {
+                    var that = this;
+
+                    Backbone.$.ajax({
+                        url: BASE_URL + '/login',
+                        dataType: 'json',
+                        headers: {
+                            'AUTH_USER': user,
+                            'AUTH_PASS': password,
+                            'AUTH_CLIENT': this.get('client')
+                        },
+                        success: function(data, textStatus, jqXHR) {
+                            var token = jqXHR.getResponseHeader('NEXT_AUTH_TOKEN');
+
+                            if (token) {
+                                that.set({
+                                    user: user,
+                                    token: token,
+                                    loggedIn: true
+                                });
+                                localStorage['user'] = user;
+                                localStorage['token'] = token;
+                            }
+                        }
+                    });
+                },
+                signout: function() {
+                    var that = this;
+
+                    Backbone.$.ajax({
+                        url: BASE_URL + '/logout',
+                        dataType: 'json',
+                        data: {
+                            user: this.get('user'),
+                            client: this.get('client')
+                        },
+                        headers: {
+                            'AUTH_USER': this.get('user'),
+                            'AUTH_CLIENT': this.get('client'),
+                            'AUTH_TOKEN': this.get('token')
+                        },
+                        success: function(data, textStatus, jqXHR) {
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('token');
+                            that.set({ user: null, token: null, loggedIn: false });
+                        }
+                    });
+                }
+            })
+        }
+    },
+    Views: {
+        Main: Backbone.View.extend({
+            el: '#application',
+            events: {
+                'submit #login-form': 'login'
+            },
+            options: {
+                template: '#tpl-application',
+                templateLogin: '#tpl-login'
+            },
+            initialize: function() {
+                if (this.model) {
+                    this.model.on('change:loggedIn', this.render, this);
+                }
+            },
+            render: function() {
+                var loggedIn = this.model && this.model.get('loggedIn'),
+                    html = '';
+
+                if (loggedIn) {
+                    html = App.render(this.options.template);
+                } else {
+                    html = App.render(this.options.templateLogin);
+                    Backbone.history.stop();
+                }
+
+                if (html) {
+                    this.$el.html(html);
+                    if (loggedIn) {
+                        var hooks = App.Session.get('hooks');
+                        if (hooks) {
+                            hooks.call('after-login');
+                            Backbone.history.start();
+                        }
+                    }
+                }
+
+                return this;
+            },
+            remove: function() {
+                this.undelegateEvents();
+                return this;
+            },
+            login: function(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                var data = App.Module.Form.Serialize(this.$(e.currentTarget)),
+                    user = App.Session.get('user');
+
+                user.signin(data.username, data.password);
+            }
+        })
+    },
     Session: function () {
         var store = {};
 

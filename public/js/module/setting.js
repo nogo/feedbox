@@ -109,9 +109,18 @@ App.Module.Setting = {
         })
     },
     initialize: function (App) {
-        var settings = new App.Module.Setting.Collection();
-        settings.fetch();
+        var settings = new App.Module.Setting.Collection(),
+            hooks = App.Session.get('hooks');
+
         App.Session.set('setting-collection', settings);
+        if (hooks) {
+            hooks.add({
+                scope: 'after-login',
+                callback: function() {
+                    settings.fetch();
+                }
+            });
+        }
     }
 };
 

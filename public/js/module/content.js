@@ -8,7 +8,8 @@ App.Module.Content = {
                 'submit #search': 'search',
                 'click .toggable': 'toggable',
                 'click .mark-as-read': 'markAsRead',
-                'click .reload': 'reload'
+                'click .reload': 'reload',
+                'click .logout': 'logout'
             },
             render: function() {
                 return this;
@@ -57,7 +58,16 @@ App.Module.Content = {
                     value = _.escape(value.replace(/\s+/g, '+'));
                     App.router.navigate('search/' + value, {trigger: true});
                 }
+            },
+            logout: function(e) {
+                if (e) {
+                    e.preventDefault();
+                }
 
+                var user = App.Session.get('user');
+                if (user) {
+                    user.signout();
+                }
             }
         }),
         Footer: Backbone.View.extend({
@@ -111,18 +121,25 @@ App.Module.Content = {
         })
     },
     initialize: function(App) {
-        var header = new this.Views.Header({
-            collection: App.Session.get('item-collection')
-        });
-        header.render();
-        App.Session.set('header-view', header);
+        var hooks = App.Session.get('hooks');
+        if (hooks) {
+            hooks.add({
+                scope: 'after-login',
+                callback: function() {
+                    var header = new App.Module.Content.Views.Header({
+                        collection: App.Session.get('item-collection')
+                    });
+                    header.render();
+                    App.Session.set('header-view', header);
 
-        var footer = new this.Views.Footer({
-            collection: App.Session.get('item-collection')
-        });
-        footer.render();
-        App.Session.set('footer-view', footer);
-
+                    var footer = new App.Module.Content.Views.Footer({
+                        collection: App.Session.get('item-collection')
+                    });
+                    footer.render();
+                    App.Session.set('footer-view', footer);
+                }
+            });
+        }
     }
 };
 

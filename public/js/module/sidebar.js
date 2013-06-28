@@ -57,20 +57,28 @@ App.Module.Sidebar = {
         })
     },
     initialize: function(App) {
-        this.tags = App.Session.get('tag-collection');
-        this.sources = App.Session.get('source-collection');
+        var hooks = App.Session.get('hooks');
+        if (hooks) {
+            hooks.add({
+                scope: 'after-login',
+                callback: function() {
+                    var tags = App.Session.get('tag-collection'),
+                        sources = App.Session.get('source-collection');
 
-        if (this.tags) {
-            this.tags.fetch({ async: false });
+                    if (tags) {
+                        tags.fetch({ async: false });
+                    }
+
+                    if (sources) {
+                        sources.fetch({ async: false });
+                    }
+
+                    var main = new App.Module.Sidebar.Views.Main();
+                    main.render();
+                    App.Session.set('sidebar', main);
+                }
+            })
         }
-
-        if (this.sources) {
-            this.sources.fetch({ async: false });
-        }
-
-        var main = new this.Views.Main();
-        main.render();
-        App.Session.set('sidebar', main);
     }
 };
 
