@@ -5,9 +5,18 @@ Feed reader inspired by Google Reader and Selfoss.
 ## Installation
 
 * Download and extract package (http://feedbox.de/dl/feedbox.zip)
+* Your DocumentRoot is the "public/" directory
+* Navigate index.php, the installer will do the rest
 
-* Check index.php, the installer will do the rest
+## Update
 
+* Do a backup of the whole installation
+
+* Download last package
+* Remove all beside "data/" directory
+* Extract package content into your directory
+* Run "install.php/migrate", this will updates your database
+* Go to index.php
 
 ## Credits
 
