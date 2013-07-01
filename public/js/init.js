@@ -1,46 +1,44 @@
 "use strict";
 
-Backbone.$.ajaxSetup({
-    statusCode: {
-        401: function() {
-            var user = App.Session.get('user');
-            if (user && user.get('loggedId')) {
-                user.signout();
-            }
-            //App.router.navigate('login', { trigger: true });
-        },
-        403: function() {
-            var user = App.Session.get('user');
-            if (user && user.get('loggedId')) {
-                user.signout();
-            }
-            //App.router.navigate('', { trigger: true });
-        }
-    }
-});
-
 (function(App, Backbone) {
+    App.initialize();
+
     var sync = Backbone.sync,
-        user = App.Session.get('user', function() {
-            return new App.Module.User.Model();
-        });
+        user = App.Session.get('user');
 
-    // send token every time
-    Backbone.sync = function(method, model, options) {
-        if (user && user.get('loggedIn')) {
-            options.headers = options.headers || {};
-            _.extend(options.headers, {
-                'AUTH_USER': user.get('user'),
-                'AUTH_CLIENT': user.get('client'),
-                'AUTH_TOKEN': user.get('token')
+    if (user) {
+        if (user.accessNeeded()) {
+            Backbone.$.ajaxSetup({
+                statusCode: {
+                    401: function() {
+                        var user = FeedBox.Session.get('user');
+                        if (user && user.get('loggedId')) {
+                            user.signout();
+                        }
+                    },
+                    403: function() {
+                        var user = FeedBox.Session.get('user');
+                        if (user && user.get('loggedId')) {
+                            user.signout();
+                        }
+                    }
+                }
             });
+
+            // send token every time
+            Backbone.sync = function(method, model, options) {
+                options.headers = options.headers || {};
+                if (user) {
+                    _.extend(options.headers, user.accessHeader());
+                }
+                return sync.call(model, method, model, options);
+            };
         }
-        return sync.call(model, method, model, options);
-    };
 
-    var appView = new App.Views.Main({
-        model: user
-    });
-    appView.render();
+        var appview = new App.Module.Main.Views.App({
+            model: user
+        });
+        appview.render();
+    }
 
-})(App, Backbone);
+})(FeedBox, Backbone);

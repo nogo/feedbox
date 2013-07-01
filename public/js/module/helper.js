@@ -1,17 +1,13 @@
 "use strict";
 
 /**
- * App.Views.ListItem
+ * FeedBox.Views.ListItem
  * @type {*}
  */
-App.Views.ListItem = Backbone.View.extend({
+FeedBox.Views.ListItem = Backbone.View.extend({
     render: function () {
         // grep template with jquery and generate template stub
-        var html = App.render(this.options.template, { model: this.model });
-        if (html) {
-            // fill model date into template and push it into element html
-            this.$el.html(html);
-
+        if (FeedBox.renderTemplate(this.$el, this.options.template, { model: this.model })) {
             // add element id with prefix
             this.$el.attr('id', this.elId());
         }
@@ -30,17 +26,17 @@ App.Views.ListItem = Backbone.View.extend({
 });
 
 /**
- * App.Views.List
+ * FeedBox.Views.List
  * @type {*}
  */
-App.Views.List = Backbone.View.extend({
+FeedBox.Views.List = Backbone.View.extend({
     options: {
         prefix: '',
         item: {
             attributes: {},
             tagName: 'div',
             template: '',
-            View: App.Views.ListItem
+            View: FeedBox.Views.ListItem
         },
         isEmpty: true
     },
@@ -118,8 +114,7 @@ App.Views.List = Backbone.View.extend({
         }
 
         if (this.options.isEmpty && this.options.emptyTemplate) {
-            var emptyTemplate = App.render(this.options.emptyTemplate);
-            this.$el.html(emptyTemplate());
+            FeedBox.renderTemplate(this.$el, this.options.emptyTemplate);
         }
         return this;
     },
@@ -166,7 +161,7 @@ App.Views.List = Backbone.View.extend({
     }
 });
 
-App.Module.Object = {
+FeedBox.Helper.Object = {
     'Set': function(obj, path, value) {
         if (_.isString(path)) {
             path = path.split('.');
@@ -218,7 +213,7 @@ App.Module.Object = {
 };
 
 
-App.Module.Form = {
+FeedBox.Helper.Form = {
     Bind: function($form, data, options) {
         options = _.extend({
             splitter: '-',
@@ -232,7 +227,7 @@ App.Module.Form = {
 
             if (name && !options.ignore[name]) {
                 var parts = name.split(options.splitter),
-                    value = App.Module.Object.Get(data, parts);
+                    value = FeedBox.Helper.Object.Get(data, parts);
 
                 switch (input.type) {
                     case 'checkbox':
@@ -299,7 +294,7 @@ App.Module.Form = {
                     }
                 }
 
-                App.Module.Object.Set(data, parts, val);
+                FeedBox.Helper.Object.Set(data, parts, val);
             }
         });
 

@@ -1,6 +1,6 @@
 "use strict";
 
-App.Module.Setting = {
+FeedBox.Module.Setting = new Nerve.Module({
     Model: Backbone.Model.extend({}),
     Views: {
         Main: Backbone.View.extend({
@@ -16,34 +16,30 @@ App.Module.Setting = {
                 }
 
                 this.isBinding = false;
-                this.tags = App.Session.get('tag-collection');
-                this.sources = App.Session.get('source-collection');
-                this.settings = App.Session.get('setting-collection');
+                this.tags = FeedBox.Session.get('tag-collection');
+                this.sources = FeedBox.Session.get('source-collection');
+                this.settings = FeedBox.Session.get('setting-collection');
             },
             render: function() {
-                var html = App.render(this.template, { model: this.model });
-                if (html) {
-                    // fill model date into template and push it into element html
-                    this.$el.html(html);
-                }
+                FeedBox.renderTemplate(this.$el, this.template, { model: this.model });
 
                 this.isBinding = true;
-                App.Module.Form.Bind(this.$el, this.settings.mapped(), {silent: true});
+                FeedBox.Helper.Form.Bind(this.$el, this.settings.mapped(), {silent: true});
                 this.isBinding = false;
 
-                var tagList = new App.Views.List({
+                var tagList = new FeedBox.Views.List({
                     prefix: 'tag-',
                     tagName: 'tbody',
                     collection: this.tags,
                     item: {
                         tagName: 'tr',
                         template: '#tpl-setting-tag',
-                        View: App.Module.Tag.Views.Item
+                        View: FeedBox.Module.Tag.Views.Item
                     }
                 });
                 this.$('#setting-tags').replaceWith(tagList.render().el);
 
-                var sourceList = new App.Views.List({
+                var sourceList = new FeedBox.Views.List({
                     prefix: 'source-',
                     collection: this.sources,
                     item: {
@@ -52,7 +48,7 @@ App.Module.Setting = {
                         },
                         tagName: 'div',
                         template: '#tpl-source',
-                        View: App.Module.Source.Views.Item
+                        View: FeedBox.Module.Source.Views.Item
                     }
                 });
                 this.$('#tab-setting-sources').html(sourceList.render().el);
@@ -88,10 +84,10 @@ App.Module.Setting = {
                     var options = {
                         wait: true,
                         success: function (model) {
-                            App.notify("Value has been saved", "success");
+                            FeedBox.notify("Value has been saved", "success");
                         },
                         error: function (model, response, scope) {
-                            App.notify(response.status + ": " + response.statusText, "error");
+                            FeedBox.notify(response.status + ": " + response.statusText, "error");
                         }
                     }
 
@@ -109,23 +105,22 @@ App.Module.Setting = {
         })
     },
     initialize: function (App) {
-        var settings = new App.Module.Setting.Collection(),
-            hooks = App.Session.get('hooks');
+        var settings = new App.Module.Setting.Collection();
 
         App.Session.set('setting-collection', settings);
-        if (hooks) {
-            hooks.add({
-                scope: 'after-login',
-                callback: function() {
-                    settings.fetch();
-                }
-            });
-        }
+        App.Hook.add({
+            scope: 'render-app-view',
+            weigth: -10,
+            callback: function() {
+                settings.fetch();
+            }
+        });
     }
-};
+});
 
-App.Module.Setting.Collection = Backbone.Collection.extend({
-    model: App.Module.Setting.Model,
+
+FeedBox.Module.Setting.Collection = Backbone.Collection.extend({
+    model: FeedBox.Module.Setting.Model,
     url: BASE_URL + '/settings',
     getByKey: function(key, default_value) {
         var value = default_value,
@@ -152,26 +147,24 @@ App.Module.Setting.Collection = Backbone.Collection.extend({
     }
 });
 
-App.Module.Setting.initialize(App);
-
 /* Routes */
 
-App.router.route('settings(/:name)', function (name) {
+FeedBox.Router.route('settings(/:name)', function (name) {
     name = name || 'view';
 
-    if (App.Session.get('content-view-name') === 'settings-view') {
-        var view = App.Session.get('content-view');
+    if (FeedBox.Session.get('content-view-name') === 'settings-view') {
+        var view = FeedBox.Session.get('content-view');
         view.activateTab(name);
     } else {
-        App.switchView('content-view', 'settings-' + name, function () {
-            return new App.Module.Setting.Views.Main({
+        FeedBox.switch('content-view', 'settings-' + name, function () {
+            return new FeedBox.Module.Setting.Views.Main({
                 el: '#content',
                 tab: name
             });
         });
 
-        App.Session.set('selected-menu-items', ['.menu-item-settings']);
-        App.selectMenuItem();
-        App.Session.get('footer-view').hide();
+        FeedBox.Session.set('selected-menu-items', ['.menu-item-settings']);
+        FeedBox.selectMenuItem();
+        FeedBox.Session.get('footer-view').hide();
     }
 });

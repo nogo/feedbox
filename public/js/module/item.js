@@ -1,12 +1,16 @@
 "use strict";
 
-App.Module.Item = {
+
+FeedBox.Module.Item = new Nerve.Module({
     Model: Backbone.Model.extend({
         defaults: {
             folded: true
         },
+        initialize: function() {
+            this.settings = FeedBox.Session.get('setting-collection');
+        },
         parse: function (response, options) {
-            var sources = App.Session.get('source-collection');
+            var sources = FeedBox.Session.get('source-collection');
             if (sources) {
                 if (response.source_id) {
                     response.source = sources.get(response.source_id);
@@ -15,7 +19,7 @@ App.Module.Item = {
             return response;
         },
         read: function(read) {
-            var sources = App.Session.get('source-collection'),
+            var sources = FeedBox.Session.get('source-collection'),
                 source = sources.get(this.get('source_id')),
                 unread = source.get('unread');
 
@@ -36,14 +40,14 @@ App.Module.Item = {
         timeHumanize: function () {
             var date = moment(this.get('pubdate'));
             if (date.isSame(moment(), 'day')) {
-                return date.format('HH:mm:ss');
+                return date.format(this.settings.getByKey('format.time', 'HH:mm:ss'));
             } else {
-                return date.format('YYYY-MM-DD HH:mm');
+                return date.format(this.settings.getByKey('format.datetime', 'YYYY-MM-DD HH:mm'));
             }
         }
     }),
     Views: {
-        Item: App.Views.ListItem.extend({
+        Item: FeedBox.Views.ListItem.extend({
             events: {
                 'click .foldable': 'showDetails',
                 'click .read': 'itemRead',
@@ -52,7 +56,7 @@ App.Module.Item = {
             },
             render: function () {
                 // Call parent contructor
-                App.Views.ListItem.prototype.render.call(this);
+                FeedBox.Views.ListItem.prototype.render.call(this);
 
                 if (this.model) {
                     var read = this.model.get('read');
@@ -70,11 +74,9 @@ App.Module.Item = {
                     }
 
                     if (this.model.get('source')) {
-                        if (this.model.get('source').get('tag')) {
-                            var color = this.model.get('source').get('tag').get('color');
-                            if (color) {
-                                this.$el.attr('style', 'border-left-color: ' + color);
-                            }
+                        var color = this.model.get('source').color();
+                        if (color) {
+                            this.$el.attr('style', 'border-left-color: ' + color);
                         }
                     }
                 }
@@ -140,9 +142,71 @@ App.Module.Item = {
     initialize: function (App) {
         App.Session.set('item-collection', new App.Module.Item.Collection());
     }
-};
+});
 
-App.Module.Item.Views.List = App.Views.List.extend({
+FeedBox.Module.Item.Collection = Backbone.Collection.extend({
+    model: FeedBox.Module.Item.Model,
+    url: BASE_URL + '/items',
+    total: function (total) {
+        if (total !== undefined) {
+            this.totalCount = total;
+        }
+
+        return this.totalCount || 0;
+    },
+    markItemRead: function (options) {
+        options = options || {};
+
+        var models = this.map(function (model) {
+                var read = model.get('read');
+                if (read === undefined || read === null) {
+                    return model.id;
+                }
+                return undefined;
+            }),
+            params = _.extend({
+                url: BASE_URL + '/read',
+                data: JSON.stringify(models),
+                dataType: 'json',
+                type: 'PUT'
+            }, options);
+
+        return Backbone.ajax(params);
+    },
+    fetchNext: function (options) {
+        options = options || {};
+
+        var data = FeedBox.Session.get('item-collection-data'),
+            params = _.extend({ data: data }, options);
+
+        if (options.reset) {
+            data.page = 1;
+        } else {
+            params.remove = false;
+            data.page += 1;
+        }
+
+        params.success = function (models, textStatus, jqXHR) {
+            FeedBox.Session.set('item-collection-data', data);
+            if (options.success) {
+                options.success(models, textStatus, jqXHR);
+            }
+        }
+
+        if (options.error) {
+            params.error = function (models, textStatus, jqXHR) {
+                options.error(models, textStatus, jqXHR);
+            }
+        }
+
+        return this.fetch(params);
+    },
+    endReached: function () {
+        return (this.length >= this.totalCount);
+    }
+});
+
+FeedBox.Module.Item.Views.List = FeedBox.Views.List.extend({
     el: '#content',
     options: {
         prefix: 'item-',
@@ -154,7 +218,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
             },
             tagName: 'article',
             template: '#tpl-item',
-            View: App.Module.Item.Views.Item
+            View: FeedBox.Module.Item.Views.Item
         }
     },
     events: {
@@ -162,7 +226,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
     },
     initialize: function () {
         // Call parent contructor
-        App.Views.List.prototype.initialize.call(this);
+        FeedBox.Views.List.prototype.initialize.call(this);
 
         if (this.collection) {
             this.collection.on('sync', this.retrieveItemCount, this);
@@ -170,7 +234,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
     },
     render: function () {
         // Call parent contructor
-        App.Views.List.prototype.render.call(this);
+        FeedBox.Views.List.prototype.render.call(this);
 
         this.isLoading = false;
 
@@ -178,7 +242,7 @@ App.Module.Item.Views.List = App.Views.List.extend({
     },
     remove: function () {
         // Call parent contructor
-        App.Views.List.prototype.remove.call(this);
+        FeedBox.Views.List.prototype.remove.call(this);
 
         if (this.collection) {
             this.collection.off('sync', this.retrieveItemCount, this);
@@ -220,67 +284,3 @@ App.Module.Item.Views.List = App.Views.List.extend({
         }
     }
 });
-
-App.Module.Item.Collection = Backbone.Collection.extend({
-    model: App.Module.Item.Model,
-    url: BASE_URL + '/items',
-    total: function (total) {
-        if (total !== undefined) {
-            this.totalCount = total;
-        }
-
-        return this.totalCount || 0;
-    },
-    markItemRead: function (options) {
-        options = options || {};
-
-        var models = this.map(function (model) {
-                var read = model.get('read');
-                if (read === undefined || read === null) {
-                    return model.id;
-                }
-                return undefined;
-            }),
-            params = _.extend({
-                url: BASE_URL + '/read',
-                data: JSON.stringify(models),
-                dataType: 'json',
-                type: 'PUT'
-            }, options);
-
-        return Backbone.ajax(params);
-    },
-    fetchNext: function (options) {
-        options = options || {};
-
-        var data = App.Session.get('item-collection-data'),
-            params = _.extend({ data: data }, options);
-
-        if (options.reset) {
-            data.page = 1;
-        } else {
-            params.remove = false;
-            data.page += 1;
-        }
-
-        params.success = function (models, textStatus, jqXHR) {
-            App.Session.set('item-collection-data', data);
-            if (options.success) {
-                options.success(models, textStatus, jqXHR);
-            }
-        }
-
-        if (options.error) {
-            params.error = function (models, textStatus, jqXHR) {
-                options.error(models, textStatus, jqXHR);
-            }
-        }
-
-        return this.fetch(params);
-    },
-    endReached: function () {
-        return (this.length >= this.totalCount);
-    }
-
-});
-App.Module.Item.initialize(App);

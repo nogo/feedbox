@@ -1,6 +1,6 @@
 "use strict";
 
-App.Module.Tag = {
+FeedBox.Module.Tag = new Nerve.Module({
     Model: Backbone.Model.extend({
         defaults: {
             folded: true,
@@ -8,10 +8,10 @@ App.Module.Tag = {
         },
         sources: function() {
             if (!this.sourceCollection) {
-                this.sourceCollection = new App.Module.Source.Collection();
+                this.sourceCollection = new FeedBox.Module.Source.Collection();
 
                 var ids = this.get('sources'),
-                    sources = App.Session.get('source-collection');
+                    sources = FeedBox.Session.get('source-collection');
                 if (ids && sources) {
                     for (var i=0; i<ids.length; i++) {
                         this.sourceCollection.add(sources.get(ids[i]));
@@ -22,7 +22,7 @@ App.Module.Tag = {
         }
     }),
     Views: {
-        Item: App.Views.ListItem.extend({
+        Item: FeedBox.Views.ListItem.extend({
             events: {
                 'click .update': 'updateItem',
                 'click .delete': 'deleteItem',
@@ -38,18 +38,19 @@ App.Module.Tag = {
 
                 if (this.model) {
                     var that = this,
-                        user = App.Session.get('user');
+                        user = FeedBox.Session.get('user');
+                    FeedBox.notify(that.model.get('name') + " - Tag start update.", "info");
                     Backbone.ajax({
                         url: BASE_URL + '/update/tag/' + this.model.id,
                         cache: false,
                         dataType: 'json',
                         headers: user.accessHeader(),
                         success: function (data, status, xhr) {
-                            App.notify(that.model.get('name') + " - Tag update successfull.", "success");
+                            FeedBox.notify(that.model.get('name') + " - Tag update successfull.", "success");
                             that.model.set(data);
                         },
                         error: function (xhr, status, errors) {
-                            App.notify(that.model.get('name') + " - Tag update failed.", "error");
+                            FeedBox.notify(that.model.get('name') + " - Tag update failed.", "error");
                             if (xhr.responseText) {
                                 that.model.set(jQuery.parseJSON(xhr.responseText));
                             }
@@ -65,7 +66,7 @@ App.Module.Tag = {
                 if (this.model) {
                     var sources =  this.model.sources();
                     if (sources) {
-                        var tagless = App.Session.get('tagless-source-collection');
+                        var tagless = FeedBox.Session.get('tagless-source-collection');
                         sources.each(function(model) {
                             model.save({ tag_id: null });
                             tagless.add(model);
@@ -120,15 +121,15 @@ App.Module.Tag = {
                     if (item.data('editorCancel')) {
                         item.removeData('editorCancel');
                         item.html(this.model.get(key));
-                        App.notify('Update canceled.', 'error');
+                        FeedBox.notify('Update canceled.', 'error');
                     } else {
                         data[key] = item.text();
                         this.model.save(data, {
                             success: function(model) {
-                                App.notify('Update successful.', 'success');
+                                FeedBox.notify('Update successful.', 'success');
                             },
                             error: function(model, response) {
-                                App.notify(response.status + ": " + response.statusText, "error");
+                                FeedBox.notify(response.status + ": " + response.statusText, "error");
                             }
                         });
 
@@ -137,15 +138,15 @@ App.Module.Tag = {
                 return this;
             }
         }),
-        SidebarItem: App.Views.ListItem.extend({
+        SidebarItem: FeedBox.Views.ListItem.extend({
             events: {
                 'click .toggable': 'toggleSource'
             },
             render: function() {
                 // Call parent contructor
-                App.Views.ListItem.prototype.render.call(this);
+                FeedBox.Views.ListItem.prototype.render.call(this);
 
-                var sourceList = new App.Views.List({
+                var sourceList = new FeedBox.Views.List({
                     prefix: 'source-',
                     tagName: 'ul',
                     collection: this.model.sources(),
@@ -155,7 +156,7 @@ App.Module.Tag = {
                     item: {
                         tagName: 'li',
                         template: '#tpl-sidebar-source-item',
-                        View: App.Views.ListItem
+                        View: FeedBox.Views.ListItem
                     }
                 });
                 this.$el.append(sourceList.render().el);
@@ -189,32 +190,30 @@ App.Module.Tag = {
     initialize: function(App) {
         App.Session.set('tag-collection', new App.Module.Tag.Collection());
     }
-};
+});
 
-App.Module.Tag.Collection = Backbone.Collection.extend({
-    model: App.Module.Tag.Model,
+FeedBox.Module.Tag.Collection = Backbone.Collection.extend({
+    model: FeedBox.Module.Tag.Model,
     url: BASE_URL + '/tags',
     comparator: function(model) {
         return model.get('name').toLowerCase();
     }
 });
 
-App.Module.Tag.initialize(App);
-
 /* Routes */
 
-App.router.route('tag/:id', function(id) {
-    var items = App.Session.get('item-collection'),
-        settings = App.Session.get('setting-collection');
+FeedBox.Router.route('tag/:id', function(id) {
+    var items = FeedBox.Session.get('item-collection'),
+        settings = FeedBox.Session.get('setting-collection');
 
-    App.switchView('content-view', 'item-list', function() {
-        return new App.Module.Item.Views.List({
+    FeedBox.switch('content-view', 'item-list', function() {
+        return new FeedBox.Module.Item.Views.List({
             collection: items
         });
     });
 
     if (items) {
-        var data = App.Session.get('item-collection-data', function() {
+        var data = FeedBox.Session.get('item-collection-data', function() {
                 return {
                     mode: 'unread',
                     page: 1,
@@ -231,12 +230,12 @@ App.router.route('tag/:id', function(id) {
             delete data.source;
         }
 
-        App.Session.set('item-collection-data', data);
+        FeedBox.Session.set('item-collection-data', data);
         items.fetch({
             reset: true,
             data: data
         });
-        App.Session.set('selected-menu-items', selectedMenuItem);
-        App.selectMenuItem();
+        FeedBox.Session.set('selected-menu-items', selectedMenuItem);
+        FeedBox.selectMenuItem();
     }
 });

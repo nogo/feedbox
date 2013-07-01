@@ -1,22 +1,32 @@
 "use strict";
 
-App.Module.Source = {
+FeedBox.Module.Source = new Nerve.Module({
     Model: Backbone.Model.extend({
         hasErrors: function () {
             return !_.isEmpty(this.get('errors'));
         },
         parse: function (response, options) {
-            var tags = App.Session.get('tag-collection');
+            var tags = FeedBox.Session.get('tag-collection');
             if (tags) {
                 if (response.tag_id) {
                     response.tag = tags.get(response.tag_id);
                 }
             }
             return response;
+        },
+        color: function() {
+            var color = undefined,
+                tag = this.get('tag');
+
+            if (tag) {
+                color = tag.get('color');
+            }
+
+            return color;
         }
     }),
     Views: {
-        Item: App.Views.ListItem.extend({
+        Item: FeedBox.Views.ListItem.extend({
             events: {
                 'click .activate': 'activateItem',
                 'click .update': 'updateItem',
@@ -24,7 +34,7 @@ App.Module.Source = {
             },
             render: function () {
                 // Call parent contructor
-                App.Views.ListItem.prototype.render.call(this);
+                FeedBox.Views.ListItem.prototype.render.call(this);
 
                 if (this.model) {
                     var errors = this.model.get('errors');
@@ -68,18 +78,19 @@ App.Module.Source = {
 
                 if (this.model) {
                     var that = this,
-                        user = App.Session.get('user');
+                        user = FeedBox.Session.get('user');
+                    FeedBox.notify(that.model.get('name') + " - Source start update.", "info");
                     Backbone.ajax({
                         url: BASE_URL + '/update/source/' + this.model.id,
                         cache: false,
                         dataType: 'json',
                         headers: user.accessHeader(),
                         success: function (data, status, xhr) {
-                            App.notify(that.model.get('name') + " - Source update successfull.", "success");
+                            FeedBox.notify(that.model.get('name') + " - Source update successfull.", "success");
                             that.model.set(data);
                         },
                         error: function (xhr, status, errors) {
-                            App.notify(that.model.get('name') + " - Source update failed.", "error");
+                            FeedBox.notify(that.model.get('name') + " - Source update failed.", "error");
                             if (xhr.responseText) {
                                 that.model.set(jQuery.parseJSON(xhr.responseText));
                             }
@@ -106,22 +117,17 @@ App.Module.Source = {
                 'submit': 'save'
             },
             initialize: function () {
-                this.tags = App.Session.get('tag-collection');
+                this.tags = FeedBox.Session.get('tag-collection');
                 this.tag = this.model.get('tag');
             },
             render: function () {
-                // grep template with jquery and generate template stub
-                var html = App.render(this.template, { model: this.model });
-                if (html) {
-                    // fill model date into template and push it into element html
-                    this.$el.html(html);
-                }
+                FeedBox.renderTemplate(this.$el, this.template, { model: this.model });
 
                 if (this.model && this.model.isNew()) {
                     this.$('legend').text('Add source')
                 }
 
-                App.Module.Form.Bind(this.$el, this.model.toJSON(), {silent: true});
+                FeedBox.Helper.Form.Bind(this.$el, this.model.toJSON(), {silent: true});
 
                 // render tags
                 var tagname = this.$('#source-tag');
@@ -146,7 +152,7 @@ App.Module.Source = {
 
                 if (this.model) {
                     var that = this,
-                        data = App.Module.Form.Serialize(this.$el)
+                        data = FeedBox.Helper.Form.Serialize(this.$el)
 
                     if (!_.isEmpty(data['tag_name'])) {
                         var tag = this.tags.findWhere({name: this.$('#source-tag').val()});
@@ -163,7 +169,7 @@ App.Module.Source = {
                     var options = {
                         wait: true,
                         success: function (model) {
-                            App.notify(model.get('name') + " - All data are saved properly.", "success");
+                            FeedBox.notify(model.get('name') + " - All data are saved properly.", "success");
                             var collection = App.Session.get('tagless-source-collection');
                             if (data['tag_id']) {
                                 model.get('tag').sources().add(model);
@@ -177,7 +183,7 @@ App.Module.Source = {
                         error: function (model, response, scope) {
                             $('.save i.icon').remove();
                             $('.cancel').removeAttr('disabled');
-                            App.notify(response.status + ": " + response.statusText, "error");
+                            FeedBox.notify(response.status + ": " + response.statusText, "error");
                         }
                     };
 
@@ -195,7 +201,7 @@ App.Module.Source = {
                     e.stopPropagation();
                 }
 
-                App.router.navigate('settings/sources', { trigger: true });
+                FeedBox.Router.navigate('settings/sources', { trigger: true });
             },
             addNewTag: function(e) {
                 if (e) {
@@ -212,10 +218,10 @@ App.Module.Source = {
                         this.tags.create({ name: tagname }, {
                             wait: true,
                             success: function (model) {
-                                App.notify("Tag created.", "success");
+                                FeedBox.notify("Tag created.", "success");
                             },
                             error: function (model, response, scope) {
-                                App.notify("Tag could not be created.", "error");
+                                FeedBox.notify("Tag could not be created.", "error");
                             }
                         });
                     }
@@ -226,9 +232,17 @@ App.Module.Source = {
     initialize: function (App) {
         App.Session.set('source-collection', new App.Module.Source.Collection());
     }
-};
+});
 
-App.Module.Source.Views.List = App.Views.List.extend({
+FeedBox.Module.Source.Collection = Backbone.Collection.extend({
+    model: FeedBox.Module.Source.Model,
+    url: BASE_URL + '/sources',
+    comparator: function (model) {
+        return model.get('name').toLowerCase();
+    }
+});
+
+FeedBox.Module.Source.Views.List = FeedBox.Views.List.extend({
     el: '#content',
     options: {
         prefix: 'source-',
@@ -240,42 +254,27 @@ App.Module.Source.Views.List = App.Views.List.extend({
             },
             tagName: 'div',
             template: '#tpl-source',
-            View: App.Module.Source.Views.Item
+            View: FeedBox.Module.Source.Views.Item
         }
-    },
-    render: function () {
-        // Call parent contructor
-        App.Views.List.prototype.render.call(this);
-
-        return this;
     }
 });
-
-App.Module.Source.Collection = Backbone.Collection.extend({
-    model: App.Module.Source.Model,
-    url: BASE_URL + '/sources',
-    comparator: function (model) {
-        return model.get('name').toLowerCase();
-    }
-});
-App.Module.Source.initialize(App);
 
 /* Routes */
 
-App.router.route('sources/:id', function(id) {
-    var items = App.Session.get('item-collection'),
-        settings = App.Session.get('setting-collection');
+FeedBox.Router.route('sources/:id', function(id) {
+    var items = FeedBox.Session.get('item-collection'),
+        settings = FeedBox.Session.get('setting-collection');
 
-    App.switchView('content-view', 'item-list', function() {
-        return new App.Module.Item.Views.List({
+    FeedBox.switch('content-view', 'item-list', function() {
+        return new FeedBox.Module.Item.Views.List({
             collection: items
         });
     });
 
     if (items) {
-        var data = App.Session.get('item-collection-data', function() {
+        var data = FeedBox.Session.get('item-collection-data', function() {
                 return {
-                    unread: true,
+                    mode: 'unread',
                     page: 1,
                     limit: settings.getByKey('view.unread.count', 50),
                     sortby: settings.getByKey('view.unread.sortby', 'newest')
@@ -283,13 +282,7 @@ App.router.route('sources/:id', function(id) {
             }),
             selectedMenuItem = ['.menu-item-source-' + id];
 
-        if (data.unread) {
-            selectedMenuItem.push('.menu-item-unread');
-        } else if (!data.unread) {
-            selectedMenuItem.push('.menu-item-read');
-        } else if (data.starred) {
-            selectedMenuItem.push('.menu-item-starred');
-        }
+        selectedMenuItem.push('.menu-item-' + data.mode);
 
         data.page = 1;
         data.source = id;
@@ -297,54 +290,54 @@ App.router.route('sources/:id', function(id) {
             delete data.tag;
         }
 
-        App.Session.set('item-collection-data', data);
+        FeedBox.Session.set('item-collection-data', data);
         items.fetch({
             reset: true,
             data: data
         });
-        App.Session.set('selected-menu-items', selectedMenuItem);
-        App.selectMenuItem();
+        FeedBox.Session.set('selected-menu-items', selectedMenuItem);
+        FeedBox.selectMenuItem();
     }
 });
 
-App.router.route('sources/add', function() {
-    var sources = App.Session.get('source-collection'),
-        model = new App.Module.Source.Model();
+FeedBox.Router.route('sources/add', function() {
+    var sources = FeedBox.Session.get('source-collection'),
+        model = new FeedBox.Module.Source.Model();
 
-    App.switchView('content-view', 'source-add', function() {
-        return new App.Module.Source.Views.Form({
+    FeedBox.switch('content-view', 'source-add', function() {
+        return new FeedBox.Module.Source.Views.Form({
             el: '#content',
             model: model,
             collection: sources
         });
     });
-    App.Session.get('footer-view').hide();
+    FeedBox.Session.get('footer-view').hide();
 });
 
-App.router.route('sources/:id/edit', function(id) {
-    var sources = App.Session.get('source-collection'),
+FeedBox.Router.route('sources/:id/edit', function(id) {
+    var sources = FeedBox.Session.get('source-collection'),
         model = sources.get(id);
 
     if (model) {
-        App.switchView('content-view', 'source-edit', function() {
-            return new App.Module.Source.Views.Form({
+        FeedBox.switch('content-view', 'source-edit', function() {
+            return new FeedBox.Module.Source.Views.Form({
                 el: '#content',
                 model: model,
                 collection: sources
             });
         });
-        App.Session.get('footer-view').hide();
+        FeedBox.Session.get('footer-view').hide();
     } else {
-        App.notify("Source not found", "error");
-        App.router.navigate('settings/sources', { trigger: true });
+        FeedBox.notify("Source not found", "error");
+        FeedBox.Router.navigate('settings/sources', { trigger: true });
     }
 });
 
-App.router.route('sources/update', function() {
-    var sources = App.Session.get('source-collection'),
-        user = App.Session.get('user');
+FeedBox.Router.route('sources/update', function() {
+    var sources = FeedBox.Session.get('source-collection'),
+        user = FeedBox.Session.get('user');
 
-    App.notify("Update started.", "success");
+    FeedBox.notify("Update started.", "success");
     Backbone.ajax({
         url: BASE_URL + '/update',
         cache: false,
@@ -352,18 +345,18 @@ App.router.route('sources/update', function() {
         headers: user.accessHeader(),
         success: function(models, textStatus, jqXHR) {
             sources.set(models);
-            App.notify("Update successfull.", "success");
+            FeedBox.notify("Update successfull.", "success");
         },
         error: function() {
-            App.notify("Update failed.", "error");
+            FeedBox.notify("Update failed.", "error");
         }
     });
 });
 
-App.router.route('sources/:id/update', function(id) {
-    var sources = App.Session.get('source-collection'),
+FeedBox.Router.route('sources/:id/update', function(id) {
+    var sources = FeedBox.Session.get('source-collection'),
         model = sources.get(id),
-        user = App.Session.get('user');
+        user = FeedBox.Session.get('user');
 
     if (model) {
         Backbone.ajax({
@@ -372,14 +365,14 @@ App.router.route('sources/:id/update', function(id) {
             headers: user.accessHeader(),
             success: function(modelData, textStatus, jqXHR) {
                 model.set(modelData);
-                App.notify(model.get('name') + " - Source update successfull.", "success");
+                FeedBox.notify(model.get('name') + " - Source update successfull.", "success");
 
             },
             error: function() {
-                App.notify(model.get('name') + " - Source update failed.", "error");
+                FeedBox.notify(model.get('name') + " - Source update failed.", "error");
             }
         });
     }
 
-    App.router.navigate('settings/sources', { trigger: true });
+    FeedBox.Router.navigate('settings/sources', { trigger: true });
 });

@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v0.2.0 - 2013-06-28
+# v0.2.0 - 2013-06-30
 
 css/bootstrap.min.css
 css/font-awesome.min.css
@@ -24,13 +24,15 @@ js/vendor/underscore.min.js
 js/vendor/backbone.min.js
 js/vendor/moment.min.js
 js/vendor/bootstrap.min.js
-js/app.js
+js/src/nerve.js
+js/feedbox.js
 js/module/helper.js
+js/module/user.js
+js/module/setting.js
 js/module/item.js
 js/module/source.js
-js/module/sidebar.js
-js/module/content.js
-js/module/routes.js
+js/module/tag.js
+js/module/main.js
 js/init.js
 
 NETWORK:
