@@ -124,9 +124,9 @@ FeedBox.Module.User = new Nerve.Module({
                 success: function(data, textStatus, jqXHR) {
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
-                    that.set({ user: null, token: null });
+                    that.set({ user: null, token: null, loggedIn: false }, { silent: true });
                     FeedBox.Hook.call('signout-success');
-                    that.set('loggedIn', true);
+                    that.trigger('change:loggedIn');
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     FeedBox.Hook.call('signout-error');

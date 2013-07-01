@@ -21,6 +21,10 @@ FeedBox.Module.Main = new Nerve.Module({
                     FeedBox.renderTemplate(this.$el, this.options.template);
                     FeedBox.Hook.call('render-app-view');
                     Backbone.history.start();
+
+                    if (!this.model.get('authRequired')) {
+                        this.$('.btn.logout').hide();
+                    }
                 } else {
                     FeedBox.Hook.call('render-login-view');
                     FeedBox.renderTemplate(this.$el, this.options.templateLogin);

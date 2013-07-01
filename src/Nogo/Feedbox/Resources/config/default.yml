@@ -9,7 +9,6 @@ log_dir:     "%data_dir%/log"
 
 # Login
 login.enabled:     false
-login.realm:       "Feedbox - Protected Area"
 login.algorithm:   "plaintext"
 login.expire:      "+2 weeks"
 login.credentials:
@@ -37,3 +36,33 @@ api.controller:
     - "Nogo\Feedbox\Controller\Sources"
     - "Nogo\Feedbox\Controller\Tags"
     - "Nogo\Feedbox\Controller\Updates"
+
+# Assets
+asset:
+    asset_dir: "%root_dir%/public/assets"
+    css:
+        files:
+            - "%src_dir%/Nogo/Feedbox/Resources/css/bootstrap.min.css"
+            - "%src_dir%/Nogo/Feedbox/Resources/css/font-awesome.min.css"
+            - "%src_dir%/Nogo/Feedbox/Resources/css/style.css"
+        out: "main.css"
+        filter:
+            - "Nogo\Filter\Merge"
+    javascript:
+        files:
+            - "%src_dir%/Nogo/Feedbox/Resources/js/vendor/jquery.min.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/vendor/underscore.min.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/vendor/backbone.min.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/vendor/moment.min.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/vendor/bootstrap.min.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/app.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/module/helper.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/module/item.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/module/source.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/module/sidebar.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/module/content.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/module/routes.js"
+            - "%src_dir%/Nogo/Feedbox/Resources/js/init.js"
+        out: "scripts.js"
+        filter:
+            - "Nogo\Filter\Merge"
