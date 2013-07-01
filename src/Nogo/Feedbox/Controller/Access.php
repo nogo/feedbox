@@ -12,8 +12,8 @@ class Access extends AbstractController
 {
     public function enable()
     {
-        $this->app->get('/login', array($this, 'signinAction'));
-        $this->app->get('/logout', array($this, 'signoutAction'));
+        $this->app->post('/login', array($this, 'signinAction'));
+        $this->app->post('/logout', array($this, 'signoutAction'));
     }
 
     public function signinAction()

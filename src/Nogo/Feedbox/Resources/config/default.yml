@@ -11,6 +11,7 @@ log_dir:     "%data_dir%/log"
 login.enabled:     false
 login.realm:       "Feedbox - Protected Area"
 login.algorithm:   "plaintext"
+login.expire:      "+2 weeks"
 login.credentials:
   #admin: "feedbox"
 
@@ -30,7 +31,9 @@ api.migration.ignore:
     - 1368823260
 api.content_type: "application/json"
 api.controller:
+    - "Nogo\Feedbox\Controller\Access"
     - "Nogo\Feedbox\Controller\Items"
     - "Nogo\Feedbox\Controller\Settings"
     - "Nogo\Feedbox\Controller\Sources"
     - "Nogo\Feedbox\Controller\Tags"
+    - "Nogo\Feedbox\Controller\Updates"

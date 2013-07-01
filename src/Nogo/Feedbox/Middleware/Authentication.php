@@ -66,8 +66,9 @@ class Authentication extends \Slim\Middleware
             if (!empty($token)) {
                 $access = $this->accessRepository->findByUserClient($user, $client);
                 if ($access !== false && $access['token'] === $token && strtotime($access['expire']) >= strtotime('now')) {
-                    $access['expire'] = date('Y-m-d H:i:s', strtotime($this->app->config('login.expire')));
-                    $this->accessRepository->persist($access);
+                    // TODO check this later
+//                    $access['expire'] = date('Y-m-d H:i:s', strtotime($this->app->config('login.expire')));
+//                    $this->accessRepository->persist($access);
                 } else {
                     $error = true;
                 }
