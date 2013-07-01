@@ -235,12 +235,12 @@ FeedBox.Module.Main = new Nerve.Module({
                     sources = App.Session.get('source-collection'),
                     items = App.Session.get('item-collection');
 
-                if (sources) {
-                    sources.fetch({ async: false });
-                }
-
                 if (tags) {
                     tags.fetch({ async: false });
+                }
+
+                if (sources) {
+                    sources.fetch({ async: false });
                 }
 
                 App.renderView('header-view', new App.Module.Main.Views.Header({

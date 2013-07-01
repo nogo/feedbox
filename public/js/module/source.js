@@ -14,9 +14,19 @@ FeedBox.Module.Source = new Nerve.Module({
             }
             return response;
         },
+        tag: function() {
+            var tags = FeedBox.Session.get('tag-collection'),
+                tagId = this.get('tag_id');
+
+            if (tags && tagId && this.get('tag') == undefined) {
+                this.set('tag', tags.get(tagId));
+            }
+
+            return this.get('tag');
+        },
         color: function() {
             var color = undefined,
-                tag = this.get('tag');
+                tag = this.tag();
 
             if (tag) {
                 color = tag.get('color');
