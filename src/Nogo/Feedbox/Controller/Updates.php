@@ -148,7 +148,7 @@ class Updates extends AbstractController
         if ($items != null) {
             foreach($items as $item) {
                 if (isset($item['uid'])) {
-                    $dbItem = $this->itemRepository->find('uid', $item['uid']);
+                    $dbItem = $this->itemRepository->findBy('uid', $item['uid']);
                     if (!empty($dbItem)) {
                         if ($item['content'] !== $dbItem['content']
                             || $item['title'] !== $dbItem['title']) {
@@ -166,7 +166,6 @@ class Updates extends AbstractController
             }
         }
 
-
         $source['last_update'] = date('Y-m-d H:i:s');
         if (empty($source['period'])) {
             $source['period'] = $worker->getUpdateInterval();
@@ -181,6 +180,15 @@ class Updates extends AbstractController
             if ($tag) {
                 $tag['unread'] = $this->sourceRepository->countTagUnread([$tag['id']]);
                 $this->tagRepository->persist($tag);
+            }
+        }
+
+        // clean up double uids in this source
+        $uids = $this->itemRepository->findDoubleUid($source['id']);
+        foreach ($uids as $uid) {
+            $items = $this->itemRepository->findAllBy('uid', $uid);
+            for ($i=1; $i<count($items); $i++) {
+                $this->itemRepository->remove($items[$i]['id']);
             }
         }
 

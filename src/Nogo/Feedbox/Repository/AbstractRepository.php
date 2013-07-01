@@ -57,7 +57,8 @@ abstract class AbstractRepository implements Repository
         $select = $this->connection->newSelect();
         $select->cols(['*'])
             ->from($this->tableName())
-            ->where($name . ' = :' . $name);
+            ->where($name . ' = :' . $name)
+            ->orderBy([$this->identifier() . ' ASC']);
 
         $result = $this->connection->fetchOne($select, [ $name => $value ]);
 
@@ -83,7 +84,8 @@ abstract class AbstractRepository implements Repository
         $select = $this->connection->newSelect();
         $select->cols(['*'])
             ->from($this->tableName())
-            ->where($name . ' = :' . $name);
+            ->where($name . ' = :' . $name)
+            ->orderBy([$this->identifier() . ' ASC']);
 
         $result = $this->connection->fetchAll($select, [ $name => $value ]);
 
@@ -106,7 +108,8 @@ abstract class AbstractRepository implements Repository
          */
         $select = $this->connection->newSelect();
         $select->cols(['*'])
-            ->from($this->tableName());
+            ->from($this->tableName())
+            ->orderBy([$this->identifier() . ' ASC']);
 
         $result = $this->connection->fetchAll($select);
 

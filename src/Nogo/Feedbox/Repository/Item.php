@@ -140,6 +140,57 @@ class Item extends AbstractRepository
         return $this->connection->fetchAll($select, $bind);
     }
 
+    /**
+     * Find all double uids
+     * @param int $source_id filter double uids by source (default: 0)
+     * @return array
+     */
+    public function findDoubleUid($source_id = 0)
+    {
+        $source_id = filter_var($source_id, FILTER_VALIDATE_INT);
+        /**
+         * @var $select \Aura\Sql\Query\Select
+         */
+        $select = $this->connection->newSelect();
+        $select->cols(['uid', 'count(*) as doubleCount'])
+            ->from($this->tableName())
+            ->groupBy(['uid'])
+            ->having("(doubleCount > 1)");
+
+        $bind = [];
+        if ($source_id) {
+            $select->where('source_id = :source_id');
+            $bind['source_id'] = $source_id;
+        }
+
+        return $this->connection->fetchCol($select, $bind);
+    }
+
+    /**
+     * Delete uid
+     * @param $uid
+     * @return int count how many
+     */
+    public function deleteUid($uid)
+    {
+        if (!empty($uid)) {
+            /**
+             * @var $delete \Aura\Sql\Query\Delete
+             */
+            $delete = $this->connection->newDelete();
+            $delete->from($this->tableName());
+            $bind = ['uid' => $uid];
+            if (is_array($uid)) {
+                $delete->where('uid IN (:uid)');
+            } else {
+                $delete->where('uid = :uid');
+            }
+
+            return $this->connection->query($delete, $bind);
+        }
+        return 0;
+    }
+
     public function countSourceUnread(array $sourceIds = array())
     {
         /**

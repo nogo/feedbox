@@ -44,6 +44,8 @@ $fetcher->setTimeout($config['fetcher.timeout']);
 
 $now = new \DateTime();
 foreach ($sources as $source) {
+    $error = false;
+
     if (!empty($source['uri'])) {
         // periodic update
         if ($source['last_update'] != null) {
@@ -96,12 +98,13 @@ foreach ($sources as $source) {
             $items = $worker->execute();
         } catch (\Exception $e) {
             $items = null;
+            $error = true;
         }
 
-        if ($items != null) {
+        if (!$error && $items != null) {
             foreach($items as $item) {
                 if (isset($item['uid'])) {
-                    $dbItem = $itemRepository->find('uid', $item['uid']);
+                    $dbItem = $itemRepository->findBy('uid', $item['uid']);
                     if (!empty($dbItem)) {
                         if ($item['content'] !== $dbItem['content']
                             || $item['title'] !== $dbItem['title']) {
@@ -122,42 +125,41 @@ foreach ($sources as $source) {
             if (empty($source['period'])) {
                 $source['period'] = $worker->getUpdateInterval();
             }
-            $source['errors'] = $worker->getErrors();
-
-            // update source unread counter
-            $count = $source['unread'];
-            $source['unread'] = $itemRepository->countSourceUnread([$source['id']]);
-            $sourceRepository->persist($source);
-
-            // update tag unread counter
-            if (!empty($source['tag_id'])) {
-                $tag = $tagRepository->find($source['tag_id']);
-                if ($tag) {
-                    $tag['unread'] = $sourceRepository->countTagUnread([$tag['id']]);
-                    $tagRepository->persist($tag);
-                }
-            }
-
-            if ($config['debug']) {
-                echo sprintf("%d new items.\n", abs($source['unread'] - $count));
-            }
-        } else {
-            $source['errors'] = $worker->getErrors();
-            $source['unread'] = $itemRepository->countSourceUnread([$source['id']]);
-            $sourceRepository->persist($source);
-
-            // update tag unread counter
-            if (!empty($source['tag_id'])) {
-                $tag = $tagRepository->find($source['tag_id']);
-                if ($tag) {
-                    $tag['unread'] = $sourceRepository->countTagUnread([$tag['id']]);
-                    $tagRepository->persist($tag);
-                }
-            }
-
-            if ($config['debug']) {
-                echo sprintf("%s\n", $worker->getErrors());
-            }
         }
+        $source['errors'] = $worker->getErrors();
+    }
+
+    // update source unread counter
+    $count = $source['unread'];
+    $source['unread'] = $itemRepository->countSourceUnread([$source['id']]);
+    $sourceRepository->persist($source);
+
+    // update tag unread counter
+    if (!empty($source['tag_id'])) {
+        $tag = $tagRepository->find($source['tag_id']);
+        if ($tag) {
+            $tag['unread'] = $sourceRepository->countTagUnread([$tag['id']]);
+            $tagRepository->persist($tag);
+        }
+    }
+
+    if ($config['debug']) {
+        if ($error) {
+            echo sprintf("%s\n", $worker->getErrors());
+        } else {
+            echo sprintf("%d new items.\n", abs($source['unread'] - $count));
+        }
+    }
+}
+
+// clean up double uids
+$uids = $itemRepository->findDoubleUid();
+if ($config['debug']) {
+    echo sprintf("Delete %d double items.\n", count($uids));
+}
+foreach ($uids as $uid) {
+    $items = $itemRepository->findAllBy('uid', $uid);
+    for ($i=1; $i<count($items); $i++) {
+        $itemRepository->remove($items[$i]['id']);
     }
 }
