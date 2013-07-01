@@ -170,7 +170,7 @@ FeedBox.Module.Source = new Nerve.Module({
                         wait: true,
                         success: function (model) {
                             FeedBox.notify(model.get('name') + " - All data are saved properly.", "success");
-                            var collection = App.Session.get('tagless-source-collection');
+                            var collection = FeedBox.Session.get('tagless-source-collection');
                             if (data['tag_id']) {
                                 model.get('tag').sources().add(model);
                                 collection.remove(model);
