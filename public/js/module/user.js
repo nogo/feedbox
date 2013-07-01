@@ -120,7 +120,6 @@ FeedBox.Module.User = new Nerve.Module({
                     user: this.get('user'),
                     client: this.get('client')
                 },
-                headers: this.accessHeader(),
                 success: function(data, textStatus, jqXHR) {
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');

@@ -44,7 +44,6 @@ FeedBox.Module.Tag = new Nerve.Module({
                         url: BASE_URL + '/update/tag/' + this.model.id,
                         cache: false,
                         dataType: 'json',
-                        headers: user.accessHeader(),
                         success: function (data, status, xhr) {
                             FeedBox.notify(that.model.get('name') + " - Tag update successfull.", "success");
                             that.model.set(data);

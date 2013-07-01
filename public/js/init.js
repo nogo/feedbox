@@ -9,6 +9,7 @@
     if (user) {
         if (user.accessNeeded()) {
             Backbone.$.ajaxSetup({
+                headers: user.accessHeader(),
                 statusCode: {
                     401: function() {
                         var user = FeedBox.Session.get('user');
@@ -24,15 +25,6 @@
                     }
                 }
             });
-
-            // send token every time
-            Backbone.sync = function(method, model, options) {
-                options.headers = options.headers || {};
-                if (user) {
-                    _.extend(options.headers, user.accessHeader());
-                }
-                return sync.call(model, method, model, options);
-            };
         }
 
         var appview = new App.Module.Main.Views.App({

@@ -94,7 +94,6 @@ FeedBox.Module.Source = new Nerve.Module({
                         url: BASE_URL + '/update/source/' + this.model.id,
                         cache: false,
                         dataType: 'json',
-                        headers: user.accessHeader(),
                         success: function (data, status, xhr) {
                             FeedBox.notify(that.model.get('name') + " - Source update successfull.", "success");
                             that.model.set(data);
@@ -352,7 +351,6 @@ FeedBox.Router.route('sources/update', function() {
         url: BASE_URL + '/update',
         cache: false,
         dataType: 'json',
-        headers: user.accessHeader(),
         success: function(models, textStatus, jqXHR) {
             sources.set(models);
             FeedBox.notify("Update successfull.", "success");
@@ -372,7 +370,6 @@ FeedBox.Router.route('sources/:id/update', function(id) {
         Backbone.ajax({
             url: BASE_URL + '/update/' + model.id,
             dataType: 'json',
-            headers: user.accessHeader(),
             success: function(modelData, textStatus, jqXHR) {
                 model.set(modelData);
                 FeedBox.notify(model.get('name') + " - Source update successfull.", "success");
