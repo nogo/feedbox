@@ -175,7 +175,7 @@ FeedBox.Module.Source = new Nerve.Module({
                                 model.get('tag').sources().add(model);
                                 collection.remove(model);
                             } else {
-                                this.tag.sources().remove(model);
+                                that.tag.sources().remove(model);
                                 collection.add(model);
                             }
                             that.close();

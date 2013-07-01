@@ -144,8 +144,9 @@ FeedBox.Module.Main = new Nerve.Module({
                     var sourceCollection = FeedBox.Session.get('source-collection');
                     return new FeedBox.Module.Source.Collection(
                         sourceCollection.filter(function(model) {
-                            var tagId = model.get('tag_id');
-                            return tagId === null || tagId === '';
+                            var tagId = model.get('tag_id'),
+                                active = model.get('active');
+                            return active && (tagId === null || tagId === '');
                         })
                     );
                 });
