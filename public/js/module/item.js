@@ -67,8 +67,21 @@ FeedBox.Module.Item = new Nerve.Module({
                     }
 
                     var folded = this.model.get('folded');
+
                     if (folded) {
                         this.$el.removeClass('entry-unfolded');
+
+                        // Read last scroll position and scroll back if necessary
+                        var scrollPosition = this.model.get('scrollPosition');
+                        if (scrollPosition) {
+                            var element = Backbone.$('#' + this.$el.attr('id')),
+                                position = element.position();
+
+                            if (position && position.top && position.top < 0) {
+                                var contentEl = Backbone.$('#content');
+                                contentEl.scrollTop(scrollPosition);
+                            }
+                        }
                     } else {
                         this.$el.addClass('entry-unfolded');
                     }
@@ -95,10 +108,11 @@ FeedBox.Module.Item = new Nerve.Module({
                     if (folded) {
                         if (read == undefined || read == null) {
                             this.model.read(true);
-                            this.model.set('folded', false);
-                        } else {
-                            this.model.set('folded', false);
                         }
+                        this.model.set({
+                            folded: false,
+                            scrollPosition: Backbone.$('#content').scrollTop()
+                        });
                     } else {
                         this.model.set('folded', true);
                     }
