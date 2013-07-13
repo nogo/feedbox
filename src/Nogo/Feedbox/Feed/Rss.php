@@ -3,6 +3,7 @@
 namespace Nogo\Feedbox\Feed;
 
 use Nogo\Feedbox\Feed\Worker;
+use Nogo\Feedbox\Helper\Sanitizer;
 use Zend\Feed\Reader\Entry\EntryInterface;
 use Zend\Feed\Reader\Exception\InvalidArgumentException;
 use Zend\Feed\Reader\Exception\RuntimeException;
@@ -21,6 +22,11 @@ class Rss implements Worker
      * @var AbstractFeed
      */
     protected $feed;
+
+    /**
+     * @var Sanitizer
+     */
+    protected $sanitizer;
 
     /**
      * @var string
@@ -59,7 +65,18 @@ class Rss implements Worker
         return $this;
     }
 
+    /**
+     * @param Sanitizer $sanitizer
+     */
+    public function setSanitizer(Sanitizer $sanitizer)
+    {
+        $this->sanitizer = $sanitizer;
+        return $this;
+    }
 
+    /**
+     * @return mixed|string
+     */
     public function getErrors()
     {
         return $this->errors;
@@ -98,22 +115,28 @@ class Rss implements Worker
             $uid = md5($entry->getId());
 
             $title = htmlspecialchars_decode($entry->getTitle());
-            $title = htmLawed($title, array("deny_attribute" => "*", "elements" => "-*"));
+            $title = $this->sanitizer->sanitize($title);
             if (strlen(trim($title)) == 0) {
                 $title = "[ no title ]";
             }
 
-            $link = htmLawed($entry->getLink(), array("deny_attribute" => "*", "elements" => "-*"));
+            $link = $this->sanitizer->sanitize($entry->getLink());
 
-            $content = htmLawed(
+            $content = $this->sanitizer->sanitize(
                 htmlspecialchars_decode($entry->getContent()),
                 array(
-                    "safe" => 1,
-                    "deny_attribute" => '* -alt -title -src -href',
-                    "keep_bad" => 0,
-                    "comment" => 1,
-                    "cdata" => 1,
-                    "elements" => 'div,p,ul,li,a,dl,dt,h1,h2,h3,h4,h5,h6,ol,br,table,tr,td,blockquote,pre,ins,del,th,thead,tbody,b,i,strong,em,tt'
+                    'AutoFormat.RemoveEmpty' => true,
+                    'HTML.Allowed' => 'div,p,ul,li,a[href],dl,dt' .
+                                      ',h1,h2,h3,h4,h5,h6,ol,br' .
+                                      ',table,th,thead,tbody,tr,td' .
+                                      ',blockquote,pre,ins,del,b,i,strong,em,tt' .
+                                      ',img[src|alt],iframe[src|height|width|frameborder]',
+                    'HTML.TargetBlank' => true,
+                    'HTML.SafeObject' => true,
+                    'HTML.SafeIframe' => true,
+                    'HTML.SafeEmbed' => true,
+                    'HTML.TidyLevel' => 'light',
+                    'URI.SafeIframeRegexp' => '%^http://(www.youtube.com/embed/|player.vimeo.com/video/)%'
                 )
             );
 

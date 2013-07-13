@@ -21,7 +21,7 @@ if ($app->config('login.enabled')) {
 $app->contentType($app->config('api.content_type'));
 
 // set default route
-$app->get('/', function() use ($db, $app) {});
+$app->get('/', function() use ($app) {});
 
 // load api controller
 foreach($app->config('api.controller') as $class) {

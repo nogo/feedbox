@@ -1,6 +1,8 @@
 <?php
 namespace Nogo\Feedbox\Feed;
 
+use Nogo\Feedbox\Helper\Sanitizer;
+
 /**
  * Class Worker
  * @package Nogo\Feedbox\Feed
@@ -14,6 +16,12 @@ interface Worker
      * @return Worker
      */
     public function setContent($content);
+
+    /**
+     * @param Sanitizer $sanitier
+     * @return Worker
+     */
+    public function setSanitizer(Sanitizer $sanitier);
 
     /**
      * Return worker errors

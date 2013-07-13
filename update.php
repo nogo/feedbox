@@ -38,6 +38,7 @@ $sources = $sourceRepository->findAllActiveWithUri();
 
 // get the feed runner
 $defaultWorkerClass = $config['worker.default'];
+$sanitizer = new \Nogo\Feedbox\Helper\HtmlPurifierSanitizer();
 
 $fetcher = new Fetcher();
 $fetcher->setTimeout($config['fetcher.timeout']);
@@ -93,6 +94,7 @@ foreach ($sources as $source) {
          * @var $worker \Nogo\Feedbox\Feed\Worker
          */
         $worker = new $defaultWorkerClass();
+        $worker->setSanitizer($sanitizer);
         $worker->setContent($content);
         try {
             $items = $worker->execute();

@@ -4,6 +4,8 @@ namespace Nogo\Feedbox\Controller;
 use Nogo\Feedbox\Helper\Fetcher;
 use Nogo\Feedbox\Api\Source as SourceApi;
 use Nogo\Feedbox\Api\Tag as TagApi;
+use Nogo\Feedbox\Helper\HtmlPurifierSanitizer;
+use Nogo\Feedbox\Helper\Sanitizer;
 use Nogo\Feedbox\Repository\Source as SourceRepository;
 use Nogo\Feedbox\Repository\Tag as TagRepository;
 use Nogo\Feedbox\Repository\Item as ItemRepository;
@@ -35,6 +37,11 @@ class Updates extends AbstractController
      */
     protected $itemRepository;
 
+    /**
+     * @var Sanitizer
+     */
+    protected $sanitier;
+
     public function enable()
     {
         $this->app->get('/update', array($this, 'updateAllAction'));
@@ -50,6 +57,8 @@ class Updates extends AbstractController
         $this->sourceRepository = new SourceRepository($this->connection);
         $this->tagRepository = new TagRepository($this->connection);
         $this->itemRepository = new ItemRepository($this->connection);
+
+        $this->sanitier = new HtmlPurifierSanitizer();
     }
 
     public function updateAllAction()
@@ -138,6 +147,7 @@ class Updates extends AbstractController
          * @var $worker \Nogo\Feedbox\Feed\Worker
          */
         $worker = new $defaultWorkerClass();
+        $worker->setSanitizer($this->sanitier);
         $worker->setContent($content);
         try {
             $items = $worker->execute();
