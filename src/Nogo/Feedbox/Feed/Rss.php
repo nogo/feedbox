@@ -48,6 +48,15 @@ class Rss implements Worker
             if (empty($content)) {
                 $this->errors = 'Source content is empty.';
             } else {
+                // repair some parser problems by adding CDATA to title and description
+                // may not catch all
+                if (strpos($content, '<![CDATA[') === FALSE) {
+                    $content = str_replace('<title>','<title><![CDATA[',$content);
+                    $content = str_replace('</title>',']]></title>',$content);
+                    $content = str_replace('<description>','<description><![CDATA[',$content);
+                    $content = str_replace('</description>',']]></description>',$content);
+                }
+
                 try {
                     Reader::registerExtension('Syndication');
                     $this->feed = Reader::importString($content);
