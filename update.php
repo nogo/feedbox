@@ -1,5 +1,6 @@
 <?php
 
+use Guzzle\Http\Client;
 use Nogo\Feedbox\Helper\Fetcher;
 use Nogo\Feedbox\Helper\ConfigLoader;
 use Nogo\Feedbox\Helper\DatabaseConnector;
@@ -41,6 +42,7 @@ $defaultWorkerClass = $config['worker.default'];
 $sanitizer = new \Nogo\Feedbox\Helper\HtmlPurifierSanitizer();
 
 $fetcher = new Fetcher();
+$fetcher->setClient(new Client());
 $fetcher->setTimeout($config['fetcher.timeout']);
 
 $now = new \DateTime();

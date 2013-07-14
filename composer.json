@@ -16,6 +16,7 @@
         "slim/slim": "2.*",
         "slim/extras": "2.*",
         "aura/sql": "1.*",
+        "guzzle/guzzle": "3.7.*",
         "symfony/yaml": "2.3.*",
         "twig/twig": "1.13.*",
         "zendframework/zend-feed": "2.2.*",

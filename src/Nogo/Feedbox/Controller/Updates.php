@@ -1,6 +1,7 @@
 <?php
 namespace Nogo\Feedbox\Controller;
 
+use Guzzle\Http\Client;
 use Nogo\Feedbox\Helper\Fetcher;
 use Nogo\Feedbox\Api\Source as SourceApi;
 use Nogo\Feedbox\Api\Tag as TagApi;
@@ -138,6 +139,7 @@ class Updates extends AbstractController
     protected function fetchSource(array $source)
     {
         $fetcher = new Fetcher();
+        $fetcher->setClient(new Client());
         $fetcher->setTimeout($this->app->config('fetcher.timeout'));
         $content = $fetcher->get($source['uri']);
 
