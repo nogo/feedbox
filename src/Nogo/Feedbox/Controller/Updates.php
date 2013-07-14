@@ -2,7 +2,7 @@
 namespace Nogo\Feedbox\Controller;
 
 use Guzzle\Http\Client;
-use Nogo\Feedbox\Helper\Fetcher;
+use Nogo\Feedbox\Feed\Fetcher;
 use Nogo\Feedbox\Api\Source as SourceApi;
 use Nogo\Feedbox\Api\Tag as TagApi;
 use Nogo\Feedbox\Helper\HtmlPurifierSanitizer;
@@ -143,46 +143,51 @@ class Updates extends AbstractController
         $fetcher->setTimeout($this->app->config('fetcher.timeout'));
         $content = $fetcher->get($source['uri']);
 
-        $defaultWorkerClass = $this->app->config('worker.default');
+        if (!empty($content)) {
+            $defaultWorkerClass = $this->app->config('worker.default');
 
-        /**
-         * @var $worker \Nogo\Feedbox\Feed\Worker
-         */
-        $worker = new $defaultWorkerClass();
-        $worker->setSanitizer($this->sanitier);
-        $worker->setContent($content);
-        try {
-            $items = $worker->execute();
-        } catch (\Exception $e) {
-            $items = null;
-        }
+            /**
+             * @var $worker \Nogo\Feedbox\Feed\Worker
+             */
+            $worker = new $defaultWorkerClass();
+            $worker->setSanitizer($this->sanitier);
+            $worker->setContent($content);
+            try {
+                $items = $worker->execute();
+            } catch (\Exception $e) {
+                $items = null;
+            }
 
-        if ($items != null) {
-            foreach($items as $item) {
-                if (isset($item['uid'])) {
-                    $dbItem = $this->itemRepository->findBy('uid', $item['uid']);
-                    if (!empty($dbItem)) {
-                        if ($item['content'] !== $dbItem['content']
-                            || $item['title'] !== $dbItem['title']) {
-                            $item['id'] = $dbItem['id'];
-                            $item['starred'] = $dbItem['starred'];
-                            $item['created_at']= $dbItem['created_at'];
-                        } else {
-                            continue;
+            if ($items != null) {
+                foreach($items as $item) {
+                    if (isset($item['uid'])) {
+                        $dbItem = $this->itemRepository->findBy('uid', $item['uid']);
+                        if (!empty($dbItem)) {
+                            if ($item['content'] !== $dbItem['content']
+                                || $item['title'] !== $dbItem['title']) {
+                                $item['id'] = $dbItem['id'];
+                                $item['starred'] = $dbItem['starred'];
+                                $item['created_at']= $dbItem['created_at'];
+                            } else {
+                                continue;
+                            }
                         }
                     }
+
+                    $item['source_id'] = $source['id'];
+                    $this->itemRepository->persist($item);
                 }
-
-                $item['source_id'] = $source['id'];
-                $this->itemRepository->persist($item);
             }
+
+            $source['last_update'] = date('Y-m-d H:i:s');
+            if (empty($source['period'])) {
+                $source['period'] = $worker->getUpdateInterval();
+            }
+            $source['errors'] = $worker->getErrors();
+        } else {
+            $source['errors'] = $fetcher->getError();
         }
 
-        $source['last_update'] = date('Y-m-d H:i:s');
-        if (empty($source['period'])) {
-            $source['period'] = $worker->getUpdateInterval();
-        }
-        $source['errors'] = $worker->getErrors();
         $source['unread'] = $this->itemRepository->countSourceUnread([$source['id']]);
         $this->sourceRepository->persist($source);
 

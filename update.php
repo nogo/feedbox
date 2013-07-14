@@ -1,7 +1,7 @@
 <?php
 
 use Guzzle\Http\Client;
-use Nogo\Feedbox\Helper\Fetcher;
+use Nogo\Feedbox\Feed\Fetcher;
 use Nogo\Feedbox\Helper\ConfigLoader;
 use Nogo\Feedbox\Helper\DatabaseConnector;
 use Nogo\Feedbox\Repository\Item;
@@ -92,45 +92,51 @@ foreach ($sources as $source) {
         $items = null;
 
         $content = $fetcher->get($source['uri']);
-        /**
-         * @var $worker \Nogo\Feedbox\Feed\Worker
-         */
-        $worker = new $defaultWorkerClass();
-        $worker->setSanitizer($sanitizer);
-        $worker->setContent($content);
-        try {
-            $items = $worker->execute();
-        } catch (\Exception $e) {
-            $items = null;
-            $error = true;
-        }
 
-        if (!$error && $items != null) {
-            foreach($items as $item) {
-                if (isset($item['uid'])) {
-                    $dbItem = $itemRepository->findBy('uid', $item['uid']);
-                    if (!empty($dbItem)) {
-                        if ($item['content'] !== $dbItem['content']
-                            || $item['title'] !== $dbItem['title']) {
-                            $item['id'] = $dbItem['id'];
-                            $item['starred'] = $dbItem['starred'];
-                            $item['created_at']= $dbItem['created_at'];
-                        } else {
-                            continue;
+        if (!empty($content)) {
+            /**
+             * @var $worker \Nogo\Feedbox\Feed\Worker
+             */
+            $worker = new $defaultWorkerClass();
+            $worker->setSanitizer($sanitizer);
+            $worker->setContent($content);
+            try {
+                $items = $worker->execute();
+            } catch (\Exception $e) {
+                $items = null;
+                $error = true;
+            }
+
+            if (!$error && $items != null) {
+                foreach($items as $item) {
+                    if (isset($item['uid'])) {
+                        $dbItem = $itemRepository->findBy('uid', $item['uid']);
+                        if (!empty($dbItem)) {
+                            if ($item['content'] !== $dbItem['content']
+                                || $item['title'] !== $dbItem['title']) {
+                                $item['id'] = $dbItem['id'];
+                                $item['starred'] = $dbItem['starred'];
+                                $item['created_at']= $dbItem['created_at'];
+                            } else {
+                                continue;
+                            }
                         }
                     }
+
+                    $item['source_id'] = $source['id'];
+                    $itemRepository->persist($item);
                 }
 
-                $item['source_id'] = $source['id'];
-                $itemRepository->persist($item);
+                $source['last_update'] = date('Y-m-d H:i:s');
+                if (empty($source['period'])) {
+                    $source['period'] = $worker->getUpdateInterval();
+                }
             }
-
-            $source['last_update'] = date('Y-m-d H:i:s');
-            if (empty($source['period'])) {
-                $source['period'] = $worker->getUpdateInterval();
-            }
+            $source['errors'] = $worker->getErrors();
+        } else {
+            $error = true;
+            $source['errors'] = $fetcher->getError();
         }
-        $source['errors'] = $worker->getErrors();
     }
 
     // update source unread counter
