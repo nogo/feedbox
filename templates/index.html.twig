@@ -294,6 +294,7 @@
             <li class="active"><a href="#settings/view">View</a></li>
             <li><a href="#settings/sources">Sources</a></li>
             <li><a href="#settings/tags">Tags</a></li>
+            <li><a href="#settings/user">User</a></li>
         </ul>
 
         <div class="tab-content">
@@ -344,6 +345,14 @@
                 </table>
             </div>
             <div class="tab-pane" id="tab-setting-sources"></div>
+            <div class="tab-pane well" id="tab-setting-user">
+                <div class="controls controls-row">
+                    <label class="span2" for="user-password-new">Password</label>
+                    <input class="span2" id="user-password-new" name="user.password.new" value="" placeholder="New">
+                    <input class="span2" id="user-password-retype" name="user.password.retype" value="" placeholder="Retype">
+                    <button id="user-password">Change</button>
+                </div>
+            </div>
         </div>
     </script>
 {% endblock %}

@@ -8,7 +8,8 @@ FeedBox.Module.Setting = new Nerve.Module({
             isBinding: false,
             tab: 'view',
             events: {
-                'change .update': 'changeSetting'
+                'change .update': 'changeSetting',
+                'click #user-password': 'changePassword'
             },
             initialize: function () {
                 if (this.options.tab) {
@@ -100,6 +101,12 @@ FeedBox.Module.Setting = new Nerve.Module({
                             value: value
                         }, options);
                     }
+                }
+            },
+            changePassword: function(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                 }
             }
         })
