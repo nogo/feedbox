@@ -67,12 +67,20 @@ FeedBox.Module.User = new Nerve.Module({
 
             return this.get('authRequired');
         },
-        accessHeader: function() {
-            return {
-                AUTH_USER: this.get('user'),
-                AUTH_CLIENT: this.get('client'),
-                AUTH_TOKEN: this.get('token')
+        accessHeader: function(user, password) {
+            var header = {
+                'AUTH_CLIENT': this.get('client')
             };
+
+            if (user && password) {
+                header['AUTH_USER'] = user;
+                header['AUTH_PASS'] = password;
+            } else {
+                header['AUTH_USER'] = this.get('user');
+                header['AUTH_token'] = this.get('token');
+            }
+
+            return header;
         },
         signin: function(user, password) {
             var that = this;
@@ -81,11 +89,7 @@ FeedBox.Module.User = new Nerve.Module({
                 url: BASE_URL + '/login',
                 type: 'POST',
                 dataType: 'json',
-                headers: {
-                    'AUTH_USER': user,
-                    'AUTH_PASS': password,
-                    'AUTH_CLIENT': this.get('client')
-                },
+                headers: this.accessHeader(user, password),
                 success: function(data, textStatus, jqXHR) {
                     var token = jqXHR.getResponseHeader('NEXT_AUTH_TOKEN');
 
@@ -97,6 +101,11 @@ FeedBox.Module.User = new Nerve.Module({
                             token: token,
                             loggedIn: true
                         }, { silent: true });
+
+                        Backbone.$.ajaxSetup({
+                            headers: that.accessHeader()
+                        });
+
                         FeedBox.Hook.call('signin-success');
                         that.trigger('change:loggedIn');
                     }
@@ -124,6 +133,11 @@ FeedBox.Module.User = new Nerve.Module({
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     that.set({ user: null, token: null, loggedIn: false }, { silent: true });
+
+                    Backbone.$.ajaxSetup({
+                        headers: {}
+                    });
+
                     FeedBox.Hook.call('signout-success');
                     that.trigger('change:loggedIn');
                 },

@@ -3,8 +3,7 @@
 (function(App, Backbone) {
     App.initialize();
 
-    var sync = Backbone.sync,
-        user = App.Session.get('user');
+    var user = App.Session.get('user');
 
     if (user) {
         if (user.accessNeeded()) {
