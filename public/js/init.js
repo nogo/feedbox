@@ -7,23 +7,7 @@
 
     if (user) {
         if (user.accessNeeded()) {
-            Backbone.$.ajaxSetup({
-                headers: user.accessHeader(),
-                statusCode: {
-                    401: function() {
-                        var user = FeedBox.Session.get('user');
-                        if (user && user.get('loggedId')) {
-                            user.signout();
-                        }
-                    },
-                    403: function() {
-                        var user = FeedBox.Session.get('user');
-                        if (user && user.get('loggedId')) {
-                            user.signout();
-                        }
-                    }
-                }
-            });
+            user.applySetup();
         }
 
         var appview = new App.Module.Main.Views.App({

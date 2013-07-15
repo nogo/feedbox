@@ -82,6 +82,30 @@ FeedBox.Module.User = new Nerve.Module({
 
             return header;
         },
+        applySetup: function(clear) {
+            var setup = {
+                statusCode: {
+                    401: function() {
+                        var user = FeedBox.Session.get('user');
+                        if (user && user.get('loggedId')) {
+                            user.signout();
+                        }
+                    },
+                    403: function() {
+                        var user = FeedBox.Session.get('user');
+                        if (user && user.get('loggedId')) {
+                            user.signout();
+                        }
+                    }
+                }
+            };
+
+            if (clear === undefined) {
+                setup.headers = this.accessHeader();
+            }
+
+            Backbone.$.ajaxSetup(setup);
+        },
         signin: function(user, password) {
             var that = this;
 
@@ -102,9 +126,7 @@ FeedBox.Module.User = new Nerve.Module({
                             loggedIn: true
                         }, { silent: true });
 
-                        Backbone.$.ajaxSetup({
-                            headers: that.accessHeader()
-                        });
+                        that.applySetup();
 
                         FeedBox.Hook.call('signin-success');
                         that.trigger('change:loggedIn');
@@ -133,10 +155,7 @@ FeedBox.Module.User = new Nerve.Module({
                     localStorage.removeItem('user');
                     localStorage.removeItem('token');
                     that.set({ user: null, token: null, loggedIn: false }, { silent: true });
-
-                    Backbone.$.ajaxSetup({
-                        headers: {}
-                    });
+                    that.applySetup(true);
 
                     FeedBox.Hook.call('signout-success');
                     that.trigger('change:loggedIn');
