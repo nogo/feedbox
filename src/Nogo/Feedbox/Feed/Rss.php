@@ -48,12 +48,6 @@ class Rss implements Worker
             if (empty($content)) {
                 $this->errors = 'Source content is empty.';
             } else {
-                // TODO flag repair xml content
-                $content = preg_replace(
-                    '/<(title|description)>(?!\s*<\!\[CDATA\[)(.*[&].*[;].*)(?!\]\]>\s*)<\/(title|description)>/im',
-                    '<${1}><![CDATA[${2}]]></${1}>',
-                    $content);
-
                 try {
                     Reader::registerExtension('Syndication');
                     $this->feed = Reader::importString($content);
