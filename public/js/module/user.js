@@ -69,15 +69,15 @@ FeedBox.Module.User = new Nerve.Module({
         },
         accessHeader: function(user, password) {
             var header = {
-                'AUTH_CLIENT': this.get('client')
+                'Auth-Client': this.get('client')
             };
 
             if (user && password) {
-                header['AUTH_USER'] = user;
-                header['AUTH_PASS'] = password;
+                header['Auth-User'] = user;
+                header['Auth-Pass'] = password;
             } else {
-                header['AUTH_USER'] = this.get('user');
-                header['AUTH_token'] = this.get('token');
+                header['Auth-User'] = this.get('user');
+                header['Auth-Token'] = this.get('token');
             }
 
             return header;
@@ -87,13 +87,13 @@ FeedBox.Module.User = new Nerve.Module({
                 statusCode: {
                     401: function() {
                         var user = FeedBox.Session.get('user');
-                        if (user && user.get('loggedId')) {
+                        if (user && user.get('loggedIn')) {
                             user.signout();
                         }
                     },
                     403: function() {
                         var user = FeedBox.Session.get('user');
-                        if (user && user.get('loggedId')) {
+                        if (user && user.get('loggedIn')) {
                             user.signout();
                         }
                     }
@@ -115,7 +115,7 @@ FeedBox.Module.User = new Nerve.Module({
                 dataType: 'json',
                 headers: this.accessHeader(user, password),
                 success: function(data, textStatus, jqXHR) {
-                    var token = jqXHR.getResponseHeader('NEXT_AUTH_TOKEN');
+                    var token = jqXHR.getResponseHeader('Next-Auth-Token');
 
                     if (token) {
                         localStorage['user'] = user;

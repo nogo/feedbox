@@ -9,7 +9,10 @@ class User  extends AbstractRepository
     protected $filter = array(
         'id' => FILTER_VALIDATE_INT,
         'name' => FILTER_SANITIZE_STRING,
+        'email' => FILTER_SANITIZE_EMAIL,
         'password' => FILTER_UNSAFE_RAW,
+        'active' => FILTER_VALIDATE_BOOLEAN,
+        'superadmin' => FILTER_VALIDATE_BOOLEAN,
         'created_at'  => array(
             'filter' => FILTER_CALLBACK,
             'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')

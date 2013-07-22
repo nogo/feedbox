@@ -66,15 +66,22 @@ class Access extends AbstractRepository
         return $result;
     }
 
-    public function removeUserClient($user, $client)
+    /**
+     * Remove UserClient
+     *
+     * @param $user_id
+     * @param $client
+     * @return \PDOStatement
+     */
+    public function removeUserClient($user_id, $client)
     {
         /**
          * @var $select \Aura\Sql\Query\Delete
          */
         $delete = $this->connection->newDelete();
         $delete->from($this->tableName())
-            ->where('user = :user AND client = :client');
+            ->where('user_id = :user_id AND client = :client');
 
-        return $this->connection->query($delete, ['user' => $user, 'client' => $client]);
+        return $this->connection->query($delete, ['user_id' => $user_id, 'client' => $client]);
     }
 }

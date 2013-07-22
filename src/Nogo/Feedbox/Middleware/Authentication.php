@@ -39,9 +39,9 @@ class Authentication extends \Slim\Middleware
 
         $access_granted = false;
 
-        $auth_user = filter_var($req->headers('AUTH_USER'), FILTER_SANITIZE_STRING);
-        $auth_pass = filter_var($req->headers('AUTH_PASS'), FILTER_SANITIZE_STRING);
-        $auth_client = filter_var($req->headers('AUTH_CLIENT'), FILTER_SANITIZE_STRING);;
+        $auth_user = filter_var($req->headers('Auth-User'), FILTER_SANITIZE_STRING);
+        $auth_pass = filter_var($req->headers('Auth-Pass'), FILTER_SANITIZE_STRING);
+        $auth_client = filter_var($req->headers('Auth-Client'), FILTER_SANITIZE_STRING);;
 
         // find corrensponding user
         $user = $this->userRepository->findBy('name', $auth_user);
@@ -54,11 +54,11 @@ class Authentication extends \Slim\Middleware
                 $token = md5(uniqid($auth_user . $auth_pass . microtime(), true));
                 $expire = date('Y-m-d H:i:s', strtotime($this->app->config('login.expire')));
                 $this->accessRepository->persist(['user_id' => $user['id'], 'client' => $auth_client, 'token' => $token, 'expire' =>  $expire]);
-                $res['NEXT_AUTH_TOKEN'] = $token;
+                $res['Next-Auth-Token'] = $token;
                 $access_granted = true;
             }
         } else {
-            $token = filter_var($req->headers('AUTH_TOKEN'), FILTER_SANITIZE_STRING);
+            $token = filter_var($req->headers('Auth-Token'), FILTER_SANITIZE_STRING);
             if (!empty($user) && !empty($token)) {
                 $access = $this->accessRepository->findByUserClient($user['id'], $auth_client);
                 if ($access !== false && $access['token'] === $token && strtotime($access['expire']) >= strtotime('now')) {
@@ -89,7 +89,7 @@ class Authentication extends \Slim\Middleware
         $credentials = $this->app->config('login.credentials');
 
         $password = $auth_pass;
-        if ($algorithm !== 'plaintext') {
+        if (!empty($algorithm) && $algorithm !== 'plaintext') {
             $password = hash($algorithm, $auth_pass);
         }
 
