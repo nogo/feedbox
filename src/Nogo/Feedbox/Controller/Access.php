@@ -28,7 +28,7 @@ class Access extends AbstractController
             $this->renderJson(array('error' => 'User and client are missing'), 404);
         }
 
-        $accessRepository = new AccessRepository($this->connection);
+        $accessRepository = new AccessRepository($this->app->db);
         $accessRepository->removeUserClient($request_data['user'], $request_data['client']);
 
         $this->renderJson(array('logout' => 'successful'));

@@ -3,7 +3,6 @@ namespace Nogo\Feedbox\Controller;
 
 use Aura\Sql\Connection\AbstractConnection;
 use Hampel\Json\Json;
-use Hampel\Json\JsonException;
 use Nogo\Feedbox\Api\AbstractApi;
 use Nogo\Feedbox\Repository\Repository;
 

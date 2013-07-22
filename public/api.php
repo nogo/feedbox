@@ -1,20 +1,23 @@
 <?php
 require_once dirname(__FILE__) . '/../bootstrap.php';
 
-$connector = new \Nogo\Feedbox\Helper\DatabaseConnector(
-    $app->config('database_adapter'),
-    $app->config('database_dsn'),
-    $app->config('database_username'),
-    $app->config('database_password')
+$app->container->singleton('db',
+    function() use ($app) {
+        $connector = new \Nogo\Feedbox\Helper\DatabaseConnector(
+            $app->config('database_adapter'),
+            $app->config('database_dsn'),
+            $app->config('database_username'),
+            $app->config('database_password')
+        );
+        return $connector->getInstance();
+    }
 );
-$db = $connector->getInstance();
 
 if ($app->config('login.enabled')) {
-    $app->add(new \Nogo\Feedbox\Middleware\Authentication(
-            $db,
-            $app->config('login.credentials'),
-            $app->config('login.algorithm')
-        ));
+    $auth = new \Nogo\Feedbox\Middleware\Authentication();
+    $auth->setAccessRepository(new \Nogo\Feedbox\Repository\Access($app->db));
+    $auth->setUserRepository(new \Nogo\Feedbox\Repository\User($app->db));
+    $app->add($auth);
 }
 
 // set content-type
@@ -30,7 +33,7 @@ foreach($app->config('api.controller') as $class) {
         /**
          * @var \Nogo\Feedbox\Controller\AbstractController $controller
          */
-        $controller = new $class($app, $db);
+        $controller = new $class($app);
         $controller->enable();
     }
 }

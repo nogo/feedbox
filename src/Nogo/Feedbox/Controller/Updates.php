@@ -55,9 +55,9 @@ class Updates extends AbstractController
         $this->sourceApi = new SourceApi();
         $this->tagApi = new TagApi();
 
-        $this->sourceRepository = new SourceRepository($this->connection);
-        $this->tagRepository = new TagRepository($this->connection);
-        $this->itemRepository = new ItemRepository($this->connection);
+        $this->sourceRepository = new SourceRepository($this->app->db);
+        $this->tagRepository = new TagRepository($this->app->db);
+        $this->itemRepository = new ItemRepository($this->app->db);
 
         $this->sanitier = new HtmlPurifierSanitizer();
     }

@@ -46,7 +46,7 @@ class Items extends AbstractRestController
     {
         if ($this->repository == null) {
             if ($connection == null) {
-                $connection = $this->connection;
+                $connection = $this->app->db;
             }
             $this->repository = new ItemRepository($connection);
         }

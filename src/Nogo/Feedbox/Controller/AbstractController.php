@@ -1,7 +1,6 @@
 <?php
 namespace Nogo\Feedbox\Controller;
 
-use Aura\Sql\Connection\AbstractConnection;
 use Slim\Slim;
 use Hampel\Json\Json;
 use Hampel\Json\JsonException;
@@ -17,21 +16,15 @@ abstract class AbstractController
      * @var Slim
      */
     protected $app;
-    /**
-     * @var AbstractConnection
-     */
-    protected $connection;
 
     /**
      * Constructor.
      *
      * @param Slim $app
-     * @param AbstractConnection $connection
      */
-    public function __construct(Slim $app, AbstractConnection $connection)
+    public function __construct(Slim $app)
     {
         $this->app = $app;
-        $this->connection = $connection;
     }
 
     /**
