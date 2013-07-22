@@ -1,8 +1,8 @@
 <?php
 namespace Nogo\Feedbox\Middleware;
 
-use Aura\Sql\Connection\AbstractConnection;
 use Nogo\Feedbox\Repository\Access;
+use Nogo\Feedbox\Repository\User;
 
 class Authentication extends \Slim\Middleware
 {
@@ -12,77 +12,104 @@ class Authentication extends \Slim\Middleware
     protected $accessRepository;
 
     /**
-     * @var array
+     * @var User
      */
-    protected $credentials;
+    protected $userRepository;
 
     /**
-     * @var string
+     * @param Access $repository
      */
-    protected $algorithm;
-
-    /**
-     * Constructor
-     *
-     * @param AbstractConnection $connection
-     * @param array  $credentials An array of usernames and passwords
-     * @param string $algorithm    Password hash algorithm
-     * @return void
-     */
-    public function __construct(AbstractConnection $connection, $credentials, $algorithm = 'md5')
+    public function setAccessRepository(Access $repository)
     {
-        $this->accessRepository = new Access($connection);
-        $this->credentials = $credentials;
-        $this->algorithm = $algorithm;
+        $this->accessRepository = $repository;
     }
 
+    /**
+     * @param User $repository
+     */
+    public function setUserRepository(User $repository)
+    {
+        $this->userRepository = $repository;
+    }
 
     public function call()
     {
         $req = $this->app->request();
         $res = $this->app->response();
 
-        $error = false;
+        $access_granted = false;
 
-        $user = $req->headers('AUTH_USER');
-        $client = $req->headers('AUTH_CLIENT');
-        $pass = $req->headers('AUTH_PASS');
+        $auth_user = $req->headers('AUTH_USER');
+        $auth_pass = $req->headers('AUTH_PASS');
+        $auth_client = $req->headers('AUTH_CLIENT');
 
-        if (!empty($pass)) {
-            if ($this->algorithm !== 'plaintext') {
-                $pass = hash($this->algorithm, $pass);
-            }
+        // find corrensponding user
+        $user = $this->userRepository->findBy('name', $auth_user);
+        if (empty($user)) {
+            $user = $this->checkConfigUser($auth_user, $auth_pass);
+        }
 
-            if ($user && $client && isset($this->credentials[$user]) && $this->credentials[$user] === $pass) {
-                $token = md5(uniqid($user . $pass . microtime(), true));
+        if (!empty($auth_pass)) {
+            if (!empty($user) && $auth_client && password_verify($auth_pass, $user['password'])) {
+                $token = md5(uniqid($auth_user . $auth_pass . microtime(), true));
                 $expire = date('Y-m-d H:i:s', strtotime($this->app->config('login.expire')));
-                $this->accessRepository->persist(['user' => $user, 'client' => $client, 'token' => $token, 'expire' =>  $expire]);
+                $this->accessRepository->persist(['user_id' => $user['id'], 'client' => $auth_client, 'token' => $token, 'expire' =>  $expire]);
                 $res['NEXT_AUTH_TOKEN'] = $token;
-            } else {
-                $error = true;
+                $access_granted = true;
             }
         } else {
             $token = $req->headers('AUTH_TOKEN');
-            if (!empty($token)) {
-                $access = $this->accessRepository->findByUserClient($user, $client);
+            if (!empty($user) && !empty($token)) {
+                $access = $this->accessRepository->findByUserClient($user['id'], $auth_client);
                 if ($access !== false && $access['token'] === $token && strtotime($access['expire']) >= strtotime('now')) {
-                    // TODO check this later
-//                    $access['expire'] = date('Y-m-d H:i:s', strtotime($this->app->config('login.expire')));
-//                    $this->accessRepository->persist($access);
-                } else {
-                    $error = true;
+                    $access_granted = true;
                 }
-            } else {
-                $error = true;
             }
         }
 
-        if ($error) {
+        if ($access_granted) {
+            $this->app->user = $user;
+            $this->next->call();
+        } else {
             $res->status(401);
             $res->body('{"error": "Access denied."}');
-        } else {
-            $this->next->call();
         }
+    }
+
+    /**
+     * Check user in config and insert them into database
+     *
+     * @param $auth_user
+     * @param $auth_pass
+     * @return array|null
+     */
+    protected function checkConfigUser($auth_user, $auth_pass)
+    {
+        $algorithm = $this->app->config('login.algorithm');
+        $credentials = $this->app->config('login.credentials');
+
+        $password = $auth_pass;
+        if ($algorithm !== 'plaintext') {
+            $password = hash($algorithm, $auth_pass);
+        }
+
+        if ($auth_user && isset($credentials[$auth_user]) && $credentials[$auth_user] === $password) {
+            $user = [
+                'name' => $auth_user,
+                'password' => password_hash($auth_pass, PASSWORD_DEFAULT),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' =>  date('Y-m-d H:i:s')
+            ];
+            $user['id'] = $this->userRepository->persist($user);
+
+            $this->app->db->query('UPDATE tags SET user_id = :user_id WHERE user_id = 0', ['user_id' => $user['id']]);
+            $this->app->db->query('UPDATE items SET user_id = :user_id WHERE user_id = 0', ['user_id' => $user['id']]);
+            $this->app->db->query('UPDATE sources SET user_id = :user_id WHERE user_id = 0', ['user_id' => $user['id']]);
+
+            return $user;
+        }
+
+        return null;
     }
 
 }

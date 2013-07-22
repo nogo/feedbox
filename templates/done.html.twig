@@ -6,7 +6,7 @@
 
 <div class="container">
     <h1 class="page-header">
-        <img src="img/feedbox128.png" alt="FeedBox"/> Install
+        <img src="img/feedbox128.png" alt="FeedBox"/> {{ title }}
     </h1>
 
     {% for message in msg %}
@@ -14,7 +14,7 @@
     {% endfor %}
 
     <div class="alert alert-success">
-        Done. Go to <a href="index.php">index</a>.
+        Done. Go to <a href="{{ base_url }}">index</a>.
     </div>
 </div>
 

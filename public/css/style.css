@@ -44,7 +44,7 @@ a:hover, a:focus,
 
 .page-header {
     border-bottom: none;
-    color: #1a1a1a;
+    color: #ccc;
     font-family: 'SearsTowerRegular';
     padding-bottom: 0;
 }
@@ -253,11 +253,11 @@ html,body {
     #content {
         left: 5px;
     }
-    
+
     #footer {
       bottom: 3px;
     }
-    
+
     #content {
         right: 5px;
     }

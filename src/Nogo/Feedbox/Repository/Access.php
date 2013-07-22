@@ -11,7 +11,7 @@ class Access extends AbstractRepository
     const TABLE = 'access';
 
     protected $filter = array(
-        'user' => FILTER_SANITIZE_STRING,
+        'user_id' => FILTER_VALIDATE_INT,
         'client' => FILTER_SANITIZE_STRING,
         'token' => FILTER_SANITIZE_STRING,
         'expire' => array(
@@ -41,13 +41,13 @@ class Access extends AbstractRepository
     }
 
     /**
-     * Find one entity by name and value.
+     * Find one access key by user_id and client
      *
-     * @param $name
-     * @param $value
-     * @return array | boolean
+     * @param $user_id
+     * @param $client
+     * @return array
      */
-    public function findByUserClient($user, $client)
+    public function findByUserClient($user_id, $client)
     {
         /**
          * @var $select \Aura\Sql\Query\Select
@@ -55,9 +55,9 @@ class Access extends AbstractRepository
         $select = $this->connection->newSelect();
         $select->cols(['*'])
             ->from($this->tableName())
-            ->where('user = :user AND client = :client');
+            ->where('user_id = :user_id AND client = :client');
 
-        $result = $this->connection->fetchOne($select, ['user' => $user, 'client' => $client]);
+        $result = $this->connection->fetchOne($select, ['user_id' => $user_id, 'client' => $client]);
 
         if (!empty($result)) {
             $result = $this->withRelations($result);

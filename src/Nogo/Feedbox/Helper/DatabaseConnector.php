@@ -144,7 +144,7 @@ class DatabaseConnector
                     $fileinfo = pathinfo($path . DIRECTORY_SEPARATOR . $file);
                     if ($fileinfo['extension'] === 'sql'
                         && !in_array($fileinfo['filename'], $ignore)) {
-
+                        echo "Load queries from " . $fileinfo['filename'] . "\n";
                         $sql = file_get_contents($path . DIRECTORY_SEPARATOR . $file);
                         $queries = array_merge($queries, explode(';', $sql));
                     }

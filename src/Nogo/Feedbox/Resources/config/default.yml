@@ -8,11 +8,11 @@ log.enabled: true
 log_dir:     "%data_dir%/log"
 
 # Login
-login.enabled:     false
-login.algorithm:   "plaintext"
-login.expire:      "+2 weeks"
-login.credentials:
-  #admin: "feedbox"
+login.enabled:      false
+login.expire:       "+2 weeks"
+
+registration.enabled: false
+registration.auto_active: true
 
 # Database (PDO)
 database_adapter:  "sqlite"

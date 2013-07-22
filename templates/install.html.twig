@@ -9,7 +9,7 @@
     <form method="post" class="form-horizontal well">
         <fieldset>
             <legend>Database</legend>
-            <div class="control-group">
+            <div class="control-group{% if error.database_adapter %} error{% endif %}">
                 <label class="control-label" for="database_adapter">Adapter</label>
 
                 <div class="controls">
@@ -17,73 +17,86 @@
                         <option value="sqlite">SQLite</option>
                         <option value="mysql">MySQL</option>
                     </select>
+                    {% if error.database_adapter %}<span class="help-block">{{ error.database_adapter }}</span>{% endif %}
                 </div>
             </div>
-            <div class="control-group">
+            <div class="control-group{% if error.database_dsn %} error{% endif %}">
                 <label class="control-label" for="database_dsn">DSN</label>
 
                 <div class="controls">
                     <input type="text" id="database_dsn" name="database_dsn" class="input-block-level" placeholder="mysql:host=localhost;dbname=feedbox"
                            value="%data_dir%/database.sdb" required>
+                    {% if error.database_dsn %}<span class="help-block">{{ error.database_dsn }}</span>{% endif %}
                 </div>
             </div>
-            <div class="control-group">
+            <div class="control-group{% if error.database_username %} error{% endif %}">
                 <label class="control-label" for="database_username">Username</label>
 
                 <div class="controls">
-                    <input type="text" id="database_username" name="database_username" class="input-block-level" value="">
+                    <input type="text" id="database_username" name="database_username" class="input-block-level">
+                    {% if error.database_username %}<span class="help-block">{{ error.database_username }}</span>{% endif %}
                 </div>
             </div>
-            <div class="control-group">
+            <div class="control-group{% if error.database_password %} error{% endif %}">
                 <label class="control-label" for="database_password">Password</label>
 
                 <div class="controls">
-                    <input type="text" id="database_password" name="database_password" class="input-block-level" value="">
+                    <input type="text" id="database_password" name="database_password" class="input-block-level">
+                    {% if error.database_password %}<span class="help-block">{{ error.database_password }}</span>{% endif %}
                 </div>
             </div>
         </fieldset>
         <fieldset>
             <legend>Login</legend>
-            <div class="control-group">
+            <div class="control-group{% if error.login_enabled %} error{% endif %}">
                 <label class="control-label" for="login_enabled">Enabled?</label>
 
                 <div class="controls">
-                    <input type="checkbox" id="login_enabled" name="login_enabled" class="input-block-level" value="true">
+                    <input type="checkbox" id="login_enabled" name="login_enabled" class="input-block-level" {% if input.login_enabled %} checked{% endif %}>
+                    {% if error.login_enabled %}<span class="help-block">{{ error.login_enabled }}</span>{% endif %}
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label" for="login_algorithm">Algorithm</label>
-
-                <div class="controls">
-                    <select id="login_algorithm" name="login_algorithm" class="input-block-level">
-                        <option value="sha256">SHA256</option>
-                        <option value="md5">MD5</option>
-                        <option value="sha1">SHA1</option>
-                    </select>
-                </div>
-            </div>
-            <div class="control-group">
+            <div class="control-group{% if error.login_username %} error{% endif %}">
                 <label class="control-label" for="login_username">Username</label>
 
                 <div class="controls">
-                    <input type="text" id="login_username" name="login_username" class="input-block-level" value="">
+                    <input type="text" id="login_username" name="login_username" class="input-block-level">
+                    {% if error.login_username %}<span class="help-block">{{ error.login_username }}</span>{% endif %}
                 </div>
             </div>
-            <div class="control-group">
+            <div class="control-group{% if error.login_email %} error{% endif %}">
+                <label class="control-label" for="login_email">eMail</label>
+
+                <div class="controls">
+                    <input type="email" id="login_email" name="login_username" class="input-block-level">
+                    {% if error.login_email %}<span class="help-block">{{ error.login_email }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="control-group{% if error.login_password %} error{% endif %}">
                 <label class="control-label" for="login_password">Password</label>
 
                 <div class="controls">
-                    <input type="password" id="login_password" name="login_password" class="input-block-level" value="">
+                    <input type="password" id="login_password" name="login_password" class="input-block-level">
+                    {% if error.login_password %}<span class="help-block">{{ error.login_password }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="control-group{% if error.login_password_retype %} error{% endif %}">
+                <label class="control-label" for="login_password_retype">Retype</label>
+
+                <div class="controls">
+                    <input type="password" id="login_password_retype" name="login_password_retype" class="input-block-level">
+                    {% if error.login_password_retype %}<span class="help-block">{{ error.login_password_retype }}</span>{% endif %}
                 </div>
             </div>
         </fieldset>
         <fieldset>
             <legend>Import</legend>
-            <div class="control-group">
+            <div class="control-group{% if error.opml %} error{% endif %}">
                 <label class="control-label" for="opml">OPML</label>
 
                 <div class="controls">
                     <textarea id="opml" name="opml" class="input-block-level"></textarea>
+                    {% if error.opml %}<span class="help-block">{{ error.opml }}</span>{% endif %}
                 </div>
             </div>
         </fieldset>

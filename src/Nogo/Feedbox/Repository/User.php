@@ -10,7 +10,6 @@ class User  extends AbstractRepository
         'id' => FILTER_VALIDATE_INT,
         'name' => FILTER_SANITIZE_STRING,
         'password' => FILTER_UNSAFE_RAW,
-        'salt' => FILTER_UNSAFE_RAW,
         'created_at'  => array(
             'filter' => FILTER_CALLBACK,
             'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
