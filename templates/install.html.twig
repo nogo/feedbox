@@ -14,8 +14,8 @@
 
                 <div class="controls">
                     <select id="database_adapter" name="database_adapter" class="input-block-level">
-                        <option value="sqlite">SQLite</option>
-                        <option value="mysql">MySQL</option>
+                        <option value="sqlite"{% if input.database_adapter == 'sqlite' %} selected{% endif %}>SQLite</option>
+                        <option value="mysql"{% if input.database_adapter == 'mysql' %} selected{% endif %}>MySQL</option>
                     </select>
                     {% if error.database_adapter %}<span class="help-block">{{ error.database_adapter }}</span>{% endif %}
                 </div>
@@ -25,7 +25,7 @@
 
                 <div class="controls">
                     <input type="text" id="database_dsn" name="database_dsn" class="input-block-level" placeholder="mysql:host=localhost;dbname=feedbox"
-                           value="%data_dir%/database.sdb" required>
+                           value="%data_dir%/database.sdb" required  value="{{ input.database_dsn }}">
                     {% if error.database_dsn %}<span class="help-block">{{ error.database_dsn }}</span>{% endif %}
                 </div>
             </div>
@@ -33,7 +33,7 @@
                 <label class="control-label" for="database_username">Username</label>
 
                 <div class="controls">
-                    <input type="text" id="database_username" name="database_username" class="input-block-level">
+                    <input type="text" id="database_username" name="database_username" class="input-block-level" value="{{ input.database_username }}">
                     {% if error.database_username %}<span class="help-block">{{ error.database_username }}</span>{% endif %}
                 </div>
             </div>
@@ -60,7 +60,7 @@
                 <label class="control-label" for="login_username">Username</label>
 
                 <div class="controls">
-                    <input type="text" id="login_username" name="login_username" class="input-block-level">
+                    <input type="text" id="login_username" name="login_username" class="input-block-level" value="{{ input.login_username }}">
                     {% if error.login_username %}<span class="help-block">{{ error.login_username }}</span>{% endif %}
                 </div>
             </div>
@@ -68,7 +68,7 @@
                 <label class="control-label" for="login_email">eMail</label>
 
                 <div class="controls">
-                    <input type="email" id="login_email" name="login_username" class="input-block-level">
+                    <input type="email" id="login_email" name="login_email" class="input-block-level" value="{{ input.login_email }}">
                     {% if error.login_email %}<span class="help-block">{{ error.login_email }}</span>{% endif %}
                 </div>
             </div>
@@ -95,7 +95,7 @@
                 <label class="control-label" for="opml">OPML</label>
 
                 <div class="controls">
-                    <textarea id="opml" name="opml" class="input-block-level"></textarea>
+                    <textarea id="opml" name="opml" class="input-block-level">{{ input.opml }}</textarea>
                     {% if error.opml %}<span class="help-block">{{ error.opml }}</span>{% endif %}
                 </div>
             </div>

@@ -39,9 +39,9 @@ class Authentication extends \Slim\Middleware
 
         $access_granted = false;
 
-        $auth_user = $req->headers('AUTH_USER');
-        $auth_pass = $req->headers('AUTH_PASS');
-        $auth_client = $req->headers('AUTH_CLIENT');
+        $auth_user = filter_var($req->headers('AUTH_USER'), FILTER_SANITIZE_STRING);
+        $auth_pass = filter_var($req->headers('AUTH_PASS'), FILTER_SANITIZE_STRING);
+        $auth_client = filter_var($req->headers('AUTH_CLIENT'), FILTER_SANITIZE_STRING);;
 
         // find corrensponding user
         $user = $this->userRepository->findBy('name', $auth_user);
@@ -58,7 +58,7 @@ class Authentication extends \Slim\Middleware
                 $access_granted = true;
             }
         } else {
-            $token = $req->headers('AUTH_TOKEN');
+            $token = filter_var($req->headers('AUTH_TOKEN'), FILTER_SANITIZE_STRING);
             if (!empty($user) && !empty($token)) {
                 $access = $this->accessRepository->findByUserClient($user['id'], $auth_client);
                 if ($access !== false && $access['token'] === $token && strtotime($access['expire']) >= strtotime('now')) {
@@ -93,7 +93,7 @@ class Authentication extends \Slim\Middleware
             $password = hash($algorithm, $auth_pass);
         }
 
-        if ($auth_user && isset($credentials[$auth_user]) && $credentials[$auth_user] === $password) {
+        if (!empty($auth_user) && isset($credentials[$auth_user]) && $credentials[$auth_user] === $password) {
             $user = [
                 'name' => $auth_user,
                 'password' => password_hash($auth_pass, PASSWORD_DEFAULT),

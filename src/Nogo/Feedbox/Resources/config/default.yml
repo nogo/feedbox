@@ -10,6 +10,9 @@ log_dir:     "%data_dir%/log"
 # Login
 login.enabled:      false
 login.expire:       "+2 weeks"
+#login,algorithm:   "plaintext"
+#login.credentials:
+#    admin: feedbox
 
 registration.enabled: false
 registration.auto_active: true
