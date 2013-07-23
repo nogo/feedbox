@@ -47,6 +47,7 @@ class Tags extends AbstractRestController
                 $connection = $this->app->db;
             }
             $this->repository = new TagRepository($connection);
+            $this->repository->setUserScope($this->app->user['id']);
         }
         return $this->repository;
     }

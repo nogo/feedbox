@@ -33,6 +33,7 @@ class Sources extends AbstractRestController
                 $connection = $this->app->db;
             }
             $this->repository = new SourceRepository($connection);
+            $this->repository->setUserScope($this->app->user['id']);
         }
         return $this->repository;
     }

@@ -49,6 +49,7 @@ class Items extends AbstractRestController
                 $connection = $this->app->db;
             }
             $this->repository = new ItemRepository($connection);
+            $this->repository->setUserScope($this->app->user['id']);
         }
         return $this->repository;
     }
@@ -106,6 +107,7 @@ class Items extends AbstractRestController
             $item = $this->getRepository()->find($id);
             if ($item !== false) {
                 $item['read'] = $dt;
+                $item['user_id'] = $this->app->user['id'];
                 $item['updated_at'] = $dt;
                 $this->getRepository()->persist($item);
                 $updated_items[] = $item;

@@ -45,6 +45,7 @@ class Settings extends AbstractRestController
                 $connection = $this->app->db;
             }
             $this->repository = new SettingRepository($connection);
+            $this->repository->setUserScope($this->app->user['id']);
         }
         return $this->repository;
     }

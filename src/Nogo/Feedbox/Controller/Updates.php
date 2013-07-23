@@ -41,7 +41,7 @@ class Updates extends AbstractController
     /**
      * @var Sanitizer
      */
-    protected $sanitier;
+    protected $sanitizer;
 
     public function enable()
     {
@@ -56,10 +56,13 @@ class Updates extends AbstractController
         $this->tagApi = new TagApi();
 
         $this->sourceRepository = new SourceRepository($this->app->db);
+        $this->sourceRepository->setUserScope($this->app->user['id']);
         $this->tagRepository = new TagRepository($this->app->db);
+        $this->tagRepository->setUserScope($this->app->user['id']);
         $this->itemRepository = new ItemRepository($this->app->db);
+        $this->itemRepository->setUserScope($this->app->user['id']);
 
-        $this->sanitier = new HtmlPurifierSanitizer();
+        $this->sanitizer = new HtmlPurifierSanitizer();
     }
 
     public function updateAllAction()
@@ -150,7 +153,7 @@ class Updates extends AbstractController
              * @var $worker \Nogo\Feedbox\Feed\Worker
              */
             $worker = new $defaultWorkerClass();
-            $worker->setSanitizer($this->sanitier);
+            $worker->setSanitizer($this->sanitizer);
             $worker->setContent($content);
             try {
                 $items = $worker->execute();
