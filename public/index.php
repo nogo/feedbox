@@ -285,8 +285,6 @@ $app->get(
             $ignore = array_unique($ignore);
         } catch (PDOException $e) {}
 
-        print_r($ignore);
-
         $queries = $connector->migrate(
             $db,
             ROOT_DIR . '/src/Nogo/Feedbox/Resources/sql/' . $app->config('database_adapter'),
