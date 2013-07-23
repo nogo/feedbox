@@ -1,37 +1,15 @@
 <?php
+
 namespace Nogo\Feedbox\Repository;
 
-use Aura\Sql\Connection\AbstractConnection;
-
 /**
- * Class AbstractRepository
+ * Class AbstractUserAwareRepository
  *
  * @package Nogo\Feedbox\Repository
  */
-abstract class AbstractRepository implements Repository
+abstract class AbstractUserAwareRepository extends AbstractRepository implements UserAware
 {
-    /**
-     * @var AbstractConnection
-     */
-    protected $connection;
-
     protected $userScope = false;
-
-    /**
-     * @param AbstractConnection $connection
-     */
-    public function __construct(AbstractConnection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    /**
-     * @return AbstractConnection
-     */
-    public function getConnection()
-    {
-        return $this->connection;
-    }
 
     /**
      * Is user scope activated.
@@ -53,16 +31,6 @@ abstract class AbstractRepository implements Repository
         $this->userScope = $user_id;
     }
 
-    /**
-     * Find entity by id.
-     *
-     * @param $id
-     * @return array | boolean
-     */
-    public function find($id)
-    {
-        return $this->findBy($this->identifier(), $id);
-    }
 
     /**
      * Find one entity by name and value.
@@ -167,19 +135,12 @@ abstract class AbstractRepository implements Repository
         } else {
             $this->connection->insert($this->tableName(), $entity);
 
+            if ($this->userScope) {
+                $entity['user_id'] = $this->userScope;
+            }
+
             return $this->connection->lastInsertId();
         }
-    }
-
-    /**
-     * Delete entity.
-     *
-     * @param $id
-     * @return int deleted rows
-     */
-    public function remove($id)
-    {
-        return $this->connection->delete($this->tableName(), $this->identifier() . ' = :id', ['id' => $id]);
     }
 
     /**

@@ -2,12 +2,13 @@
 
 namespace Nogo\Feedbox\Repository;
 
-class Source extends AbstractRepository
+class Source extends AbstractUserAwareRepository
 {
     const ID = 'id';
     const TABLE = 'sources';
     protected $filter = array(
         'id' => FILTER_VALIDATE_INT,
+        'user_id' => FILTER_VALIDATE_INT,
         'name' => FILTER_SANITIZE_STRING,
         'uri' => FILTER_VALIDATE_URL,
         'icon' => FILTER_UNSAFE_RAW,

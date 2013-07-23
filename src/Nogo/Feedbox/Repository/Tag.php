@@ -5,7 +5,7 @@ namespace Nogo\Feedbox\Repository;
  * Class Tag
  * @package Nogo\Feedbox\Repository
  */
-class Tag extends AbstractRepository
+class Tag extends AbstractUserAwareRepository
 {
     const ID = 'id';
     const TABLE = 'tags';
@@ -15,6 +15,7 @@ class Tag extends AbstractRepository
      */
     protected $filter = array(
         'id' => FILTER_VALIDATE_INT,
+        'user_id' => FILTER_VALIDATE_INT,
         'name' => FILTER_SANITIZE_STRING,
         'color' => FILTER_SANITIZE_STRING,
         'unread' => FILTER_VALIDATE_INT,

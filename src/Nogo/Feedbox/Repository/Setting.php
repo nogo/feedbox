@@ -1,13 +1,14 @@
 <?php
 namespace Nogo\Feedbox\Repository;
 
-class Setting extends AbstractRepository
+class Setting extends AbstractUserAwareRepository
 {
     const ID = 'id';
     const TABLE = 'settings';
 
     protected $filter = array(
         'id' => FILTER_VALIDATE_INT,
+        'user_id' => FILTER_VALIDATE_INT,
         'key' => FILTER_SANITIZE_STRING,
         'value' => FILTER_SANITIZE_STRING,
         'created_at'  => array(

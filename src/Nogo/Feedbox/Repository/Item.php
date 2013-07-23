@@ -5,7 +5,7 @@ namespace Nogo\Feedbox\Repository;
  * Class Item
  * @package Nogo\Feedbox\Repository
  */
-class Item extends AbstractRepository
+class Item extends AbstractUserAwareRepository
 {
     const ID = 'id';
     const TABLE = 'items';
@@ -13,6 +13,7 @@ class Item extends AbstractRepository
     protected $filter = array(
         'id' => FILTER_VALIDATE_INT,
         'source_id' => FILTER_VALIDATE_INT,
+        'user_id' => FILTER_VALIDATE_INT,
         'read' => array(
             'filter' => FILTER_CALLBACK,
             'options' => array('Nogo\Feedbox\Helper\Validator', 'datetime')
@@ -79,7 +80,7 @@ class Item extends AbstractRepository
             }
         }
 
-        $bind = [];
+        $bind = $this->scopeByUserId($select);
         foreach ($filter as $key => $value) {
             if ($value === null) {
                 continue;
@@ -157,7 +158,7 @@ class Item extends AbstractRepository
             ->groupBy(['uid'])
             ->having("(doubleCount > 1)");
 
-        $bind = [];
+        $bind = $this->scopeByUserId($select);
         if ($source_id) {
             $select->where('source_id = :source_id');
             $bind['source_id'] = $source_id;
@@ -185,6 +186,7 @@ class Item extends AbstractRepository
             } else {
                 $delete->where('uid = :uid');
             }
+            $bind = $this->scopeByUserId($delete, $bind);
 
             return $this->connection->query($delete, $bind);
         }
@@ -201,7 +203,7 @@ class Item extends AbstractRepository
             ->from($this->tableName())
             ->where('read IS NULL');
 
-        $bind = [];
+        $bind = $this->scopeByUserId($select);
         if (!empty($sourceIds)) {
             $select->where('source_id IN (:source_id)');
             $bind['source_id'] = $sourceIds;
