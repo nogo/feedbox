@@ -69,15 +69,15 @@ FeedBox.Module.User = new Nerve.Module({
         },
         accessHeader: function(user, password) {
             var header = {
-                'Auth-Client': this.get('client')
+                'X-FeedBox-Client': this.get('client')
             };
 
             if (user && password) {
-                header['Auth-User'] = user;
-                header['Auth-Pass'] = password;
+                header['X-FeedBox-User'] = user;
+                header['X-FeedBox-Pass'] = password;
             } else {
-                header['Auth-User'] = this.get('user');
-                header['Auth-Token'] = this.get('token');
+                header['X-FeedBox-User'] = this.get('user');
+                header['X-FeedBox-Token'] = this.get('token');
             }
 
             return header;
@@ -115,7 +115,7 @@ FeedBox.Module.User = new Nerve.Module({
                 dataType: 'json',
                 headers: this.accessHeader(user, password),
                 success: function(data, textStatus, jqXHR) {
-                    var token = jqXHR.getResponseHeader('Next-Auth-Token');
+                    var token = jqXHR.getResponseHeader('X-FeedBox-Next-Token');
 
                     if (token) {
                         localStorage['user'] = user;
@@ -156,12 +156,16 @@ FeedBox.Module.User = new Nerve.Module({
                     localStorage.removeItem('token');
                     that.set({ user: null, token: null, loggedIn: false }, { silent: true });
                     that.applySetup(true);
-
                     FeedBox.Hook.call('signout-success');
                     that.trigger('change:loggedIn');
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                    that.set({ user: null, token: null, loggedIn: false }, { silent: true });
+                    that.applySetup(true);
                     FeedBox.Hook.call('signout-error');
+                    that.trigger('change:loggedIn');
                 }
             });
 
