@@ -295,6 +295,7 @@ FeedBox.Module.Item.Views.List = FeedBox.Views.List.extend({
                     this.collection.fetchNext({
                         success: function() {
                             that.isLoading = false;
+                            FeedBox.Session.get('footer-view').loading(false);
                         }
                     });
                 }
