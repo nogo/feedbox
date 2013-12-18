@@ -102,13 +102,16 @@
 
     <script type="text/template" id="tpl-sidebar-tag-item">
         <a class="menu-item menu-item-tag-<%- model.id %>" href="#tag/<%- model.id %>">
+
+            <span class="toggable tag-toggle" data-toggle="#tag-sources-<%- model.id %>">
+            <% if (model.get('folded')) { %>
+                <i class="icon-chevron-down"></i>
+            <% } else { %>
+                <i class="icon-chevron-up"></i>
+            <% } %>
+            </span>
             <span class="tag-name"><%- model.get('name') %></span>
             <span class="tag-unread" style="background: <%- model.get('color') %>"><%- model.get('unread') %></span>
-            <% if (model.get('folded')) { %>
-            <button class="btn btn-mini toggable tag-toggle" data-toggle="#tag-sources-<%- model.id %>"><i class="icon-chevron-down"></i></button>
-            <% } else { %>
-            <button class="btn btn-mini toggable tag-toggle" data-toggle="#tag-sources-<%- model.id %>"><i class="icon-chevron-up"></i></button>
-            <% } %>
         </a>
 
     </script>

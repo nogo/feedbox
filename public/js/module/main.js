@@ -85,6 +85,12 @@ FeedBox.Module.Main = new Nerve.Module({
                     e.preventDefault();
                 }
 
+                var sources = FeedBox.Session.get('source-collection'),
+                    tags = FeedBox.Session.get('tag-collection');
+
+                sources.fetch();
+                tags.fetch();
+
                 this.collection.fetchNext({
                     reset: true,
                     success: function(models, textStatus, jqXHR) {
