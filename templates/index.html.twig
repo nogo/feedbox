@@ -156,13 +156,14 @@
                     <% } else { %>
                     <button class="btn btn-mini starred"><i class="icon-star-empty"></i></button>
                     <% } %>
-                    <%- model.get('source').get('name') %>
+                    &nbsp;<%- model.get('source').get('name') %>
                 </div>
-                <div class="entry-title span7"><%= model.get('title') %></div>
+                <div class="entry-title span7">
+                    <a class="btn btn-mini open-entry-link" href="<%= model.get('uri') %>" target="_blank"><i class="icon-external-link"></i></a>&nbsp;
+                    <%= model.get('title') %>
+                </div>
                 <div class="entry-date span2"><%- model.timeHumanize() %></div>
-                <div class="entry-link span1">
-                    <a class="btn btn-mini open-entry-link" href="<%= model.get('uri') %>" target="_blank"><i class="icon-external-link"></i></a>
-                </div>
+                <div class="entry-link span1"></div>
             </div>
         </header>
         <div class="entry-details">
