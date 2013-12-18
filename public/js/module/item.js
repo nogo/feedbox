@@ -289,13 +289,18 @@ FeedBox.Module.Item.Views.List = FeedBox.Views.List.extend({
         if (this.autofetch && !this.isLoading) {
             if(this.el.scrollTop + this.el.clientHeight + triggerPoint > this.el.scrollHeight) {
                 this.isLoading = true;
-                FeedBox.Session.get('footer-view').loading(true);
                 if (!this.collection.endReached()) {
                     var that = this;
+                    var footerView = FeedBox.Session.get('footer-view');
+                    if (footerView) {
+                        footerView.loading(true);
+                    }
                     this.collection.fetchNext({
                         success: function() {
                             that.isLoading = false;
-                            FeedBox.Session.get('footer-view').loading(false);
+                            if (footerView) {
+                                footerView.loading(false);
+                            }
                         }
                     });
                 }
