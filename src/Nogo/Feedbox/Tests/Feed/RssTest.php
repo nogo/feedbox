@@ -30,7 +30,7 @@ class RssTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($result);
         $this->assertNotEmpty($result[2]);
         $this->assertNotEmpty($result[2]['content']);
-        print_r($result[2]);
+
         $this->assertFalse(strstr($result[2]['title'], '<'));
         $this->assertTrue(strpos($result[2]['content'], '<iframe src="') !== false);
     }

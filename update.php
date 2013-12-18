@@ -155,7 +155,7 @@ foreach ($sources as $source) {
 
     if ($config['debug']) {
         if ($error) {
-            echo sprintf("%s\n", $worker->getErrors());
+            echo sprintf("%s\n", $source['errors']);
         } else {
             echo sprintf("%d new items.\n", abs($source['unread'] - $count));
         }
