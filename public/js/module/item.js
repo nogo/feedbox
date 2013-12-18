@@ -245,11 +245,14 @@ FeedBox.Module.Item.Views.List = FeedBox.Views.List.extend({
         if (this.collection) {
             this.collection.on('sync', this.retrieveItemCount, this);
         }
+
+        this.settings = FeedBox.Session.get('setting-collection');
     },
     render: function () {
         // Call parent contructor
         FeedBox.Views.List.prototype.render.call(this);
 
+        this.autofetch = this.settings.getByKey('view.autofetch', 'on') === 'on';
         this.isLoading = false;
 
         return this;
@@ -283,9 +286,10 @@ FeedBox.Module.Item.Views.List = FeedBox.Views.List.extend({
     },
     addMore: function (e) {
         var triggerPoint = 100; // 100px from the bottom
-        if (!this.isLoading) {
+        if (this.autofetch && !this.isLoading) {
             if(this.el.scrollTop + this.el.clientHeight + triggerPoint > this.el.scrollHeight) {
                 this.isLoading = true;
+                FeedBox.Session.get('footer-view').loading(true);
                 if (!this.collection.endReached()) {
                     var that = this;
                     this.collection.fetchNext({

@@ -222,6 +222,13 @@ FeedBox.Module.Main = new Nerve.Module({
                     }
                 }
             },
+            loading: function (show) {
+                if (show) {
+                    this.$('#footer-loading').show();
+                } else {
+                    this.$('#footer-loading').hide();
+                }
+            },
             hide: function(e) {
                 this.$el.html('');
             }

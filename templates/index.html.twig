@@ -122,7 +122,7 @@
 
     <script type="text/template" id="tpl-footer">
         <div class="text-right">
-            <span class="badge"><i class="icon-rss"></i> <%- length %> / <%- total %></span>
+          <i id="footer-loading" class="icon loading" style="display: none"></i>  <span class="badge"><i class="icon-rss"></i> <%- length %> / <%- total %></span>
         </div>
     </script>
 
@@ -300,8 +300,12 @@
         <div class="tab-content">
             <div class="tab-pane well active" id="tab-setting-view">
                 <div class="controls controls-row">
+                    <label class="span2" for="view-unread-sortby">Load on scrolling</label>
+                    <input type="checkbox" class="span2 update" id="view-autofetch" name="view.autofetch">
+                </div>
+                <div class="controls controls-row">
                     <label class="span2" for="view-unread-sortby">Unread</label>
-                    <input class="span2 update" id="view-unread-count" name="view.unread.count" value="50">
+                    <input type="text" class="span2 update" id="view-unread-count" name="view.unread.count" value="50">
                     <select class="span2 update" id="view-unread-sortby" name="view.unread.sortby">
                         <option value="newest">Newest</option>
                         <option value="oldest">Oldest</option>
@@ -309,7 +313,7 @@
                 </div>
                 <div class="controls controls-row">
                     <label class="span2" for="view-read-sortby">Read</label>
-                    <input class="span2 update" id="view-read-count" name="view.read.count" value="50">
+                    <input type="text" class="span2 update" id="view-read-count" name="view.read.count" value="50">
                     <select class="span2 update" id="view-read-sortby" name="view.read.sortby">
                         <option value="newest">Newest</option>
                         <option value="oldest">Oldest</option>
@@ -317,7 +321,7 @@
                 </div>
                 <div class="controls controls-row">
                     <label class="span2" for="view-starred-sortby">Starred</label>
-                    <input class="span2 update" id="view-starred-count" name="view.starred.count" value="50">
+                    <input type="text" class="span2 update" id="view-starred-count" name="view.starred.count" value="50">
                     <select class="span2 update" id="view-starred-sortby" name="view.starred.sortby">
                         <option value="newest">Newest</option>
                         <option value="oldest">Oldest</option>
@@ -325,9 +329,9 @@
                 </div>
                 <div class="controls controls-row">
                     <label class="span2" for="format-date">Format (<a href="http://momentjs.com/docs/#/displaying/format/" target="_blank">Help</a>)</label>
-                    <input class="span2 update" id="format-datetime" name="format.datetime" placeholder="YYYY-MM-DD HH:mm" value="YYYY-MM-DD HH:mm" title="Datetime">
-                    <input class="span2 update" id="format-date" name="format.date" placeholder="YYYY-MM-DD" value="YYYY-MM-DD" title="Date">
-                    <input class="span2 update" id="format-time" name="format.time" placeholder="HH:mm" value="HH:mm" title="Time">
+                    <input type="text" class="span2 update" id="format-datetime" name="format.datetime" placeholder="YYYY-MM-DD HH:mm" value="YYYY-MM-DD HH:mm" title="Datetime">
+                    <input type="text" class="span2 update" id="format-date" name="format.date" placeholder="YYYY-MM-DD" value="YYYY-MM-DD" title="Date">
+                    <input type="text" class="span2 update" id="format-time" name="format.time" placeholder="HH:mm" value="HH:mm" title="Time">
                 </div>
             </div>
             <div class="tab-pane well" id="tab-setting-tags">

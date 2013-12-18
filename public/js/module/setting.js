@@ -81,6 +81,29 @@ FeedBox.Module.Setting = new Nerve.Module({
                     name = component.name,
                     value = component.value;
 
+                switch(component.type) {
+                    case 'checkbox':
+                        if (component.checked) {
+                            if (value === undefined || _.isEmpty(value)) {
+                                value = true;
+                            }
+                        } else {
+                            value = false;
+                        }
+                        break;
+                    case 'radio':
+                        if (component.checked) {
+                            if (value === undefined || _.isEmpty(value)) {
+                                value = true;
+                            }
+                        } else {
+                            value = false;
+                        }
+                        break;
+                    case 'button': // button values are not intresting
+                        return;
+                }
+
                 if (!this.isBinding && this.settings) {
                     var options = {
                         wait: true,
