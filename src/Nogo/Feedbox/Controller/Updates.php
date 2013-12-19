@@ -56,17 +56,22 @@ class Updates extends AbstractController
         $this->tagApi = new TagApi();
 
         $this->sourceRepository = new SourceRepository($this->app->db);
-        $this->sourceRepository->setUserScope($this->app->user['id']);
         $this->tagRepository = new TagRepository($this->app->db);
-        $this->tagRepository->setUserScope($this->app->user['id']);
         $this->itemRepository = new ItemRepository($this->app->db);
-        $this->itemRepository->setUserScope($this->app->user['id']);
 
         $this->sanitizer = new HtmlPurifierSanitizer();
     }
 
+    protected function before()
+    {
+        $this->sourceRepository->setUserScope($this->app->user['id']);
+        $this->tagRepository->setUserScope($this->app->user['id']);
+        $this->itemRepository->setUserScope($this->app->user['id']);
+    }
+
     public function updateAllAction()
     {
+        $this->before();
         $sources = $this->sourceRepository->findAllActiveWithUri();
 
         $result = array();
@@ -82,6 +87,7 @@ class Updates extends AbstractController
 
     public function updateAction($name, $id)
     {
+        $this->before();
         $id = filter_var($id, FILTER_VALIDATE_INT);
 
         $source = [];

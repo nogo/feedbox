@@ -9,7 +9,7 @@ namespace Nogo\Feedbox\Repository;
  */
 abstract class AbstractUserAwareRepository extends AbstractRepository implements UserAware
 {
-    protected $userScope = false;
+    protected $userScope = null;
 
     /**
      * Is user scope activated.
@@ -18,7 +18,7 @@ abstract class AbstractUserAwareRepository extends AbstractRepository implements
      */
     public function hasUserScope()
     {
-        return $this->userScope;
+        return empty($this->userScope);
     }
 
     /**
@@ -127,6 +127,10 @@ abstract class AbstractUserAwareRepository extends AbstractRepository implements
         $entity = $this->validate($entity);
         $id_key = $this->identifier();
 
+        if (!empty($this->userScope)) {
+            $entity['user_id'] = $this->userScope;
+        }
+
         if (isset($entity[$id_key])) {
             $id = $entity[$id_key];
             unset($entity[$id_key]);
@@ -134,11 +138,6 @@ abstract class AbstractUserAwareRepository extends AbstractRepository implements
             return $this->connection->update($this->tableName(), $entity, $id_key . ' = :id', ['id' => $id]);
         } else {
             $this->connection->insert($this->tableName(), $entity);
-
-            if ($this->userScope) {
-                $entity['user_id'] = $this->userScope;
-            }
-
             return $this->connection->lastInsertId();
         }
     }
@@ -152,7 +151,7 @@ abstract class AbstractUserAwareRepository extends AbstractRepository implements
      */
     public function scopeByUserId(\Aura\Sql\Query\Select $select, array $bind = [])
     {
-        if ($this->userScope) {
+        if (!empty($this->userScope)) {
             $select->where('user_id = :user_id');
             $bind['user_id'] = $this->userScope;
         }
