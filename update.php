@@ -46,10 +46,13 @@ $fetcher->setClient(new Client());
 $fetcher->setTimeout($config['fetcher.timeout']);
 
 $now = new \DateTime();
+$user_id = null;
 foreach ($sources as $source) {
     $error = false;
 
     if (!empty($source['uri'])) {
+        $user_id = $source['user_id'];
+
         // periodic update
         if ($source['last_update'] != null) {
             $last_update = new \DateTime($source['last_update']);
@@ -124,6 +127,7 @@ foreach ($sources as $source) {
                     }
 
                     $item['source_id'] = $source['id'];
+                    $itemRepository->setUserScope($user_id);
                     $itemRepository->persist($item);
                 }
 
@@ -142,6 +146,7 @@ foreach ($sources as $source) {
     // update source unread counter
     $count = $source['unread'];
     $source['unread'] = $itemRepository->countSourceUnread([$source['id']]);
+    $sourceRepository->setUserScope($user_id);
     $sourceRepository->persist($source);
 
     // update tag unread counter
@@ -149,6 +154,7 @@ foreach ($sources as $source) {
         $tag = $tagRepository->find($source['tag_id']);
         if ($tag) {
             $tag['unread'] = $sourceRepository->countTagUnread([$tag['id']]);
+            $tagRepository->setUserScope($user_id);
             $tagRepository->persist($tag);
         }
     }
