@@ -65,7 +65,9 @@ FeedBox.Module.Main = new Nerve.Module({
                     e.preventDefault();
                 }
 
-                var that = this;
+                var that = this,
+                    footerView = FeedBox.Session.get('footer-view');
+                footerView.loading(true);
 
                 // save models read state
                 this.collection.markItemRead({
@@ -75,6 +77,7 @@ FeedBox.Module.Main = new Nerve.Module({
                             success: function(models, textStatus, jqXHR) {
                                 var view = FeedBox.Session.get('content-view');
                                 view.el.scrollTop = 0;
+                                footerView.loading(false);
                             }
                         });
                     }
@@ -86,8 +89,10 @@ FeedBox.Module.Main = new Nerve.Module({
                 }
 
                 var sources = FeedBox.Session.get('source-collection'),
-                    tags = FeedBox.Session.get('tag-collection');
+                    tags = FeedBox.Session.get('tag-collection'),
+                    footerView = FeedBox.Session.get('footer-view');
 
+                footerView.loading(true);
                 sources.fetch();
                 tags.fetch();
 
@@ -96,6 +101,7 @@ FeedBox.Module.Main = new Nerve.Module({
                     success: function(models, textStatus, jqXHR) {
                         var view = FeedBox.Session.get('content-view');
                         view.el.scrollTop = 0;
+                        footerView.loading(false);
                     }
                 });
             },
