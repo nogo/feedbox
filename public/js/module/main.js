@@ -54,7 +54,6 @@ FeedBox.Module.Main = new Nerve.Module({
                 'submit #search': 'search',
                 'click .toggable': 'toggable',
                 'click .mark-as-read': 'markAsRead',
-                'click .reload': 'reload',
                 'click .logout': 'logout'
             },
             render: function() {
@@ -197,6 +196,9 @@ FeedBox.Module.Main = new Nerve.Module({
             options: {
                 template: '#tpl-footer'
             },
+            events: {
+                'click #load-more': 'loadMore'
+            },
             initialize: function() {
                 if (this.collection) {
                     this.collection.on('sync', this.updateItemTotal, this);
@@ -241,8 +243,31 @@ FeedBox.Module.Main = new Nerve.Module({
                     this.$('#footer-loading').hide();
                 }
             },
+            show: function(e) {
+                this.$el.show();
+            },
             hide: function(e) {
-                this.$el.html('');
+                this.$el.hide();
+            },
+            loadMore: function(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                if (!this.collection.endReached()) {
+                    var footerView = FeedBox.Session.get('footer-view');
+                    if (footerView) {
+                        footerView.loading(true);
+                    }
+                    this.collection.fetchNext({
+                        success: function() {
+                            if (footerView) {
+                                footerView.loading(false);
+                            }
+                        }
+                    });
+                }
             }
         })
     },

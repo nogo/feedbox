@@ -36,8 +36,7 @@
         <header id="header">
             <div class="btn-group pull-right">
                 <a class="btn" href="#sources/add" title="Add"><i class="icon-plus"></i></a>
-                <button class="btn mark-as-read" title="Mark all as read"><i class="icon-circle-blank"></i></button>
-                <button class="btn reload" title="Reload"><i class="icon-refresh"></i></button>
+                <button class="btn mark-as-read" title="Mark all as read"><i class="icon-ok-circle"></i></button>
                 <button class="btn logout" title="Logout"><i class="icon-off"></i></button>
             </div>
             <form id="search" class="hidden-phone pull-right">
@@ -111,7 +110,7 @@
             <% } %>
             </span>
             <span class="tag-name"><%- model.get('name') %></span>
-            <span class="tag-unread" style="background: <%- model.get('color') %>"><%- model.get('unread') %></span>
+            <span class="tag-unread hidden-tablet" style="background: <%- model.get('color') %>"><%- model.get('unread') %></span>
         </a>
 
     </script>
@@ -119,13 +118,14 @@
     <script type="text/template" id="tpl-sidebar-source-item">
         <a class="menu-item menu-item-source-<%- model.id %>" href="#sources/<%- model.id %>">
             <span class="source-name"><%- model.get('name') %></span>
-            <span class="source-unread"><%- model.get('unread') %></span>
+            <span class="source-unread hidden-tablet" style="background: <%- model.get('color') %>"><%- model.get('unread') %></span>
         </a>
     </script>
 
     <script type="text/template" id="tpl-footer">
         <div class="text-right">
           <i id="footer-loading" class="icon loading" style="display: none"></i>  <span class="badge"><i class="icon-rss"></i> <%- length %> / <%- total %></span>
+            <a id="load-more" class="badge" title="load next items"><i class="icon-play"></i></a>
         </div>
     </script>
 
@@ -150,20 +150,22 @@
                 <div class="entry-title"><%= model.get('title') %></div>
             </div>
             <div class="hidden-phone row-fluid">
-                <div class="entry-source span2" title="<%- model.get('source').get('name') %>">
+                <div class="entry-source span2" title="<%- model.get('source').get('name') %>"><%- model.get('source').get('name') %></div>
+                <div class="entry-title span7">
+                    <%= model.get('title') %>
+                </div>
+                <div class="entry-date span2"><%- model.timeHumanize() %></div>
+                <div class="entry-link span1">
+
+                    <div class="btn-group">
                     <% if (model.get('starred') == 1) { %>
                     <button class="btn btn-mini starred active"><i class="icon-star"></i></button>
                     <% } else { %>
                     <button class="btn btn-mini starred"><i class="icon-star-empty"></i></button>
                     <% } %>
-                    &nbsp;<%- model.get('source').get('name') %>
+                    <a class="btn btn-mini open-entry-link" href="<%= model.get('uri') %>" target="_blank"><i class="icon-external-link"></i></a>
+                    </div>
                 </div>
-                <div class="entry-title span7">
-                    <a class="btn btn-mini open-entry-link" href="<%= model.get('uri') %>" target="_blank"><i class="icon-external-link"></i></a>&nbsp;
-                    <%= model.get('title') %>
-                </div>
-                <div class="entry-date span2"><%- model.timeHumanize() %></div>
-                <div class="entry-link span1"></div>
             </div>
         </header>
         <div class="entry-details">
@@ -175,15 +177,12 @@
 
             <div class="entry-content"><%= model.get('content') %></div>
         </div>
-        <footer class="entry-controls">
-            <div class="pull-right">
-                <button class="btn foldable"><i class="icon-chevron-up"></i></button>
-            </div>
+        <footer class="entry-controls" style="text-align: right;">
             <div class="btn-group">
                 <% if (model.get('read')) { %>
-                <button class="btn read active" title="mark as unread"><i class="icon-circle-blank"></i></button>
+                <button class="btn read active" title="mark as unread"><i class="icon-ok-circle"></i></button>
                 <% } else { %>
-                <button class="btn read" title="mark as read"><i class="icon-circle"></i></button>
+                <button class="btn read" title="mark as read"><i class="icon-circle-blank"></i></button>
                 <% } %>
                 <% if (model.get('starred') == 1) { %>
                 <button class="btn starred active"><i class="icon-star"></i></button>
@@ -191,6 +190,7 @@
                 <button class="btn starred"><i class="icon-star-empty"></i></button>
                 <% } %>
                 <a class="btn open-entry-link" href="<%= model.get('uri') %>" target="_blank"><i class="icon-external-link"></i></a>
+                <button class="btn foldable"><i class="icon-chevron-up"></i></button>
             </div>
         </footer>
     </script>

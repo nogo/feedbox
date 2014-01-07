@@ -30,6 +30,7 @@ FeedBox.Router.route('unread', function() {
         });
         FeedBox.Session.set('selected-menu-items', ['.menu-item-unread']);
         FeedBox.selectMenuItem();
+        FeedBox.Session.get('footer-view').show();
     }
 });
 
@@ -57,6 +58,7 @@ FeedBox.Router.route('read', function() {
         });
         FeedBox.Session.set('selected-menu-items', ['.menu-item-read']);
         FeedBox.selectMenuItem();
+        FeedBox.Session.get('footer-view').show();
     }
 });
 
@@ -85,6 +87,7 @@ FeedBox.Router.route('starred', function() {
 
         FeedBox.Session.set('selected-menu-items', ['.menu-item-starred']);
         FeedBox.selectMenuItem();
+        FeedBox.Session.get('footer-view').show();
     }
 });
 
@@ -117,6 +120,7 @@ FeedBox.Router.route('search(/:name)', function(name) {
             });
             FeedBox.Session.set('selected-menu-items', []);
             FeedBox.selectMenuItem();
+            FeedBox.Session.get('footer-view').show();
         }
     }
 });
