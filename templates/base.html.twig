@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Selfhosted rss reader">
     <meta name="author" content="Danilo Kühn">
+    <meta name="apple-mobile-web-app-title" content="Feedbox">
     <link href="{{ base_url }}/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ base_url }}/css/font-awesome.min.css" rel="stylesheet">
     <link href="{{ base_url }}/css/style.css" rel="stylesheet">
@@ -15,6 +16,7 @@
     {{ stylesheets|raw }}
     {% endblock %}
     <link rel="shortcut icon" href="{{ base_url }}/img/feedbox.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon-precomposed.png" />
 </head>
 <body>
 {% block content %}
