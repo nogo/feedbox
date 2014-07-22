@@ -75,22 +75,22 @@
       <div class="footer">
         <p>&copy; <a href="http://nogo-software.de">Danilo Kühn</a> &dash; 2013</p>
       </div>
-      
-      <!-- Piwik -->
-      <script type="text/javascript">
-        var _paq = _paq || [];
-        _paq.push(["trackPageView"]);
-        _paq.push(["enableLinkTracking"]);
-
-        (function() {
-          var u=(("https:" == document.location.protocol) ? "https" : "http") + "://stats.nogo-software.de/";
-          _paq.push(["setTrackerUrl", u+"piwik.php"]);
-          _paq.push(["setSiteId", "9"]);
-          var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-          g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-        })();
-      </script>
-      <!-- End Piwik Code -->
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(["setCookieDomain", "*.feedbox.de"]);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://stats.nogo-software.de/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 4]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+    g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="http://stats.nogo-software.de/piwik.php?idsite=4" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
     </div>
   </body>
 </html>
